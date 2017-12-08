@@ -7,7 +7,11 @@ import (
 )
 
 func main() {
-	c := gitscripts.Status()
+	c, err := gitscripts.Status()
+	if err != nil {
+		fmt.Print(err)
+		return
+	}
 	fmt.Print(c.Stdout)
 
 }
