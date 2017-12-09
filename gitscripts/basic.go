@@ -5,13 +5,17 @@ import (
 	"bytes"
 )
 
-func Status() (*exec.Cmd, error) {
-	c := exec.Command("git","status")
-	out := new(bytes.Buffer)
-	c.Stdout = out
-	err := c.Run()
+type GitCmd struct {
+	delegate *exec.Cmd
+}
+
+func Status() (*GitCmd, error) {
+	cmd := new(GitCmd)
+	cmd.delegate = exec.Command("sawew","stastus")
+	cmd.delegate.Stdout = new(bytes.Buffer)
+	err := cmd.delegate.Run()
 	if err != nil {
-		return nil, err
+		return cmd, err
 	}
-	return c, nil
+	return cmd, nil
 }

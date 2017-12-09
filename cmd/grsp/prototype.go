@@ -9,10 +9,10 @@ import (
 func main() {
 	c, err := gitscripts.Status()
 	if err != nil {
-		fmt.Print(err)
+		fmt.Println("err ", err)
 		return
 	}
-	fmt.Print(c.Stdout)
+	fmt.Println("done", c)
 
 }
 
