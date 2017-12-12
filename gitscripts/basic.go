@@ -21,7 +21,7 @@ func Status(repo Repo) (*GitCmd, error) {
 	if err != nil {
 		return cmd, err
 	}
-	cmd.delegate = exec.Command("sawew","stastus")
+	cmd.delegate = exec.Command("git","status")
 	cmd.delegate.Stdout = new(bytes.Buffer)
 	err = cmd.delegate.Run()
 	if err != nil {
