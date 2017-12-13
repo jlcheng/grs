@@ -20,7 +20,10 @@ func main() {
 	}
 
 	repo := defaultRepo(args)
-	c, err := grs.Status(repo)
+
+	var cmd grs.Cmd = grs.Status
+
+	c, err := cmd(repo)
 	if err != nil {
 		fmt.Println("err ", err)
 		return

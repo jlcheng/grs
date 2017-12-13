@@ -10,13 +10,15 @@ type Repo struct {
 	Path string
 }
 
-type GitCmd struct {
+type Result struct {
 	delegate *exec.Cmd
 	Stdout string
 }
 
-func Status(repo Repo) (*GitCmd, error) {
-	cmd := new(GitCmd)
+
+
+func Status(repo Repo) (*Result, error) {
+	cmd := new(Result)
 	err := os.Chdir(repo.Path)
 	if err != nil {
 		return cmd, err
@@ -30,8 +32,8 @@ func Status(repo Repo) (*GitCmd, error) {
 	return cmd, nil
 }
 
-func Pwd(repo Repo) (*GitCmd, error) {
-	cmd := new(GitCmd)
+func Pwd(repo Repo) (*Result, error) {
+	cmd := new(Result)
 	err := os.Chdir(repo.Path)
 	if err != nil {
 		return cmd, err
@@ -45,6 +47,11 @@ func Pwd(repo Repo) (*GitCmd, error) {
 	return cmd, nil
 }
 
-func (cmd *GitCmd) String() string {
+// Cmd takes a Repo to act on and returns the result of the command
+type Cmd func(Repo) (*Result, error )
+
+
+
+func (cmd *Result) String() string {
 	return cmd.delegate.Stdout.(*bytes.Buffer).String()
 }
