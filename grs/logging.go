@@ -1,4 +1,4 @@
-package gitscripts
+package grs
 
 import "fmt"
 
