@@ -15,14 +15,11 @@ type Args struct {
 func main() {
 	flag.Parse()
 	args := Args{repo: flag.Arg(0), verbose: true}
-	if len(args.repo) == 0 {
-		args.repo = os.ExpandEnv("$HOME/github/test")
-	}
 	if args.verbose {
-		fmt.Printf("using repo: %v\n", args.repo)
+		gitscripts.SetLogLevel(gitscripts.DEBUG)
 	}
 
-	repo := gitscripts.Repo{args.repo}
+	repo := defaultRepo(args)
 	c, err := gitscripts.Status(repo)
 	if err != nil {
 		fmt.Println("err ", err)
@@ -32,4 +29,19 @@ func main() {
 	fmt.Println(c.String())
 }
 
+// defaultRepo returns a Repo based on CLI args, Env variable, then defaults to "$HOME/grstest"
+func defaultRepo(args Args) gitscripts.Repo {
+	if len(args.repo) != 0 {
+		gitscripts.Debug("Using repo from CLI: %v", args.repo)
+		return gitscripts.Repo{args.repo}
+	}
 
+	val, ok := os.LookupEnv("GRS_DEFAULT")
+	if ok {
+		gitscripts.Debug("Using repo from $GRS_DEFAULT: %v", val)
+		return gitscripts.Repo{val}
+	}
+
+	gitscripts.Debug("Using default repo %v", os.ExpandEnv("$HOME/grstest"))
+	return gitscripts.Repo{os.ExpandEnv("$HOME/grstest")}
+}
