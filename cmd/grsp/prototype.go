@@ -10,11 +10,16 @@ import (
 type Args struct {
 	repo string
 	verbose bool
+	command string
 }
 
 func main() {
+	args := Args{}
+	flag.StringVar(&args.repo, "repo", "", "target repo")
+	flag.StringVar(&args.command, "command", "", "command to run")
+	flag.BoolVar(&args.verbose, "verbose", true, "verbosity")
 	flag.Parse()
-	args := Args{repo: flag.Arg(0), verbose: true}
+
 	if args.verbose {
 		grs.SetLogLevel(grs.DEBUG)
 	}
@@ -39,12 +44,36 @@ func defaultRepo(args Args) grs.Repo {
 		return grs.Repo{args.repo}
 	}
 
-	val, ok := os.LookupEnv("GRS_DEFAULT")
+	val, ok := os.LookupEnv("GRS_REPO")
 	if ok {
-		grs.Debug("Using repo from $GRS_DEFAULT: %v", val)
+		grs.Debug("Using repo from $GRS_REPO: %v", val)
 		return grs.Repo{val}
 	}
 
-	grs.Debug("Using default repo %v", os.ExpandEnv("$HOME/grstest"))
+	grs.Debug("Using default repo %v", os.ExpandEnv("$HOME" + string(os.PathSeparator) + "grstest"))
 	return grs.Repo{os.ExpandEnv("$HOME/grstest")}
+}
+
+func defaultCommand(args Args) grs.Cmd {
+	var val string
+	if len(args.command) != 0 {
+		val = args.command
+	}
+
+	val, ok := os.LookupEnv("GRS_ACTION")
+	if ok {
+		grs.Debug("Using repo from $GRS_ACTION: %v", val)
+	}
+
+	if len(val) == 0 {
+		grs.Debug("Using default action: status")
+		val = "status"
+	}
+
+	switch val {
+	case "pwd":
+		return grs.Pwd
+	default:
+		return grs.Status
+	}
 }
