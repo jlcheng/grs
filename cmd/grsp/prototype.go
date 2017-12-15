@@ -62,7 +62,8 @@ func defaultCommand(args Args) grs.Cmd {
 	}
 
 	if len(val) == 0 {
-		val, ok := os.LookupEnv("GRS_ACTION")
+		var ok bool
+		val, ok = os.LookupEnv("GRS_ACTION")
 		if ok {
 			grs.Debug("Using repo from $GRS_ACTION: %v", val)
 		}
@@ -76,6 +77,8 @@ func defaultCommand(args Args) grs.Cmd {
 	switch val {
 	case "pwd":
 		return grs.Pwd
+	case "rebase":
+		return grs.Rebase
 	default:
 		return grs.Status
 	}
