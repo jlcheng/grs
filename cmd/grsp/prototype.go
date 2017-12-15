@@ -26,7 +26,7 @@ func main() {
 
 	repo := defaultRepo(args)
 
-	var cmd grs.Cmd = grs.Status
+	cmd := defaultCommand(args)
 
 	c, err := cmd(repo)
 	if err != nil {
@@ -58,11 +58,14 @@ func defaultCommand(args Args) grs.Cmd {
 	var val string
 	if len(args.command) != 0 {
 		val = args.command
+		grs.Debug("Using action from CLI: %v", args.command)
 	}
 
-	val, ok := os.LookupEnv("GRS_ACTION")
-	if ok {
-		grs.Debug("Using repo from $GRS_ACTION: %v", val)
+	if len(val) == 0 {
+		val, ok := os.LookupEnv("GRS_ACTION")
+		if ok {
+			grs.Debug("Using repo from $GRS_ACTION: %v", val)
+		}
 	}
 
 	if len(val) == 0 {

@@ -38,7 +38,7 @@ func Pwd(repo Repo) (*Result, error) {
 	if err != nil {
 		return cmd, err
 	}
-	cmd.delegate = exec.Command("ls","-alth")
+	cmd.delegate = exec.Command("pwd")
 	cmd.delegate.Stdout = new(bytes.Buffer)
 	err = cmd.delegate.Run()
 	if err != nil {

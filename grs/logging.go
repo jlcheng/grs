@@ -11,14 +11,14 @@ const (
 
 func Debug(format string, a ...interface{}) {
 	if (level <= DEBUG) {
-		fmt.Printf(format, a)
+		fmt.Printf(format, a...)
 		fmt.Println()
 	}
 }
 
 func Info(format string, a ...interface{}) {
 	if (level <= INFO) {
-		fmt.Printf(format, a)
+		fmt.Printf(format, a...)
 		fmt.Println()
 	}
 }
