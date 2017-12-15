@@ -4,6 +4,8 @@ import (
 	"os/exec"
 	"bytes"
 	"os"
+	"time"
+	"errors"
 )
 
 type Repo struct {
@@ -23,6 +25,7 @@ func Status(repo Repo) (*Result, error) {
 	if err != nil {
 		return cmd, err
 	}
+
 	cmd.delegate = exec.Command("git","status")
 	cmd.delegate.Stdout = new(bytes.Buffer)
 	err = cmd.delegate.Run()
@@ -38,6 +41,7 @@ func Pwd(repo Repo) (*Result, error) {
 	if err != nil {
 		return cmd, err
 	}
+
 	cmd.delegate = exec.Command("pwd")
 	cmd.delegate.Stdout = new(bytes.Buffer)
 	err = cmd.delegate.Run()
@@ -53,6 +57,13 @@ func Rebase(repo Repo) (*Result, error) {
 	if err != nil {
 		return cmd, err
 	}
+
+	if repo.modifiedRecently() {
+		Debug("%v was modified recently. Will not rebase.", repo.Path)
+		return cmd, errors.New("repo recently modified")
+	}
+
+
 	buf := new(bytes.Buffer)
 	cmd.delegate = exec.Command("git","fetch")
 	cmd.delegate.Stdout = buf
@@ -75,6 +86,21 @@ func Rebase(repo Repo) (*Result, error) {
 		return cmd, nil
 	}
 	return cmd, nil
+}
+
+func (repo *Repo) modifiedRecently() bool {
+	info, err := os.Stat(repo.Path)
+	if err != nil {
+		Debug("%v stat failed, modification time unknown", repo.Path)
+		return true
+	}
+	tdiff := time.Now().Sub(info.ModTime())
+	Debug("%v last accessed %v ago", repo.Path, tdiff)
+	if tdiff > time.Hour {
+		return false
+	} else {
+		return true
+	}
 }
 
 // Cmd takes a Repo to act on and returns the result of the command
