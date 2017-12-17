@@ -88,6 +88,15 @@ func Rebase(repo Repo) (*Result, error) {
 	return cmd, nil
 }
 
+func RepoPath(repo Repo) (*Result, error) {
+	cmd := exec.Command("")
+	buf := new(bytes.Buffer)
+	cmd.Stdout = buf
+	buf.WriteString(repo.Path)
+	result := Result{delegate:cmd}
+	return &result, nil
+}
+
 func (repo *Repo) modifiedRecently() bool {
 	info, err := os.Stat(repo.Path)
 	if err != nil {
