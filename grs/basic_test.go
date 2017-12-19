@@ -5,6 +5,7 @@ import (
 	"os"
 	"fmt"
 	"os/exec"
+	"strings"
 )
 
 func TestRepoPath(t *testing.T) {
@@ -19,8 +20,18 @@ func TestHelperProcess(*testing.T) {
 	if os.Getenv("GO_WANT_HELPER_PROCESS") != "1" {
 		return
 	}
-	defer os.Exit(0)
 
+	args := os.Args[3:]
+	switch args[0] {
+	case "echo":
+		fmt.Println(strings.Join(args[1:], " "))
+		os.Exit(0)
+	case "false":
+		os.Exit(1)
+	default:
+		os.Exit(1)
+	}
+	fmt.Println(os.Args[3:])
 	fmt.Println("hello world")
 }
 
@@ -32,7 +43,7 @@ func helperCommand(s ...string) (cmd *exec.Cmd) {
 	return cmd
 }
 
-func TestHelloWorld(t *testing.T) {
+func TestEcho(t *testing.T) {
 	cmd := helperCommand("echo", "hello world")
 	out, err := cmd.Output()
 	if err != nil {
@@ -40,5 +51,15 @@ func TestHelloWorld(t *testing.T) {
 	}
 	if g, e := string(out), "hello world\n"; g != e {
 		t.Errorf("echo: want %q, got %q", e, g)
+	}
+}
+
+func TestFail(t *testing.T) {
+	cmd := helperCommand("false")
+	out, err := cmd.Output()
+	if err != nil {
+		t.Errorf("false: want exit status 1, got %v", err)
+	} else {
+		t.Errorf("false: want exit status 1, got exit status 0 with: %v", string(out))
 	}
 }
