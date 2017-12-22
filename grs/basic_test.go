@@ -58,7 +58,9 @@ func TestFail(t *testing.T) {
 	cmd := helperCommand("false")
 	out, err := cmd.Output()
 	if err != nil {
-		t.Errorf("false: want exit status 1, got %v", err)
+		if s := fmt.Sprintf("%v", err); s != "exit status 1" {
+			t.Errorf("false: want [exit status 1], got [%v]", err)
+		}
 	} else {
 		t.Errorf("false: want exit status 1, got exit status 0 with: %v", string(out))
 	}

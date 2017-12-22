@@ -14,6 +14,7 @@ type Args struct {
 }
 
 func main() {
+
 	args := Args{}
 	flag.StringVar(&args.repo, "repo", "", "target repo")
 	flag.StringVar(&args.command, "command", "", "command to run")
