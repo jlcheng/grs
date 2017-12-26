@@ -26,9 +26,10 @@ func main() {
 		grs.SetLogLevel(grs.DEBUG)
 	}
 
+	runner := grs.ExecRunner{}
 	repo := defaultRepo(args)
 	script := defaultScript(args)
-	fmt.Printf("repo [%v] status is %v\n", repo.Path, script(repo))
+	fmt.Printf("repo [%v] status is %v\n", repo.Path, script(repo, runner))
 }
 
 // defaultRepo returns a Repo based on CLI args, Env variable, then defaults to "$HOME/grstest"

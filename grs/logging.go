@@ -2,7 +2,7 @@ package grs
 
 import "fmt"
 
-var level int
+var level int = INFO
 
 const (
 	DEBUG = iota

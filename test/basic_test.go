@@ -1,4 +1,4 @@
-package grs
+package test
 
 import (
 	"testing"
@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
+	"jcheng/grs/grs"
 )
 
 func TestRepoPath(t *testing.T) {
-	repo := Repo{"/foo/bar"}
-	result, _ := RepoPath(repo)
+	repo := grs.Repo{"/foo/bar"}
+	result, _ := grs.RepoPath(repo)
 	if result.String() != "/foo/bar" {
 		t.Fail()
 	}

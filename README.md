@@ -12,8 +12,9 @@ $GOPATH
 ## Testing
 ```
 ~$ cd <project root>
-.../grs$ cd grs
-.../grs/grs$ go test
+.../grs$ go test -v ./..
+?       jcheng/grs/cmd/grsp     [no test files]
+<snipped> 
 PASS
-ok      jcheng/grs/grs  1.234s 
+ok      jcheng/grs/test 0.259s
 ```

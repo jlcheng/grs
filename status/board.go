@@ -11,14 +11,18 @@ type RepoStatus int
 const (
 	UNKNOWN RepoStatus = iota  // Repo status cannot be determined
 	INVALID // Repo is not a valid Git repo
+	BEHIND // Repo is behind remote
 	AHEAD // Repo is ahead of remote
-	CONFLICT // Repo is in conflict with remote
+	DIVERGED // Repo and remote have diverged - conflict unknown
+	CONFLICT // Repo and remote have diverged - known conflict
 	LATEST // Repo is up-to-date with remote
 	)
-var statusStrings [5]string = [5]string{
+var statusStrings [LATEST+1]string = [LATEST+1]string{
 	"UNKNOWN",
 	"INVALID",
+	"BEHIND",
 	"AHEAD",
+	"DIVERGED",
 	"CONFLICT",
 	"LATEST",
 }

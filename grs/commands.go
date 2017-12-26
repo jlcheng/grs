@@ -1,5 +1,7 @@
 package grs
 
+import "os/exec"
+
 type Command interface {
 	CombinedOutput() ([]byte, error)
 }
@@ -22,5 +24,11 @@ func NewCommandHelper(bytes []byte, err error) *Command {
 	}
 	var r Command = CommandHelper{f}
 	return &r
+}
 
+type ExecRunner struct { }
+
+func (r ExecRunner) Command(name string, arg ...string) *Command {
+	var c Command = exec.Command(name, arg...)
+	return &c
 }
