@@ -31,20 +31,47 @@ func (s RepoStatus) String() string {
 	return statusStrings[s]
 }
 
+type entry struct {
+	repo grs.Repo
+	status RepoStatus
+}
 type Statusboard struct {
-	repos map[string]RepoStatus
+	repos map[string]entry
 }
 
-func (s *Statusboard) Status(repo *grs.Repo) (RepoStatus, error) {
-	var r RepoStatus
+
+func (s *Statusboard) Status(path string) (RepoStatus, error) {
+	var r entry
 	var exists bool
-	if r, exists = s.repos[repo.Path]; !exists {
-		return UNKNOWN, errors.New(fmt.Sprintf("repo not found [%v]", repo.Path))
+	if r, exists = s.repos[path]; !exists {
+		return UNKNOWN, errors.New(fmt.Sprintf("repo not found [%v]", path))
 	}
-	return r, nil
+	return r.status, nil
 }
 
-func (s *Statusboard) SetStatus(repo *grs.Repo, status RepoStatus) {
-	s.repos[repo.Path] = status
+func (s *Statusboard) SetStatus(path string, status RepoStatus) {
+	var r entry
+	var exists bool
+	if r, exists = s.repos[path]; !exists {
+		s.repos[path] = entry{repo:grs.Repo{Path:path}, status:status}
+	} else {
+		r.status = status
+	}
 }
 
+func (s *Statusboard) Repos() []string {
+	var keys []string
+	for k := range s.repos {
+		keys = append(keys, k)
+	}
+	return keys
+}
+
+func NewStatusboard(repos ...grs.Repo) Statusboard {
+	var s = Statusboard{}
+	s.repos = make(map[string]entry, 0)
+	for _, repo := range repos {
+		s.SetStatus(repo.Path, UNKNOWN)
+	}
+	return s
+}

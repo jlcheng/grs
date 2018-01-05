@@ -76,3 +76,17 @@ func TestMockCommandMulti(t *testing.T) {
 		t.Errorf("expected empty out, got %v", string(out))
 	}
 }
+
+func TestMockCommandMapOk(t *testing.T) {
+	m := NewMockRunner()
+	m.AddMap("echo one", echoOne)
+	m.AddMap("echo two", echoTwo)
+	cmd := *m.Command("echo", "one")
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Errorf("expected ok, got error: %v\n", err)
+	}
+	if s := string(out); s != "one" {
+		t.Errorf("expected 'one', got %v", s)
+	}
+}
