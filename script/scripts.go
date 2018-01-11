@@ -15,15 +15,15 @@ func GetRepoStatus(repo grs.Repo, runner grs.CommandRunner) status.RepoStatus {
 	if err != nil {
 		return status.INVALID
 	}
-	command := *runner.Command("git", "rev-list", "--left-right", "--count", "@\\{u\\}..@")
+	command := *runner.Command("git", "rev-list", "--left-right", "--count", "@{u}..@")
 	var out []byte
 	if out, err = command.CombinedOutput(); err != nil {
-		grs.Debug("command failed: %v\n", err)
+		grs.Debug("rev-list failed: %v\n%v\n", err, string(out))
 		return status.UNKNOWN
 	}
 	diff, err := parseRevList(out)
 	if err != nil {
-		grs.Debug("cannot parse `git rev-list...` output: %q", (out))
+		grs.Debug("cannot parse `git rev-list...` output: %q", string(out))
 		return status.UNKNOWN
 	}
 	if diff.remote == 0 && diff.local == 0 {
