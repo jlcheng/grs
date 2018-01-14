@@ -27,6 +27,7 @@ var statusStrings [LATEST+1]string = [LATEST+1]string{
 	"LATEST",
 }
 
+
 func (s RepoStatus) String() string {
 	return statusStrings[s]
 }

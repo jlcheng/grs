@@ -5,7 +5,6 @@ import (
 	"jcheng/grs/grs"
 	"regexp"
 	"strings"
-	"fmt"
 )
 
 type clist struct {
@@ -32,18 +31,18 @@ func (m *MockRunner) AddMap(s string, cmd *grs.Command) {
 			commands: make([]*grs.Command, 0),
 		}
 	}
-	fmt.Printf("%p\n", &v.commands)
 	v.commands = append(v.commands, cmd)
-	fmt.Println(v.commands)
 	m.commands[s] = v
 }
 
 func (m *MockRunner) Command(name string, arg ...string) *grs.Command {
+	if len(m._commands) == 0 && len(m.commands) == 0 {
+		return grs.NewCommandHelper(make([]byte,0), errors.New("no commands configured"))
+	}
+
 	full := strings.Join(append([]string{name}, arg...), " ")
-	fmt.Println(m._commands)
 	for k := range m.commands {
 		if v, ok := m.commands[k]; ok {
-			fmt.Println(full, k, ok, v)
 			if v.pattern.MatchString(full) && len(v.commands) != 0 {
 				r := v.commands[0]
 				v.commands = v.commands[1:]
@@ -52,8 +51,9 @@ func (m *MockRunner) Command(name string, arg ...string) *grs.Command {
 		}
 	}
 	if len(m._commands) == 0 {
-		return grs.NewCommandHelper(make([]byte,0), errors.New("no commands configured"))
+		return grs.NewCommandHelper(make([]byte,0), errors.New("no matching commands in mock " + name))
 	}
+
 	r := m._commands[0]
 	m._commands = m._commands[1:]
 	return r
