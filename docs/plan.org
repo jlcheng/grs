@@ -1,2 +1,6 @@
 * Dev Plan
 ** TODO Implement notification for aheadum
+** TODO Implement notification for behindum
+** TODO Implement notification for conflictum
+** TODO Implement notification for uptodateum
+** TODO Implement notification for invalidum

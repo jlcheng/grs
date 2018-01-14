@@ -45,18 +45,19 @@ The status of the repository cannot be determined. Represents a generic error co
 
 ## Internal Statuses
 
+RStat
+ - dir: valid; invalid
+ - branch: uptodate; ahead; behind; diverged;
+ - index: unmodified;modified
 
-repo status | desc
+ dir status | desc
 -------------------
 invalid     | The specified repo directory does not exist or is not a git repository
 valid       | The specified repo exists and is a git repository
 
- c/idx     | unmodified | modified 
------------|------------|----------
-ahead      | notify     | "
-behind     | rebase     | ???
-conflict   | notify     | "
-up-to-date | notify     | "
-invalid    | notify     | notify
-
- 
+ branch/idx | unmodified | modified 
+------------|------------|----------
+up-to-date  | notify     | "
+ahead       | notify     | "
+behind      | rebase     | ???
+diverged    | notify     | "

@@ -27,6 +27,31 @@ var statusStrings [LATEST+1]string = [LATEST+1]string{
 	"LATEST",
 }
 
+type Dirstat int
+const (
+	DIR_VALID Dirstat = iota
+	DIR_INVALID
+	BRANCH_UPTODATE Branchstat = iota
+	BRANCH_AHEAD
+	BRANCH_BEHIND
+	BRANCH_DIVERGED
+	INDEX_MODIFIED Indexstat = iota
+	INDEX_UNMODIFIED
+)
+type Branchstat int
+type Indexstat int
+type RStat struct {
+	Dir Dirstat
+	Branch Branchstat
+	Index Indexstat
+}
+func NewRStat() RStat {
+	return RStat{
+		Dir: DIR_INVALID,
+		Branch: BRANCH_UPTODATE,
+		Index: INDEX_UNMODIFIED,
+	}
+}
 
 func (s RepoStatus) String() string {
 	return statusStrings[s]
