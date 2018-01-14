@@ -47,17 +47,18 @@ The status of the repository cannot be determined. Represents a generic error co
 
 RStat
  - dir: valid; invalid
- - branch: uptodate; ahead; behind; diverged;
- - index: unmodified;modified
+ - branch: unknown; uptodate; ahead; behind; diverged;
+ - index: unknown; unmodified;modified
 
  dir status | desc
 -------------------
 invalid     | The specified repo directory does not exist or is not a git repository
 valid       | The specified repo exists and is a git repository
 
- branch/idx | unmodified | modified 
-------------|------------|----------
-up-to-date  | notify     | "
-ahead       | notify     | "
-behind      | rebase     | ???
-diverged    | notify     | "
+ branch/idx | unmodified | modified | unknown 
+------------|------------|----------|---------
+unknown     | notify     | "        | notify
+up-to-date  | notify     | "        | notify
+ahead       | notify     | "        | notify
+behind      | rebase     | ???      | notify
+diverged    | notify     | "        | notify

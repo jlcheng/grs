@@ -10,38 +10,48 @@ import (
 	"strconv"
 )
 
-func GetRepoStatus(repo grs.Repo, runner grs.CommandRunner) status.RepoStatus {
+func GetRepoStatus(repo grs.Repo, runner grs.CommandRunner) (rstat status.RStat) {
+	rstat = status.NewRStat()
 	if f, err := os.Stat(repo.Path); err != nil || !f.IsDir() {
-		return status.INVALID
+		rstat.Dir = status.DIR_INVALID
+		return rstat
 	}
 	if err := os.Chdir(repo.Path); err != nil {
-		return status.INVALID
+		rstat.Dir = status.DIR_INVALID
+		return rstat
 	}
-	command := *runner.Command("git", "rev-list", "--left-right", "--count", "@{u}..@")
+	rstat.Dir = status.DIR_VALID
+	command := *runner.Command("git", "rev-list", "--left-right", "--count", "'@{upstream}..HEAD'")
 	var out []byte;
 	var err error;
 	if out, err = command.CombinedOutput(); err != nil {
 		grs.Debug("rev-list failed: %v\n%v\n", err, string(out))
-		return status.UNKNOWN
+		rstat.Dir = status.DIR_INVALID
+		return rstat
 	}
 	diff, err := parseRevList(out)
 	if err != nil {
 		grs.Debug("cannot parse `git rev-list...` output: %q", string(out))
-		return status.UNKNOWN
+		rstat.Dir = status.DIR_INVALID
+		return rstat
 	}
 	if diff.remote == 0 && diff.local == 0 {
-		return status.LATEST
+		rstat.Branch = status.BRANCH_UPTODATE
+		return rstat
 	}
 	if diff.remote > 0 && diff.local == 0 {
-		return status.BEHIND
+		rstat.Branch = status.BRANCH_BEHIND
+		return rstat
 	}
 	if diff.remote == 0 && diff.local > 0 {
-		return status.AHEAD
+		rstat.Branch = status.BRANCH_AHEAD
+		return rstat
 	}
 	if diff.remote > 0 && diff.local > 0 {
-		return status.DIVERGED
+		rstat.Branch = status.BRANCH_DIVERGED
+		return rstat
 	}
-	return status.UNKNOWN
+	return rstat
 }
 
 func GetWorkingDirStatus(repo grs.Repo, runner grs.CommandRunner) status.RepoStatus {
@@ -87,4 +97,4 @@ func parseRevList(out []byte) (diff RemoteDiff, err error) {
 	return diff, nil
 }
 
-type Script func(grs.Repo, grs.CommandRunner) status.RepoStatus
+type Script func(grs.Repo, grs.CommandRunner) status.RStat

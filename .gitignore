@@ -22,3 +22,6 @@
 
 # vi
 *.swp
+
+# Ad-hoc testing, should never be checked-in
+/ignore.go

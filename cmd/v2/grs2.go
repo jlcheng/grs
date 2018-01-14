@@ -33,7 +33,7 @@ func main() {
 	script := defaultScript(args)
 	s := status.NewStatusboard(repos...)
 	for _, repo := range s.Repos() {
-		fmt.Printf("repos [%v] status is %v\n", repo, script(grs.Repo{Path:repo}, runner))
+		fmt.Printf("repos [%v] status is %v\n", repo, script(grs.Repo{Path:repo}, runner).Branch)
 	}
 }
 

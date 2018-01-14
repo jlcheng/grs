@@ -4,3 +4,4 @@
 ** TODO Implement notification for conflictum
 ** TODO Implement notification for uptodateum
 ** TODO Implement notification for invalidum
+** TODO Debug why "@\\{u\\}..@" is needed on windows for causes problems on MacOS (scripts.go:GetRepoStatus)
