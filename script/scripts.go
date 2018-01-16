@@ -21,7 +21,7 @@ func GetRepoStatus(repo grs.Repo, runner grs.CommandRunner) (rstat status.RStat)
 		return rstat
 	}
 	rstat.Dir = status.DIR_VALID
-	command := *runner.Command("git", "rev-list", "--left-right", "--count", "'@{upstream}..HEAD'")
+	command := *runner.Command("git", "rev-list", "--left-right", "--count", "@{upstream}..HEAD")
 	var out []byte;
 	var err error;
 	if out, err = command.CombinedOutput(); err != nil {
