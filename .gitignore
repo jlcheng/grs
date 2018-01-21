@@ -24,4 +24,6 @@
 *.swp
 
 # Ad-hoc testing, should never be checked-in
-/ignore.go
+/ignore.*
+# git@vger.kernel.org:cygwin git and golang: how @{u} is handle
+/upstream_shorthand.go
