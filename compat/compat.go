@@ -12,6 +12,6 @@ func BeforeCmd(cmd *exec.Cmd) {
 	// cygwin version of git will strip braces during globbing. Should be configurable TODO:1
 	if strings.HasPrefix(os.Getenv("OS"),"Windows") {
 		cmd.Env = append(cmd.Env, "CYGWIN=noglob")
-		cmd.Env = append(cmd.Env, "MYSYS=noglob")
+		cmd.Env = append(cmd.Env, "MSYS=noglob")
 	}
 }

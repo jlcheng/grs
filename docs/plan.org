@@ -10,7 +10,8 @@
 ** TODO Implement notification for uptodateum
 ** TODO Implement notification for invalidum
 ** TODO [#A] TODO:2 unit test for compat.BeforeRun
-** TODO [#C] TODO:1 Move 'cygwin git' identification into a config file
+** TODO [#C] TODO:3 Get rid of 'noglob' and allow use to specify path to git in config file
+** TODO [#C] TODO:1 Move 'cygwin git' identification logic into a config file
 ** DONE Debug why "@\\{u\\}..@" is needed on windows for causes problems on MacOS (scripts.go:GetRepoStatus)`
    - Note taken on [2018-01-21 Sun 10:49] \\
      posted to git mailing list to share feedback. moving on to trying pure go git library.

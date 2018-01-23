@@ -1,6 +1,9 @@
 package grs
 
-import "os/exec"
+import (
+	"os/exec"
+	"jcheng/grs/compat"
+)
 
 type Command interface {
 	CombinedOutput() ([]byte, error)
@@ -29,6 +32,8 @@ func NewCommandHelper(bytes []byte, err error) *Command {
 type ExecRunner struct { }
 
 func (r ExecRunner) Command(name string, arg ...string) *Command {
-	var c Command = exec.Command(name, arg...)
-	return &c
+	c := exec.Command(name, arg...)
+	compat.BeforeCmd(c)
+	ref := Command(c)
+	return &ref
 }
