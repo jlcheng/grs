@@ -9,6 +9,7 @@
 ** TODO Implement notification for conflictum
 ** TODO Implement notification for uptodateum
 ** TODO Implement notification for invalidum
+** TODO TODO:4 Add support to fetch remote tracking branch's commit history before comparing branches (as Jan 2018, the code does not perform any data-modifying logic at all)
 ** TODO [#A] TODO:2 unit test for compat.BeforeRun
 ** TODO [#C] TODO:3 Get rid of 'noglob' and allow use to specify path to git in config file
 ** TODO [#C] TODO:1 Move 'cygwin git' identification logic into a config file
