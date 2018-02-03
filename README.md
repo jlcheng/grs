@@ -8,6 +8,12 @@ $GOPATH
           +-- cmd/grsp/prototype.go
           +-- grs/basic.go
 ```
+
+```
+$ go build ./...
+$ go test ./...
+```
+
  
 ## Testing
 Run the entire test suite before committing any changes

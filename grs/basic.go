@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 	"errors"
+	"jcheng/grs/config"
 )
 
 type Repo struct {
@@ -119,4 +120,63 @@ type Cmd func(Repo) (*Result, error )
 
 func (cmd *Result) String() string {
 	return cmd.delegate.Stdout.(*bytes.Buffer).String()
+}
+
+var _ctx *AppContext = (&AppContext{}).ResetInternal()
+
+type AppContext struct {
+	confParams *config.ConfigParams
+	cliRepos []string
+	defaultGitExec string
+}
+
+func GetContext() *AppContext {
+	return _ctx
+}
+
+func (ctx *AppContext) CliRepos(cliRepos []string) {
+	ctx.cliRepos = cliRepos
+}
+
+func (ctx *AppContext) ConfParams(confParams *config.ConfigParams) {
+	ctx.confParams = confParams
+}
+
+func (ctx *AppContext) GetRepos() []string {
+	if len(ctx.cliRepos) != 0 {
+		return ctx.cliRepos
+	}
+
+	if c, err := config.GetCurrConfig(ctx.confParams); err == nil {
+		r := make([]string,len(c.Repos))
+		for idx,elem := range c.Repos {
+			r[idx] = elem.Path
+		}
+		return r
+	}
+	return make([]string,0)
+}
+
+func (ctx *AppContext) GetGitExec() string {
+	if c, err := config.GetCurrConfig(ctx.confParams); err == nil && len(c.Git) != 0  {
+		return c.Git
+	}
+
+	return ctx.defaultGitExec
+}
+
+// ResetInternal resets the AppContext to its default values. Mainly used for testing.
+func (ctx *AppContext) ResetInternal() *AppContext {
+	ctx.confParams = config.NewConfigParams()
+	ctx.defaultGitExec = "git"
+	ctx.cliRepos = []string{}
+	return ctx
+}
+
+func ReposFromConf(rc []config.RepoConf) []Repo {
+	var r []Repo = make([]Repo,len(rc))
+	for idx, elem := range rc {
+		r[idx] = Repo{Path:elem.Path}
+	}
+	return r
 }

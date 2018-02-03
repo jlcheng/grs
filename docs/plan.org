@@ -17,4 +17,5 @@
    - Note taken on [2018-01-21 Sun 10:49] \\
      posted to git mailing list to share feedback. moving on to trying pure go git library.
 ** TODO [#B] Clean up .gitignore
-   
+** TODO Rejigger conf file reading so that the cli parameter overrides conf files rather being them being mutually exclusive
+** TODO Either rename cliGitExec->defaultGitExec or allow GitExec to be passed via cli

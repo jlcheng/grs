@@ -8,6 +8,7 @@ import (
 	"jcheng/grs/script"
 	"strings"
 	"jcheng/grs/status"
+	"jcheng/grs/config"
 )
 
 type Args struct {
@@ -30,10 +31,15 @@ func main() {
 
 	runner := grs.ExecRunner{}
 	repos := defaultRepos(args)
-	script := defaultScript(args)
-	s := status.NewStatusboard(repos...)
-	for _, repo := range s.Repos() {
-		fmt.Printf("repos [%v] status is %v\n", repo, script(grs.Repo{Path:repo}, runner).Branch)
+	if len(repos) == 0 {
+		fmt.Println("repos not specified")
+		os.Exit(1)
+	}
+
+	s := defaultScript(args)
+	status := status.NewStatusboard(repos...)
+	for _, repo := range status.Repos() {
+		fmt.Printf("repos [%v] status is %v\n", repo, s(grs.Repo{Path:repo}, runner).Branch)
 	}
 }
 
@@ -46,14 +52,11 @@ func defaultRepos(args Args) []grs.Repo {
 		return mkrepos(args.repos)
 	}
 
-	val, ok := os.LookupEnv("GRS_REPO")
-	if ok {
-		grs.Debug("Using repos from $GRS_REPO: %v", val)
-		return mkrepos(val)
+	p := config.NewConfigParams()
+	if c, _ := config.GetCurrConfig(p); c != nil {
+		return grs.ReposFromConf(c.Repos)
 	}
-
-	grs.Debug("Using default repos %v", os.ExpandEnv("$HOME" + string(os.PathSeparator) + "grstest"))
-	return mkrepos(os.ExpandEnv("$HOME/grstest"))
+	return []grs.Repo{}
 }
 
 func mkrepos(s string) []grs.Repo {

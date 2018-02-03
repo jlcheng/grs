@@ -2,6 +2,33 @@
 Based on https://medium.com/golang-learn/go-project-layout-e5213cdcfaa2 with the intent of
 separating commands, library, and test code.
 
+# Configuration
+The `grs` program can be configured with a config file. The config file looks like
+```$json
+{
+  "git": "/path/to/git_executable",
+  "repos": [
+    {"path":"/foo/bar/repo1"}
+    {"path":"/home/repos/myproject"}
+    ...
+  ]
+}
+```
+
+The config file can be read from
+- `${GRS_CONF}`
+- `$HOME/.grs.json`
+
+The command line parameters for grs looks like
+```$bash
+Usage of grs:
+  -repos rel/repo1:/abs/repo2:...
+    target repos
+  -verbose 
+    verbose mode
+```
+
+
 # grs
 Foundation for the "interesting" parts of the code. 
 . logging
@@ -62,3 +89,15 @@ up-to-date  | notify     | "        | notify
 ahead       | notify     | "        | notify
 behind      | rebase     | ???      | notify
 diverged    | notify     | "        | notify
+
+# config
+The config module provides `GetCurrConfig`, which allows the user to specify the location of 
+the `git` program and target repos using a config file.
+
+# ctx
+The ctx module is a singleton context that is available throughout the entire ilfe of the `grs`
+program. The context (`GetContext()`) provides global methods:
+```$golang
+GetRepos() - Which repos to scan
+GetGitExec() - The `git` executable to use
+```

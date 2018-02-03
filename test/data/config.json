@@ -1,0 +1,7 @@
+{
+  "git":"/path/to/git",
+  "repos":[
+    {"path":"rel/repo1"},
+    {"path":"/abs/repo2"}
+  ]
+}
