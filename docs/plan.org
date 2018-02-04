@@ -10,12 +10,12 @@
 ** TODO Implement notification for uptodateum
 ** TODO Implement notification for invalidum
 ** TODO TODO:4 Add support to fetch remote tracking branch's commit history before comparing branches (as Jan 2018, the code does not perform any data-modifying logic at all)
-** TODO [#A] TODO:2 unit test for compat.BeforeRun
+** DONE [#A] TODO:2 unit test for compat.BeforeRun
 ** TODO [#C] TODO:3 Get rid of 'noglob' and allow use to specify path to git in config file
 ** TODO [#C] TODO:1 Move 'cygwin git' identification logic into a config file
 ** DONE Debug why "@\\{u\\}..@" is needed on windows for causes problems on MacOS (scripts.go:GetRepoStatus)`
    - Note taken on [2018-01-21 Sun 10:49] \\
      posted to git mailing list to share feedback. moving on to trying pure go git library.
-** TODO [#B] Clean up .gitignore
+** TODO [#A] Clean up .gitignore. Remove 'ad-hoc' lines
 ** TODO Rejigger conf file reading so that the cli parameter overrides conf files rather being them being mutually exclusive
 ** TODO Either rename cliGitExec->defaultGitExec or allow GitExec to be passed via cli

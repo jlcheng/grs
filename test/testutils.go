@@ -12,6 +12,24 @@ type clist struct {
 	commands []*grs.Command
 }
 
+// CommandHelper allows one to easily mock a CommandRunner interface. Useful when you wan to return the same output
+// given any input.
+type CommandHelper struct {
+	f func() ([]byte, error)
+}
+
+func (m CommandHelper) CombinedOutput() ([]byte, error) {
+	return m.f()
+}
+
+func NewCommandHelper(bytes []byte, err error) *grs.Command {
+	f := func() ([]byte, error) {
+		return bytes, err
+	}
+	var r grs.Command = CommandHelper{f}
+	return &r
+}
+
 // MockRunner holds a sequence of Commands, mapped to their command-line text. When the user specifies a command text,
 // it returns the corresponding command and advances to the next command in memory.
 type MockRunner struct {
@@ -37,7 +55,7 @@ func (m *MockRunner) AddMap(s string, cmd *grs.Command) {
 
 func (m *MockRunner) Command(name string, arg ...string) *grs.Command {
 	if len(m._commands) == 0 && len(m.commands) == 0 {
-		return grs.NewCommandHelper(make([]byte,0), errors.New("no commands configured"))
+		return NewCommandHelper(make([]byte,0), errors.New("no commands configured"))
 	}
 
 	full := strings.Join(append([]string{name}, arg...), " ")
@@ -51,7 +69,7 @@ func (m *MockRunner) Command(name string, arg ...string) *grs.Command {
 		}
 	}
 	if len(m._commands) == 0 {
-		return grs.NewCommandHelper(make([]byte,0), errors.New("no matching commands in mock " + name))
+		return NewCommandHelper(make([]byte,0), errors.New("no matching commands in mock " + name))
 	}
 
 	r := m._commands[0]

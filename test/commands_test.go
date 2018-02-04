@@ -7,10 +7,10 @@ import (
 	"jcheng/grs/grs"
 )
 
-var echoOne *grs.Command = grs.NewCommandHelper([]byte("one"), nil)
-var echoTwo *grs.Command = grs.NewCommandHelper([]byte("two"), nil)
-var dateS *grs.Command = grs.NewCommandHelper([]byte("1515196992"), nil)
-var failed *grs.Command = grs.NewCommandHelper(make([]byte,0), errors.New("failed"))
+var echoOne *grs.Command = NewCommandHelper([]byte("one"), nil)
+var echoTwo *grs.Command = NewCommandHelper([]byte("two"), nil)
+var dateS *grs.Command = NewCommandHelper([]byte("1515196992"), nil)
+var failed *grs.Command = NewCommandHelper(make([]byte,0), errors.New("failed"))
 
 func TestMockCommandFail(t *testing.T) {
 	m := NewMockRunner()

@@ -17,7 +17,7 @@ func TestGetRepoStatus_Git_Failed(t *testing.T) {
 	} else {
 		repo = grs.Repo{Path:cwd}
 	}
-	runner.Add(grs.NewCommandHelper([]byte(""), errors.New("failed")))
+	runner.Add(NewCommandHelper([]byte(""), errors.New("failed")))
 	s := script.GetRepoStatus(repo, runner)
 	if s.Branch != status.BRANCH_UNKNOWN {
 		t.Error("expected %s, got: %v", status.BRANCH_UNKNOWN, s.Branch)
@@ -41,7 +41,7 @@ func TestGetRepoStatus_Git(t *testing.T) {
 
 func helpGetRepoStatus(t *testing.T, out string, expected status.Branchstat) {
 	runner := NewMockRunner()
-	runner.Add(grs.NewCommandHelper([]byte(out), nil))
+	runner.Add(NewCommandHelper([]byte(out), nil))
 	var repo grs.Repo
 	if d, e := os.Getwd(); e != nil {
 		t.Error(e)
