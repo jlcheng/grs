@@ -57,6 +57,7 @@ func TestGetGitExecConfFile(t *testing.T) {
 	}
 }
 
+// Verifies that the default git exec is `git`
 func TestGetGitExecDefault(t *testing.T) {
 	ctx := grs.GetContext().ResetInternal()
 
