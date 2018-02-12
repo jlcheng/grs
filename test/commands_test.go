@@ -101,3 +101,22 @@ func TestMockCommandMapOk(t *testing.T) {
 		t.Errorf("expected '1515196992', got %v", s)
 	}
 }
+
+func TestMOckCommandHistoryCount(t *testing.T) {
+	m := *NewMockRunner()
+
+	m.Command("foo")
+	m.Command("fab", "foz")
+	m.Command("foo", "fab", "foz")
+
+	var c int
+	if c = m.HistoryCount("^foo$"); c != 1 {
+		t.Error("expected count(^foo$) == 1, got", c)
+	}
+	if c = m.HistoryCount("^fab foz$"); c != 1 {
+		t.Error("expected count(^fab foz$) == 1, got", c)
+	}
+	if c = m.HistoryCount("foo"); c != 2 {
+		t.Error("expected count(foo) == 2, got", c)
+	}
+}

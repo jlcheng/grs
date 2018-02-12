@@ -10,7 +10,13 @@
 * TODO Implement notification for conflictum
 * TODO Implement notification for uptodateum
 * TODO Implement notification for invalidum
-* TODO TODO:4 Add support to fetch remote tracking branch's commit history before comparing branches (as Jan 2018, the code does not perform any data-modifying logic at all)
+* TODO Add support to fetch remote tracking branch's commit history before comparing branches (as Jan 2018, the code does not perform any data-modifying logic at all)
+  - Note taken on [2018-02-11 Sun 22:02] \\
+    A failed experiment to include `fetch` in the GetRepoStatus script tells
+    me that I should perform `fetch` in a different script. Otherwise, it looks like
+    GetRepoStatus will turn into a super function that is hard to test - 
+    it'll require setting up fixtures for all the things it does even when I
+    want to test just a small part of its behavior.
 * DONE [#A] TODO:2 unit test for compat.BeforeRun
 * TODO [#C] TODO:3 Get rid of 'noglob' and allow use to specify path to git in config file
 * TODO [#C] TODO:1 Move 'cygwin git' identification logic into a config file
@@ -24,4 +30,7 @@
 * TODO Type can be omitted (*grs.Command) in commands_test.go
 * TODO UX: Print error messsage when .grs.json is missing a ',' - now it just silently fails (user, "why is it not using the repos in the file?")
 * TODO Write test case for TestGetRepoStatus_Git_From_Ctx to verify the script gets the git command from Ctx
+  SCHEDULED: <2018-02-11 Sun>
 * TODO Rename grs.Command to something that is not so much like 'Cmd'
+* TODO DRY: `if d, e := os.Getwd(); e != nil {` in 3 different places
+* TODO CLARITY: Rename NewCommandHelper-> ConstantOutput() && ConstantError()
