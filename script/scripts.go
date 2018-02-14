@@ -10,6 +10,31 @@ import (
 	"strconv"
 )
 
+func Fetch(repo grs.Repo, runner grs.CommandRunner) (rstat status.RStat) {
+	ctx := grs.GetContext()
+	git := ctx.GetGitExec()
+
+	rstat = status.NewRStat()
+	if f, err := os.Stat(repo.Path); err != nil || !f.IsDir() {
+		rstat.Dir = status.DIR_INVALID
+		return rstat
+	}
+	if err := os.Chdir(repo.Path); err != nil {
+		rstat.Dir = status.DIR_INVALID
+		return rstat
+	}
+	rstat.Dir = status.DIR_VALID
+	command := *runner.Command(git, "fetch")
+	var out []byte;
+	var err error;
+	if out, err = command.CombinedOutput(); err != nil {
+		grs.Debug("fetch failed: %v\n%v\n", err, string(out))
+		rstat.Dir = status.DIR_INVALID
+		return rstat
+	}
+	return rstat
+}
+
 func GetRepoStatus(repo grs.Repo, runner grs.CommandRunner) (rstat status.RStat) {
 	ctx := grs.GetContext()
 	git := ctx.GetGitExec()

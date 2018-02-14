@@ -36,10 +36,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	s := defaultScript(args)
 	status := status.NewStatusboard(repos...)
-	for _, repo := range status.Repos() {
-		fmt.Printf("repos [%v] status is %v\n", repo, s(grs.Repo{Path:repo}, runner).Branch)
+	for _, elem := range status.Repos() {
+		fmt.Printf("repo [%v]\n", elem)
+		repo := grs.Repo{Path:elem}
+		rstat := script.Fetch(repo, runner)
+		if rstat.Dir == 0 {
+			rstat = script.GetRepoStatus(repo, runner)
+			fmt.Printf("repos [%v] status is %v\n", repo, rstat.Branch)
+		}
 	}
 }
 
@@ -65,9 +70,4 @@ func mkrepos(s string) []grs.Repo {
 		res = append(res, grs.Repo{Path:elem})
 	}
 	return res
-}
-
-func defaultScript(args Args) script.Script {
-	grs.Debug("Using hard-coded script `GetRepoStatus`")
-	return script.GetRepoStatus
 }
