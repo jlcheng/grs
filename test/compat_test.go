@@ -12,7 +12,7 @@ func TestWindowsFix(t *testing.T) {
 	v, has_os := os.LookupEnv("OS")
 	os.Setenv("OS", "Windows_NT")
 
-	cmd := helperExec(t, "TestWindowsFixHelper")
+	cmd := helperExec(t, "TestWindowsFixHelper", "@{upstream}..HEAD")
 	compat.BeforeCmd(cmd)
 	b, err := cmd.CombinedOutput()
 	if err != nil {
@@ -30,11 +30,14 @@ func TestWindowsFixHelper(t *testing.T) {
 	if os.Getenv("GO_WANT_HELPER_PROCESS") != "1" {
 		return
 	}
-	if os.Getenv("CYGWIN") != "noglob" {
-		t.Error("expected ENV[CYGWIN]=noglob")
+	var arg string = ""
+	for idx, elem := range os.Args {
+		if elem == "--" && idx < len(os.Args) - 1 {
+			arg = os.Args[idx+1]
+		}
 	}
-	if os.Getenv("MSYS") != "noglob" {
-		t.Error("expected ENV[MSYS]=noglob")
+	if expected := "@\\{upstream\\}..HEAD"; arg != expected {
+		t.Errorf("expected arg to be [%v] but got [%v]", expected, arg)
 	}
 }
 

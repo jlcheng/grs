@@ -34,4 +34,4 @@
 * TODO Rename grs.Command to something that is not so much like 'Cmd'
 * TODO DRY: `if d, e := os.Getwd(); e != nil {` in 3 different places
 * TODO CLARITY: Rename NewCommandHelper-> ConstantOutput() && ConstantError()
-* TODO CRITICAL: Look into 'ssh: Could not resolve hostname github.com: Non-recoverable failure in name resolution' on windows
+* DONE CRITICAL: Look into 'ssh: Could not resolve hostname github.com: Non-recoverable failure in name resolution' on windows
