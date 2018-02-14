@@ -34,4 +34,16 @@
 * TODO Rename grs.Command to something that is not so much like 'Cmd'
 * TODO DRY: `if d, e := os.Getwd(); e != nil {` in 3 different places
 * TODO CLARITY: Rename NewCommandHelper-> ConstantOutput() && ConstantError()
+* TODO Fix bug: grs does not seem to detect repos behind
+  - Note taken on [2018-02-14 Wed 12:05] \\
+    ~/privprjs/grs$ git status
+    On branch master
+    Your branch is behind 'origin/master' by 6 commits, and can be fast-forwarded.
+      (use "git pull" to update your local branch)
+    
+    nothing to commit, working tree clean
+    ~/privprjs/grs$ ~/bin/grs2 
+    [DEBUG] Using hard-coded script `GetRepoStatus`
+    repos [/Users/jcheng/privprjs/dotfiles] status is UP-TO-DATE
+    repos [/Users/jcheng/privprjs/grs] status is UP-TO-DATE
 * DONE CRITICAL: Look into 'ssh: Could not resolve hostname github.com: Non-recoverable failure in name resolution' on windows
