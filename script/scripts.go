@@ -49,7 +49,7 @@ func GetRepoStatus(repo grs.Repo, runner grs.CommandRunner) (rstat status.RStat)
 		return rstat
 	}
 	rstat.Dir = status.DIR_VALID
-	command := *runner.Command(git, "rev-list", "--left-right", "--count", "@{upstream}..HEAD")
+	command := *runner.Command(git, "rev-list", "--left-right", "--count", "@{upstream}...HEAD")
 	var out []byte;
 	var err error;
 	if out, err = command.CombinedOutput(); err != nil {
@@ -59,10 +59,12 @@ func GetRepoStatus(repo grs.Repo, runner grs.CommandRunner) (rstat status.RStat)
 	}
 	diff, err := parseRevList(out)
 	if err != nil {
-		grs.Debug("cannot parse `git rev-list...` output: %q", string(out))
+		grs.Info("cannot parse `git rev-list...` output: %q", string(out))
 		rstat.Dir = status.DIR_INVALID
 		return rstat
 	}
+	grs.Debug("CMD: git rev-list --left-right --count @{upstream}...HEAD")
+	grs.Debug(string(out))
 	if diff.remote == 0 && diff.local == 0 {
 		rstat.Branch = status.BRANCH_UPTODATE
 		return rstat

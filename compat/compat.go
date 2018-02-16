@@ -12,8 +12,8 @@ func BeforeCmd(cmd *exec.Cmd) {
 	// cygwin version of git will strip braces during globbing. Should be configurable TODO:1
 	if strings.HasPrefix(os.Getenv("OS"),"Windows") {
 		for i ,elem := range cmd.Args {
-			if elem == "@{upstream}..HEAD" {
-				cmd.Args[i] = "@\\{upstream\\}..HEAD"
+			if elem == "@{upstream}...HEAD" {
+				cmd.Args[i] = "@\\{upstream\\}...HEAD"
 			}
 		}
 	}

@@ -34,7 +34,9 @@
 * TODO Rename grs.Command to something that is not so much like 'Cmd'
 * TODO DRY: `if d, e := os.Getwd(); e != nil {` in 3 different places
 * TODO CLARITY: Rename NewCommandHelper-> ConstantOutput() && ConstantError()
-* TODO Fix bug: grs does not seem to detect repos behind
+* DONE Fix bug: grs does not seem to detect repos behind
+  - Note taken on [2018-02-15 Thu 20:55] \\
+    Fix is with the rev-list command, should be @{upstream}...HEAD, but I had @{upstream}..HEAD
   - Note taken on [2018-02-14 Wed 12:05] \\
     ~/privprjs/grs$ git status
     On branch master
