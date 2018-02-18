@@ -4,7 +4,6 @@ import (
 	"testing"
 	"jcheng/grs/grs"
 	"jcheng/grs/script"
-	"os"
 	"jcheng/grs/status"
 	"errors"
 	"jcheng/grs/config"
@@ -12,16 +11,12 @@ import (
 
 func TestGetRepoStatus_Git_Failed(t *testing.T) {
 	runner := NewMockRunner()
-	var repo grs.Repo
-	if cwd, e := os.Getwd(); e != nil {
-		t.Error(e)
-	} else {
-		repo = grs.Repo{Path:cwd}
-	}
 	runner.Add(NewCommandHelper([]byte(""), errors.New("failed")))
-	s := script.GetRepoStatus(repo, runner)
-	if s.Branch != status.BRANCH_UNKNOWN {
-		t.Error("expected %s, got: %v", status.BRANCH_UNKNOWN, s.Branch)
+	rstat := status.NewRStat()
+	rstat.Dir = status.DIR_VALID
+	script.GetRepoStatus(runner, rstat)
+	if rstat.Branch != status.BRANCH_UNKNOWN {
+		t.Error("expected %s, got: %v\n", status.BRANCH_UNKNOWN, rstat.Branch)
 	}
 }
 
@@ -48,13 +43,9 @@ func TestGetRepoStatus_Git_From_Ctx(t *testing.T) {
 	ctx := grs.GetContext()
 	ctx.ConfParams(&config.ConfigParams{User:"data/config.json"})
 
-	var repo grs.Repo
-	if d, e := os.Getwd(); e != nil {
-		t.Error(e)
-	} else {
-		repo = grs.Repo{Path:d}
-	}
-	rstat := script.GetRepoStatus(repo, runner)
+	rstat := status.NewRStat()
+	rstat.Dir = status.DIR_VALID
+	script.GetRepoStatus(runner, rstat)
 	if rstat.Dir == status.DIR_INVALID {
 		t.Error("Unexpected rstat.Dir, got DIR_INVALID")
 		return
@@ -68,13 +59,11 @@ func TestGetRepoStatus_Git_From_Ctx(t *testing.T) {
 func helpGetRepoStatus(t *testing.T, out string, expected status.Branchstat) {
 	runner := NewMockRunner()
 	runner.Add(NewCommandHelper([]byte(out), nil))
-	var repo grs.Repo
-	if d, e := os.Getwd(); e != nil {
-		t.Error(e)
-	} else {
-		repo = grs.Repo{Path:d}
-	}
-	got := script.GetRepoStatus(repo, runner).Branch
+
+	rstat := status.NewRStat()
+	rstat.Dir = status.DIR_VALID
+	script.GetRepoStatus(runner, rstat)
+	got := rstat.Branch
 	if got != expected {
 		t.Errorf("expected [%v], got [%v]\n", expected, got)
 	}

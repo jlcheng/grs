@@ -36,13 +36,17 @@ func main() {
 		os.Exit(1)
 	}
 
-	status := status.NewStatusboard(repos...)
-	for _, elem := range status.Repos() {
+	board := status.NewStatusboard(repos...)
+	for _, elem := range board.Repos() {
 		repo := grs.Repo{Path:elem}
-		rstat := script.Fetch(repo, runner)
-		if rstat.Dir == 0 {
-			rstat_repo := script.GetRepoStatus(repo, runner)
-			fmt.Printf("repo [%v] status is %v\n", repo.Path, rstat_repo.Branch)
+		rstat := status.NewRStat()
+		script.BeforeScript(repo, runner, rstat)
+		if rstat.Dir == status.DIR_VALID {
+			script.Fetch(runner, rstat)
+		}
+		if rstat.Dir == status.DIR_VALID {
+			script.GetRepoStatus(runner, rstat)
+			fmt.Printf("repo [%v] status is %v\n", repo.Path, rstat.Branch)
 		}
 	}
 }

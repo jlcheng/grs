@@ -102,7 +102,7 @@ func TestMockCommandMapOk(t *testing.T) {
 	}
 }
 
-func TestMOckCommandHistoryCount(t *testing.T) {
+func TestMockCommandHistoryCount(t *testing.T) {
 	m := *NewMockRunner()
 
 	m.Command("foo")

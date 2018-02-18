@@ -10,44 +10,53 @@ import (
 	"strconv"
 )
 
-func Fetch(repo grs.Repo, runner grs.CommandRunner) (rstat *status.RStat) {
+// BeforeScript chdir to the repo directory and validates the repo. Sets rstat.Dir to `DIR_VALID` on success.
+func BeforeScript(repo grs.Repo, runner grs.CommandRunner, rstat *status.RStat) {
 	ctx := grs.GetContext()
 	git := ctx.GetGitExec()
 
-	rstat = status.NewRStat()
 	if f, err := os.Stat(repo.Path); err != nil || !f.IsDir() {
 		rstat.Dir = status.DIR_INVALID
-		return rstat
+		return
 	}
 	if err := os.Chdir(repo.Path); err != nil {
 		rstat.Dir = status.DIR_INVALID
-		return rstat
+		return
+	}
+	command := *runner.Command(git, "show-ref", "-q", "HEAD")
+	if _, err := command.CombinedOutput(); err != nil {
+		rstat.Dir = status.DIR_INVALID
+		return
 	}
 	rstat.Dir = status.DIR_VALID
-	command := *runner.Command(git, "fetch")
-	var out []byte
-	var err error
-	if out, err = command.CombinedOutput(); err != nil {
-		grs.Debug("fetch failed: %v\n%v\n", err, string(out))
-		rstat.Dir = status.DIR_INVALID
-		return rstat
-	}
-	return rstat
 }
 
-func GetRepoStatus(repo grs.Repo, runner grs.CommandRunner) (rstat status.RStat) {
+// Fetch runs `git fetch`. Sets rstat.Dir to `DIR_INVALID` on error
+func Fetch(runner grs.CommandRunner, rstat *status.RStat) {
+	if rstat.Dir != status.DIR_VALID {
+		return
+	}
+
 	ctx := grs.GetContext()
 	git := ctx.GetGitExec()
 
-	rstat = *status.NewRStat()
-	if f, err := os.Stat(repo.Path); err != nil || !f.IsDir() {
+	command := *runner.Command(git, "fetch")
+	if out, err := command.CombinedOutput(); err != nil {
+		grs.Debug("fetch failed: %v\n%v\n", err, string(out))
 		rstat.Dir = status.DIR_INVALID
-		return rstat
+		return
 	}
-	if err := os.Chdir(repo.Path); err != nil {
-		rstat.Dir = status.DIR_INVALID
-		return rstat
+}
+
+// GetRepoStatus gives a summary of the repo's status. Sets a number of `rstat` properties.
+func GetRepoStatus(runner grs.CommandRunner, rstat *status.RStat) {
+	if rstat.Dir != status.DIR_VALID {
+		return
 	}
+
+	ctx := grs.GetContext()
+	git := ctx.GetGitExec()
+
 	rstat.Dir = status.DIR_VALID
 	command := *runner.Command(git, "rev-list", "--left-right", "--count", "@{upstream}...HEAD")
 	var out []byte
@@ -55,33 +64,35 @@ func GetRepoStatus(repo grs.Repo, runner grs.CommandRunner) (rstat status.RStat)
 	if out, err = command.CombinedOutput(); err != nil {
 		grs.Debug("rev-list failed: %v\n%v\n", err, string(out))
 		rstat.Dir = status.DIR_INVALID
-		return rstat
+		return
 	}
 	diff, err := parseRevList(out)
 	if err != nil {
 		grs.Info("cannot parse `git rev-list...` output: %q", string(out))
 		rstat.Dir = status.DIR_INVALID
-		return rstat
+		return
 	}
+
 	grs.Debug("CMD: git rev-list --left-right --count @{upstream}...HEAD")
 	grs.Debug(string(out))
+
 	if diff.remote == 0 && diff.local == 0 {
 		rstat.Branch = status.BRANCH_UPTODATE
-		return rstat
+		return
 	}
 	if diff.remote > 0 && diff.local == 0 {
 		rstat.Branch = status.BRANCH_BEHIND
-		return rstat
+		return
 	}
 	if diff.remote == 0 && diff.local > 0 {
 		rstat.Branch = status.BRANCH_AHEAD
-		return rstat
+		return
 	}
 	if diff.remote > 0 && diff.local > 0 {
 		rstat.Branch = status.BRANCH_DIVERGED
-		return rstat
+		return
 	}
-	return rstat
+	return
 }
 
 type RemoteDiff struct {
