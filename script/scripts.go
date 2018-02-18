@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-func Fetch(repo grs.Repo, runner grs.CommandRunner) (rstat status.RStat) {
+func Fetch(repo grs.Repo, runner grs.CommandRunner) (rstat *status.RStat) {
 	ctx := grs.GetContext()
 	git := ctx.GetGitExec()
 
@@ -39,7 +39,7 @@ func GetRepoStatus(repo grs.Repo, runner grs.CommandRunner) (rstat status.RStat)
 	ctx := grs.GetContext()
 	git := ctx.GetGitExec()
 
-	rstat = status.NewRStat()
+	rstat = *status.NewRStat()
 	if f, err := os.Stat(repo.Path); err != nil || !f.IsDir() {
 		rstat.Dir = status.DIR_INVALID
 		return rstat
@@ -83,27 +83,6 @@ func GetRepoStatus(repo grs.Repo, runner grs.CommandRunner) (rstat status.RStat)
 	}
 	return rstat
 }
-
-func GetWorkingDirStatus(repo grs.Repo, runner grs.CommandRunner) status.RepoStatus {
-	if f, err := os.Stat(repo.Path); err != nil || !f.IsDir() {
-		return status.INVALID
-	}
-	if f, err := os.Stat(repo.Path); err != nil || !f.IsDir() {
-		return status.INVALID
-	}
-	if err := os.Chdir(repo.Path); err != nil {
-		return status.INVALID
-	}
-	command := *runner.Command("git", "rev-list", "--left-right", "--count", "@\\{u\\}..@")
-	var err error;
-	if _, err = command.CombinedOutput(); err != nil {
-		grs.Debug("command failed: %v\n", err)
-		return status.UNKNOWN
-	}
-
-	return status.UNKNOWN
-}
-
 
 type RemoteDiff struct {
 	local int

@@ -41,8 +41,8 @@ func main() {
 		repo := grs.Repo{Path:elem}
 		rstat := script.Fetch(repo, runner)
 		if rstat.Dir == 0 {
-			rstat = script.GetRepoStatus(repo, runner)
-			fmt.Printf("repo [%v] status is %v\n", repo.Path, rstat.Branch)
+			rstat_repo := script.GetRepoStatus(repo, runner)
+			fmt.Printf("repo [%v] status is %v\n", repo.Path, rstat_repo.Branch)
 		}
 	}
 }

@@ -70,8 +70,8 @@ type RStat struct {
 	Branch Branchstat
 	Index Indexstat
 }
-func NewRStat() RStat {
-	return RStat{
+func NewRStat() *RStat {
+	return &RStat{
 		Dir: DIR_INVALID,
 		Branch: BRANCH_UNKNOWN,
 		Index: INDEX_UNKNOWN,
