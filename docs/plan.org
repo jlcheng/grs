@@ -31,6 +31,7 @@
 * TODO UX: Print error messsage when .grs.json is missing a ',' - now it just silently fails (user, "why is it not using the repos in the file?")
 * TODO UX: Do not run 'git fetch' by default. Store fetch date in per-repo metadata. 
 * TODO UX: Print 'DEBUG' only when -v is specified on the cli
+* TODO UX: logging.Info should output only when running from cli
 * TODO Write test case for TestGetRepoStatus_Git_From_Ctx to verify the script gets the git command from Ctx
   SCHEDULED: <2018-02-11 Sun>
 * TODO Rename grs.Command to something that is not so much like 'Cmd'

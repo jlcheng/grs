@@ -12,7 +12,7 @@ func TestWindowsFix(t *testing.T) {
 	v, has_os := os.LookupEnv("OS")
 	os.Setenv("OS", "Windows_NT")
 
-	cmd := helperExec(t, "TestWindowsFixHelper", "@{upstream}..HEAD")
+	cmd := helperExec(t, "TestWindowsFixHelper", "@{upstream}...HEAD")
 	compat.BeforeCmd(cmd)
 	b, err := cmd.CombinedOutput()
 	if err != nil {
@@ -36,7 +36,7 @@ func TestWindowsFixHelper(t *testing.T) {
 			arg = os.Args[idx+1]
 		}
 	}
-	if expected := "@\\{upstream\\}..HEAD"; arg != expected {
+	if expected := "@\\{upstream\\}...HEAD"; arg != expected {
 		t.Errorf("expected arg to be [%v] but got [%v]", expected, arg)
 	}
 }
