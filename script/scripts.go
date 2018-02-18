@@ -25,8 +25,8 @@ func Fetch(repo grs.Repo, runner grs.CommandRunner) (rstat status.RStat) {
 	}
 	rstat.Dir = status.DIR_VALID
 	command := *runner.Command(git, "fetch")
-	var out []byte;
-	var err error;
+	var out []byte
+	var err error
 	if out, err = command.CombinedOutput(); err != nil {
 		grs.Debug("fetch failed: %v\n%v\n", err, string(out))
 		rstat.Dir = status.DIR_INVALID
@@ -50,8 +50,8 @@ func GetRepoStatus(repo grs.Repo, runner grs.CommandRunner) (rstat status.RStat)
 	}
 	rstat.Dir = status.DIR_VALID
 	command := *runner.Command(git, "rev-list", "--left-right", "--count", "@{upstream}...HEAD")
-	var out []byte;
-	var err error;
+	var out []byte
+	var err error
 	if out, err = command.CombinedOutput(); err != nil {
 		grs.Debug("rev-list failed: %v\n%v\n", err, string(out))
 		rstat.Dir = status.DIR_INVALID
