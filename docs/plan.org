@@ -5,11 +5,9 @@
 * // M-Shift-Ret add new TODO
 * // S-TAB cycle folding
 * == Dev Plan
-* TODO Implement notification for aheadum
-* TODO Implement notification for behindum
-* TODO Implement notification for conflictum
-* TODO Implement notification for uptodateum
-* TODO Implement notification for invalidum
+* DONE FEATURE: Implement detection of up-to-date + modified
+* DONE TEST: Add unit test for GetIndexStatus
+* DONE BUG: for GetIndexStatus - handle changes that are staged but not committed
 * TODO Add support to fetch remote tracking branch's commit history before comparing branches (as Jan 2018, the code does not perform any data-modifying logic at all)
   - Note taken on [2018-02-11 Sun 22:02] \\
     A failed experiment to include `fetch` in the GetRepoStatus script tells
@@ -26,6 +24,7 @@
 * TODO [#A] Clean up .gitignore. Remove 'ad-hoc' lines
 * DONE Rejigger conf file reading so that the cli parameter overrides conf files rather being them being mutually exclusive
 * TODO Either rename cliGitExec->defaultGitExec or allow GitExec to be passed via cli
+* TODO CONSISTENCY: Change test of form TestMockCommandOk  to TestMockCommmand_Ok and _Failed
 * TODO Add makefile or gb for running tests
 * TODO Type can be omitted (*grs.Command) in commands_test.go
 * TODO UX: Print error messsage when .grs.json is missing a ',' - now it just silently fails (user, "why is it not using the repos in the file?")
@@ -33,7 +32,7 @@
 * TODO UX: Print 'DEBUG' only when -v is specified on the cli
 * TODO BUG: Handle case when the current branch is untracked
 * TODO UX: logging.Info should output only when running from cli
-* TODO Write test case for TestGetRepoStatus_Git_From_Ctx to verify the script gets the git command from Ctx
+* DONE Write test case for TestGetRepoStatus_Git_From_Ctx to verify the script gets the git command from Ctx
   SCHEDULED: <2018-02-11 Sun>
 * TODO Rename grs.Command to something that is not so much like 'Cmd'
 * TODO DRY: `if d, e := os.Getwd(); e != nil {` in 3 different places

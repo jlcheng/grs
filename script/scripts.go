@@ -117,4 +117,42 @@ func parseRevList(out []byte) (diff RemoteDiff, err error) {
 	return diff, nil
 }
 
+// GetIndexStatus sets the rstat.index property to modified if there are uncommited changes or if the index has been
+// modified
+func GetIndexStatus(runner grs.CommandRunner, rstat *status.RStat) {
+	if rstat.Dir != status.DIR_VALID {
+		return
+	}
+
+	ctx := grs.GetContext()
+	git := ctx.GetGitExec()
+
+	rstat.Index = status.INDEX_UNKNOWN
+	command := *runner.Command(git, "ls-files", "--exclude-standard", "-om")
+	var out []byte
+	var err error
+	if out, err = command.CombinedOutput(); err != nil {
+		grs.Debug("ls-files failed: %v\n%v\n", err, string(out))
+		return
+	}
+	if len(out) != 0 {
+		rstat.Index = status.INDEX_MODIFIED
+		return
+	}
+
+	command = *runner.Command(git, "diff-index", "HEAD")
+	if out, err = command.CombinedOutput(); err != nil {
+		grs.Debug("diff-index failed: %v\n%v\n", err, string(out))
+		return
+	}
+	if len(out) != 0 {
+		rstat.Index = status.INDEX_MODIFIED
+		return
+	}
+
+	rstat.Index = status.INDEX_UNMODIFIED
+}
+
+
+
 type Script func(grs.Repo, grs.CommandRunner) status.RStat

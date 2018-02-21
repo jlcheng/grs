@@ -46,8 +46,12 @@ func main() {
 		}
 		if rstat.Dir == status.DIR_VALID {
 			script.GetRepoStatus(runner, rstat)
-			fmt.Printf("repo [%v] status is %v\n", repo.Path, rstat.Branch)
+
 		}
+		if rstat.Dir == status.DIR_VALID {
+			script.GetIndexStatus(runner, rstat)
+		}
+		fmt.Printf("repo [%v] status is %v, %v\n", repo.Path, rstat.Branch, rstat.Index)
 	}
 }
 
