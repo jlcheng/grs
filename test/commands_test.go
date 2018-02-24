@@ -4,13 +4,12 @@ import (
 	"testing"
 	"errors"
 	"fmt"
-	"jcheng/grs/grs"
 )
 
-var echoOne *grs.Command = NewCommandHelper([]byte("one"), nil)
-var echoTwo *grs.Command = NewCommandHelper([]byte("two"), nil)
-var dateS *grs.Command = NewCommandHelper([]byte("1515196992"), nil)
-var failed *grs.Command = NewCommandHelper(make([]byte,0), errors.New("failed"))
+var echoOne = NewCommandHelper([]byte("one"), nil)
+var echoTwo = NewCommandHelper([]byte("two"), nil)
+var dateS = NewCommandHelper([]byte("1515196992"), nil)
+var failed = NewCommandHelper(make([]byte,0), errors.New("failed"))
 
 func TestMockCommandFail(t *testing.T) {
 	m := NewMockRunner()
