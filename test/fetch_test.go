@@ -4,12 +4,11 @@ import (
 	"testing"
 	"jcheng/grs/script"
 	"jcheng/grs/status"
-	"errors"
 )
 
-func TestFetch_Git_Failed(t *testing.T) {
+func TestFetch_Git_Fail(t *testing.T) {
 	runner := NewMockRunner()
-	runner.Add(NewCommandHelper([]byte(""), errors.New("failed")))
+	runner.Add(Error("failed"))
 	rstat := status.NewRStat()
 	rstat.Dir = status.DIR_VALID
 	script.Fetch(runner, rstat)
@@ -20,7 +19,7 @@ func TestFetch_Git_Failed(t *testing.T) {
 
 func TestFetch_Git_OK(t *testing.T) {
 	runner := NewMockRunner()
-	runner.AddMap("git", NewCommandHelper([]byte("0"),nil))
+	runner.AddMap("git", Ok("0"))
 	rstat := status.NewRStat()
 	rstat.Dir = status.DIR_VALID
 	script.Fetch(runner, rstat)

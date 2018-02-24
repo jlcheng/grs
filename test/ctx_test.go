@@ -7,7 +7,8 @@ import (
 	"jcheng/grs/config"
 )
 
-func TestGetReposCli(t *testing.T) {
+// TestGetReposCli verifies the getter/setter for CliRepos
+func TestGetRepos_Cli(t *testing.T) {
 	ctx := grs.GetContext()
 	in := []string{"cli/rel/repo1","/cli/abs/repo2"}
 	ctx.CliRepos(in)
@@ -17,7 +18,8 @@ func TestGetReposCli(t *testing.T) {
 	}
 }
 
-func TestGetReposConfFile(t *testing.T) {
+// TestGetRepos_ConfFile verifies resolving repos from ConfigParams
+func TestGetRepos_ConfFile(t *testing.T) {
 	ctx := grs.GetContext()
 	ctx.CliRepos([]string{})
 
@@ -37,7 +39,8 @@ func TestGetReposConfFile(t *testing.T) {
 	}
 }
 
-func TestGetReposCliAndConfFile(t *testing.T) {
+// TestGetRepos_Cli_And_ConfFile verifies that CLI takes precedence
+func TestGetRepos_Cli_And_ConfFile(t *testing.T) {
 	ctx := grs.GetContext()
 	in := []string{"cli/rel/repo1","/cli/abs/repo2"}
 	ctx.CliRepos(in)
@@ -48,7 +51,8 @@ func TestGetReposCliAndConfFile(t *testing.T) {
 	}
 }
 
-func TestGetGitExecConfFile(t *testing.T) {
+// TestGetGitExec_ConfFile verifies that GetGitExec() is controlled by ConfigParams
+func TestGetGitExec_ConfFile(t *testing.T) {
 	ctx := grs.GetContext()
 	ctx.ConfParams(&config.ConfigParams{User: "data/config.json"})
 
@@ -57,7 +61,7 @@ func TestGetGitExecConfFile(t *testing.T) {
 	}
 }
 
-// Verifies that the default git exec is `git`
+// Verifies that the default GetGitExec() is `git`
 func TestGetGitExecDefault(t *testing.T) {
 	ctx := grs.GetContext().ResetInternal()
 

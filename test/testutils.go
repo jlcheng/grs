@@ -30,6 +30,18 @@ func NewCommandHelper(bytes []byte, err error) *grs.Command {
 	return &r
 }
 
+
+var _EMPTY_BYTES = []byte("")
+// Error is a convenience function for mocking common errors
+func Error(msg string) *grs.Command {
+	return NewCommandHelper(_EMPTY_BYTES, errors.New(msg))
+}
+
+func Ok(msg string) *grs.Command {
+	return NewCommandHelper([]byte(msg), nil)
+}
+
+
 // MockRunner holds a sequence of Commands, mapped to their command-line text. When the user specifies a command text,
 // it returns the corresponding command and advances to the next command in memory.
 type MockRunner struct {

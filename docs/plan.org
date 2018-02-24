@@ -5,50 +5,13 @@
 * // M-Shift-Ret add new TODO
 * // S-TAB cycle folding
 * == Dev Plan
-* DONE FEATURE: Implement detection of up-to-date + modified
-* DONE TEST: Add unit test for GetIndexStatus
-* DONE BUG: for GetIndexStatus - handle changes that are staged but not committed
-* TODO Add support to fetch remote tracking branch's commit history before comparing branches (as Jan 2018, the code does not perform any data-modifying logic at all)
-  - Note taken on [2018-02-11 Sun 22:02] \\
-    A failed experiment to include `fetch` in the GetRepoStatus script tells
-    me that I should perform `fetch` in a different script. Otherwise, it looks like
-    GetRepoStatus will turn into a super function that is hard to test - 
-    it'll require setting up fixtures for all the things it does even when I
-    want to test just a small part of its behavior.
-* DONE [#A] TODO:2 unit test for compat.BeforeRun
-* TODO [#C] TODO:3 Get rid of 'noglob' and allow use to specify path to git in config file
-* TODO [#C] TODO:1 Move 'cygwin git' identification logic into a config file
-* DONE Debug why "@\\{u\\}..@" is needed on windows for causes problems on MacOS (scripts.go:GetRepoStatus)`
-   - Note taken on [2018-01-21 Sun 10:49] \\
-     posted to git mailing list to share feedback. moving on to trying pure go git library.
 * TODO [#A] Clean up .gitignore. Remove 'ad-hoc' lines
-* DONE Rejigger conf file reading so that the cli parameter overrides conf files rather being them being mutually exclusive
 * TODO Either rename cliGitExec->defaultGitExec or allow GitExec to be passed via cli
-* TODO CONSISTENCY: Change test of form TestMockCommandOk  to TestMockCommmand_Ok and _Failed
 * TODO Add makefile or gb for running tests
-* TODO Type can be omitted (*grs.Command) in commands_test.go
 * TODO UX: Print error messsage when .grs.json is missing a ',' - now it just silently fails (user, "why is it not using the repos in the file?")
 * TODO UX: Do not run 'git fetch' by default. Store fetch date in per-repo metadata. 
 * TODO UX: Print 'DEBUG' only when -v is specified on the cli
 * TODO BUG: Handle case when the current branch is untracked
 * TODO UX: logging.Info should output only when running from cli
-* DONE Write test case for TestGetRepoStatus_Git_From_Ctx to verify the script gets the git command from Ctx
-  SCHEDULED: <2018-02-11 Sun>
 * TODO Rename grs.Command to something that is not so much like 'Cmd'
 * TODO DRY: `if d, e := os.Getwd(); e != nil {` in 3 different places
-* TODO CLARITY: Rename NewCommandHelper-> ConstantOutput() && ConstantError()
-* DONE Fix bug: grs does not seem to detect repos behind
-  - Note taken on [2018-02-15 Thu 20:55] \\
-    Fix is with the rev-list command, should be @{upstream}...HEAD, but I had @{upstream}..HEAD
-  - Note taken on [2018-02-14 Wed 12:05] \\
-    ~/privprjs/grs$ git status
-    On branch master
-    Your branch is behind 'origin/master' by 6 commits, and can be fast-forwarded.
-      (use "git pull" to update your local branch)
-    
-    nothing to commit, working tree clean
-    ~/privprjs/grs$ ~/bin/grs2 
-    [DEBUG] Using hard-coded script `GetRepoStatus`
-    repos [/Users/jcheng/privprjs/dotfiles] status is UP-TO-DATE
-    repos [/Users/jcheng/privprjs/grs] status is UP-TO-DATE
-* DONE CRITICAL: Look into 'ssh: Could not resolve hostname github.com: Non-recoverable failure in name resolution' on windows

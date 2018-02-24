@@ -11,7 +11,7 @@ var echoTwo = NewCommandHelper([]byte("two"), nil)
 var dateS = NewCommandHelper([]byte("1515196992"), nil)
 var failed = NewCommandHelper(make([]byte,0), errors.New("failed"))
 
-func TestMockCommandFail(t *testing.T) {
+func TestMockCommand_Fail(t *testing.T) {
 	m := NewMockRunner()
 	m.Add(failed)
 	cmd := *m.Command("echo","one")
@@ -24,7 +24,7 @@ func TestMockCommandFail(t *testing.T) {
 	}
 }
 
-func TestMockCommandEmpty(t *testing.T) {
+func TestMockCommand_Empty(t *testing.T) {
 	m := NewMockRunner()
 	cmd := *m.Command("echo","one")
 	out, err := cmd.CombinedOutput()
@@ -39,7 +39,7 @@ func TestMockCommandEmpty(t *testing.T) {
 	}
 }
 
-func TestMockCommandOk(t *testing.T) {
+func TestMockCommand_Ok(t *testing.T) {
 	m := NewMockRunner()
 	m.Add(echoOne)
 	cmd := *m.Command("echo","one")
@@ -52,7 +52,7 @@ func TestMockCommandOk(t *testing.T) {
 	}
 }
 
-func TestMockCommandMulti(t *testing.T) {
+func TestMockCommand_Multi_Ok(t *testing.T) {
 	m := NewMockRunner()
 	m.Add(echoOne)
 	m.Add(echoTwo)
@@ -77,7 +77,7 @@ func TestMockCommandMulti(t *testing.T) {
 	}
 }
 
-func TestMockCommandMapOk(t *testing.T) {
+func TestMockCommandMap_Ok(t *testing.T) {
 	m := NewMockRunner()
 	m.AddMap("date \\+%s", dateS) // Must to escape + as arg is a regexp
 	m.AddMap("echo one", echoOne)
@@ -101,7 +101,7 @@ func TestMockCommandMapOk(t *testing.T) {
 	}
 }
 
-func TestMockCommandHistoryCount(t *testing.T) {
+func TestMockCommand_HistoryCount(t *testing.T) {
 	m := *NewMockRunner()
 
 	m.Command("foo")
