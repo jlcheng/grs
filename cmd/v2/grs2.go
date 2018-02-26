@@ -9,6 +9,7 @@ import (
 	"strings"
 	"jcheng/grs/status"
 	"jcheng/grs/config"
+	"jcheng/grs/grsdb"
 )
 
 type Args struct {
@@ -37,22 +38,27 @@ func main() {
 	}
 
 	board := status.NewStatusboard(repos...)
+	ctx := grs.NewAppContext()
+	if db, err := grsdb.LoadFile(ctx.DbPath); err == nil {
+		ctx.SetDB(db)
+	}
 	for _, elem := range board.Repos() {
 		repo := grs.Repo{Path:elem}
 		rstat := status.NewRStat()
-		script.BeforeScript(repo, runner, rstat)
+		script.BeforeScript(ctx, repo, runner, rstat)
 		if rstat.Dir == status.DIR_VALID {
-			script.Fetch(runner, rstat)
+			script.Fetch(ctx, runner, rstat, repo)
 		}
 		if rstat.Dir == status.DIR_VALID {
-			script.GetRepoStatus(runner, rstat)
+			script.GetRepoStatus(ctx, runner, rstat)
 
 		}
 		if rstat.Dir == status.DIR_VALID {
-			script.GetIndexStatus(runner, rstat)
+			script.GetIndexStatus(ctx, runner, rstat)
 		}
 		fmt.Printf("repo [%v] status is %v, %v\n", repo.Path, rstat.Branch, rstat.Index)
 	}
+	grsdb.SaveFile(ctx.DBWriter(), ctx.DbPath, ctx.DB())
 }
 
 

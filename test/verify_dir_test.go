@@ -20,7 +20,7 @@ func TestBeforeScript_Fail(t *testing.T) {
 	}
 	rstat := status.NewRStat()
 	runner.Add(Error("failed"))
-	script.BeforeScript(repo, runner, rstat)
+	script.BeforeScript(grs.NewAppContext(), repo, runner, rstat)
 	if rstat.Dir == status.DIR_VALID {
 		t.Errorf("expected %s, got: %v\n" +
 			"", status.DIR_INVALID, rstat.Dir)
@@ -38,7 +38,7 @@ func TestBeforeScript_OK(t *testing.T) {
 	}
 	rstat := status.NewRStat()
 	runner.Add(Ok(""))
-	script.BeforeScript(repo, runner, rstat)
+	script.BeforeScript(grs.NewAppContext(), repo, runner, rstat)
 	if rstat.Dir != status.DIR_VALID {
 		t.Errorf("expected %s, got: %v\n", status.DIR_VALID, rstat.Dir)
 	}

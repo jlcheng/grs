@@ -95,9 +95,12 @@ The config module provides `GetCurrConfig`, which allows the user to specify the
 the `git` program and target repos using a config file.
 
 # ctx
-The ctx module is a singleton context that is available throughout the entire ilfe of the `grs`
-program. The context (`GetContext()`) provides global methods:
+The AppContext instance is available throughout most of the `grs` program. It provides globally
+useful methods:
+
 ```$golang
 GetRepos() - Which repos to scan
 GetGitExec() - The `git` executable to use
+GetPrinter() - (TODO) The API for presenting messages to users with different verbosity settings
+GetDB() - Read/Save the "last fetched" time for each Repo
 ```

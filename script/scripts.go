@@ -8,11 +8,12 @@ import (
 	"strings"
 	"errors"
 	"strconv"
+	"jcheng/grs/grsdb"
+	"time"
 )
 
 // BeforeScript chdir to the repo directory and validates the repo. Sets rstat.Dir to `DIR_VALID` on success.
-func BeforeScript(repo grs.Repo, runner grs.CommandRunner, rstat *status.RStat) {
-	ctx := grs.GetContext()
+func BeforeScript(ctx *grs.AppContext, repo grs.Repo, runner grs.CommandRunner, rstat *status.RStat) {
 	git := ctx.GetGitExec()
 
 	if f, err := os.Stat(repo.Path); err != nil || !f.IsDir() {
@@ -32,29 +33,49 @@ func BeforeScript(repo grs.Repo, runner grs.CommandRunner, rstat *status.RStat) 
 }
 
 // Fetch runs `git fetch`. Sets rstat.Dir to `DIR_INVALID` on error
-func Fetch(runner grs.CommandRunner, rstat *status.RStat) {
+func Fetch(ctx *grs.AppContext, runner grs.CommandRunner, rstat *status.RStat, repo grs.Repo) {
 	if rstat.Dir != status.DIR_VALID {
 		return
 	}
 
-	ctx := grs.GetContext()
+	var rIdx = -1
+	db := ctx.DB()
+
+	for i, r := range db.Repos {
+		if r.Id == repo.Path {
+			rIdx = i
+			break
+		}
+	}
+	if rIdx == -1 {
+		tmp := grsdb.Repo{Id: repo.Path}
+		db.Repos = append(db.Repos, tmp)
+		rIdx = len(db.Repos) - 1
+	}
+	now := time.Now().Unix()
+	if db.Repos[rIdx].FetchedSec > (now - int64(ctx.MinFetchSec)) {
+		return
+	}
+
 	git := ctx.GetGitExec()
 
 	command := *runner.Command(git, "fetch")
 	if out, err := command.CombinedOutput(); err != nil {
-		grs.Debug("fetch failed: %v\n%v\n", err, string(out))
+		grs.Debug("fetch failed: %v\n%v", err, string(out))
 		rstat.Dir = status.DIR_INVALID
 		return
 	}
+	grs.Debug("git fetch for %v", repo.Path)
+
+	db.Repos[rIdx].FetchedSec = time.Now().Unix()
 }
 
 // GetRepoStatus gives a summary of the repo's status. Sets a number of `rstat` properties.
-func GetRepoStatus(runner grs.CommandRunner, rstat *status.RStat) {
+func GetRepoStatus(ctx *grs.AppContext, runner grs.CommandRunner, rstat *status.RStat) {
 	if rstat.Dir != status.DIR_VALID {
 		return
 	}
 
-	ctx := grs.GetContext()
 	git := ctx.GetGitExec()
 
 	rstat.Dir = status.DIR_VALID
@@ -62,7 +83,7 @@ func GetRepoStatus(runner grs.CommandRunner, rstat *status.RStat) {
 	var out []byte
 	var err error
 	if out, err = command.CombinedOutput(); err != nil {
-		grs.Debug("rev-list failed: %v\n%v\n", err, string(out))
+		grs.Debug("rev-list failed: %v\n%v", err, string(out))
 		rstat.Dir = status.DIR_INVALID
 		return
 	}
@@ -74,7 +95,6 @@ func GetRepoStatus(runner grs.CommandRunner, rstat *status.RStat) {
 	}
 
 	grs.Debug("CMD: git rev-list --left-right --count @{upstream}...HEAD")
-	grs.Debug(string(out))
 
 	if diff.remote == 0 && diff.local == 0 {
 		rstat.Branch = status.BRANCH_UPTODATE
@@ -119,12 +139,11 @@ func parseRevList(out []byte) (diff RemoteDiff, err error) {
 
 // GetIndexStatus sets the rstat.index property to modified if there are uncommited changes or if the index has been
 // modified
-func GetIndexStatus(runner grs.CommandRunner, rstat *status.RStat) {
+func GetIndexStatus(ctx *grs.AppContext, runner grs.CommandRunner, rstat *status.RStat) {
 	if rstat.Dir != status.DIR_VALID {
 		return
 	}
 
-	ctx := grs.GetContext()
 	git := ctx.GetGitExec()
 
 	rstat.Index = status.INDEX_UNKNOWN
@@ -152,7 +171,6 @@ func GetIndexStatus(runner grs.CommandRunner, rstat *status.RStat) {
 
 	rstat.Index = status.INDEX_UNMODIFIED
 }
-
 
 
 type Script func(grs.Repo, grs.CommandRunner) status.RStat

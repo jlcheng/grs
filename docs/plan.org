@@ -8,10 +8,12 @@
 * TODO [#A] Clean up .gitignore. Remove 'ad-hoc' lines
 * TODO Either rename cliGitExec->defaultGitExec or allow GitExec to be passed via cli
 * TODO Add makefile or gb for running tests
-* TODO STYLE: Make ctx not a singleton to simplify testing
+* DONE STYLE: Make ctx not a singleton to simplify testing
 * TODO UX: Print error messsage when .grs.json is missing a ',' - now it just silently fails (user, "why is it not using the repos in the file?")
-* TODO UX: Do not run 'git fetch' by default. Store fetch date in per-repo metadata. 
-* TODO Get rid of the basic.go:Cmd type
+* TODO CLEANUP: Get rid of the basic.go:Cmd type
+* TODO CLEANUP: Get rid of the basic.go:Script type
+* DONE UX: Do not always run 'git fetch'. Store fetch date in per-repo metadata. 
+  SCHEDULED: <2018-02-24 Sat>
 * TODO UX: Print 'DEBUG' only when -v is specified on the cli
 * TODO BUG: Handle case when the current branch is untracked
 * TODO UX: logging.Info should output only when running from cli

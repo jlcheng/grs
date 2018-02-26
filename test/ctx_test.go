@@ -9,7 +9,7 @@ import (
 
 // TestGetReposCli verifies the getter/setter for CliRepos
 func TestGetRepos_Cli(t *testing.T) {
-	ctx := grs.GetContext()
+	ctx := grs.NewAppContext()
 	in := []string{"cli/rel/repo1","/cli/abs/repo2"}
 	ctx.CliRepos(in)
 
@@ -20,7 +20,7 @@ func TestGetRepos_Cli(t *testing.T) {
 
 // TestGetRepos_ConfFile verifies resolving repos from ConfigParams
 func TestGetRepos_ConfFile(t *testing.T) {
-	ctx := grs.GetContext()
+	ctx := grs.NewAppContext()
 	ctx.CliRepos([]string{})
 
 	ctx.ConfParams(&config.ConfigParams{Env: "data/config.json", User: "data/empty_config.json"})
@@ -41,7 +41,7 @@ func TestGetRepos_ConfFile(t *testing.T) {
 
 // TestGetRepos_Cli_And_ConfFile verifies that CLI takes precedence
 func TestGetRepos_Cli_And_ConfFile(t *testing.T) {
-	ctx := grs.GetContext()
+	ctx := grs.NewAppContext()
 	in := []string{"cli/rel/repo1","/cli/abs/repo2"}
 	ctx.CliRepos(in)
 	ctx.ConfParams(&config.ConfigParams{User: "data/config.json"})
@@ -53,7 +53,7 @@ func TestGetRepos_Cli_And_ConfFile(t *testing.T) {
 
 // TestGetGitExec_ConfFile verifies that GetGitExec() is controlled by ConfigParams
 func TestGetGitExec_ConfFile(t *testing.T) {
-	ctx := grs.GetContext()
+	ctx := grs.NewAppContext()
 	ctx.ConfParams(&config.ConfigParams{User: "data/config.json"})
 
 	if r := ctx.GetGitExec(); r != "/path/to/git" {
@@ -63,7 +63,7 @@ func TestGetGitExec_ConfFile(t *testing.T) {
 
 // Verifies that the default GetGitExec() is `git`
 func TestGetGitExecDefault(t *testing.T) {
-	ctx := grs.GetContext().ResetInternal()
+	ctx := grs.NewAppContext()
 
 	if r := ctx.GetGitExec(); r != "git" {
 		t.Error("Unexpected git executable. Got:", r)
