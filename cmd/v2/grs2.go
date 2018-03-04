@@ -23,7 +23,7 @@ func main() {
 	args := Args{}
 	flag.StringVar(&args.repos, "repos", "", "target repos")
 	flag.StringVar(&args.command, "command", "", "command to run")
-	flag.BoolVar(&args.verbose, "verbose", true, "verbosity")
+	flag.BoolVar(&args.verbose, "verbose", false, "verbosity")
 	flag.Parse()
 
 	if args.verbose {
