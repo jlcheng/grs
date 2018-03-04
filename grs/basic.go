@@ -113,9 +113,6 @@ func (repo *Repo) modifiedRecently() bool {
 	}
 }
 
-// Cmd takes a Repo to act on and returns the result of the command
-type Cmd func(Repo) (*Result, error )
-
 func (cmd *Result) String() string {
 	return cmd.delegate.Stdout.(*bytes.Buffer).String()
 }

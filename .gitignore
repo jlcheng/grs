@@ -23,8 +23,3 @@ docs/*.org_archive
 
 # vi
 *.swp
-
-# Ad-hoc testing, should never be checked-in
-/ignore.*
-# git@vger.kernel.org:cygwin git and golang: how @{u} is handle
-/upstream_shorthand.go
