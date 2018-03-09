@@ -15,6 +15,9 @@ func BeforeCmd(cmd *exec.Cmd) {
 			if elem == "@{upstream}...HEAD" {
 				cmd.Args[i] = "@\\{upstream\\}...HEAD"
 			}
+			if elem == "@{upstream}" {
+				cmd.Args[i] = "@\\{upstream\\}"
+			}
 		}
 	}
 }

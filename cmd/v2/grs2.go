@@ -56,7 +56,13 @@ func main() {
 		if rstat.Dir == status.DIR_VALID {
 			script.GetIndexStatus(ctx, runner, rstat)
 		}
-		fmt.Printf("repo [%v] status is %v, %v\n", repo.Path, rstat.Branch, rstat.Index)
+
+
+		if script.AutoFFMerge(ctx, runner, rstat) {
+			grs.Info("repo [%v] auto fast-foward to latest", repo.Path)
+		} else {
+			grs.Info("repo [%v] status is %v, %v", repo.Path, rstat.Branch, rstat.Index)
+		}
 	}
 	grsdb.SaveFile(ctx.DBWriter(), ctx.DbPath, ctx.DB())
 }
