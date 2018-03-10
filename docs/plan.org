@@ -7,7 +7,9 @@
 * == Dev Plan
 * DONE [#A] Clean up .gitignore. Remove 'ad-hoc' lines
 * TODO DEV: Add makefile or gb for running tests
-* TODO UX: Automatically merge when it is safe to do so
+* DONE UX: Automatically merge when it is safe to do so
+* TODO UX: Update design documnt to reflect current state of the project
+* TODO UX: 0Don't AutoFFMerge when the repo has recently been worked on
 * TODO UX: Print error messsage when .grs.json is missing a ',' - now it just silently fails (user, "why is it not using the repos in the file?")
 * TODO BUG: Handle case when the current branch is untracked
 * TODO UX: logging.Info should output only when running from cli
