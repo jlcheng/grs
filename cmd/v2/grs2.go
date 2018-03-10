@@ -37,13 +37,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	board := status.NewStatusboard(repos...)
 	ctx := grs.NewAppContext()
 	if db, err := grsdb.LoadFile(ctx.DbPath); err == nil {
 		ctx.SetDB(db)
 	}
-	for _, elem := range board.Repos() {
-		repo := grs.Repo{Path:elem}
+	for _, repo := range repos {
 		rstat := status.NewRStat()
 		script.BeforeScript(ctx, repo, runner, rstat)
 		if rstat.Dir == status.DIR_VALID {
