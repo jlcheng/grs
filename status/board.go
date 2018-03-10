@@ -5,7 +5,7 @@ const (
 	DIR_VALID Dirstat = iota
 	DIR_INVALID
 )
-var dirstatStr [DIR_INVALID+1]string = [DIR_INVALID+1]string{
+var dirstatStr = [DIR_INVALID+1]string{
 	"VALID",
 	"INVALID",
 }
@@ -18,7 +18,7 @@ const (
 	BRANCH_BEHIND
 	BRANCH_DIVERGED
 )
-var branchstatdir [BRANCH_DIVERGED+1]string = [BRANCH_DIVERGED+1]string{
+var branchstatdir = [BRANCH_DIVERGED+1]string{
 	"UNKNOWN",
 	"UP-TO-DATE",
 	"AHEAD",
@@ -32,7 +32,7 @@ const(
 	INDEX_MODIFIED
 	INDEX_UNMODIFIED
 )
-var indexstatdir [INDEX_UNMODIFIED+1]string = [INDEX_UNMODIFIED+1]string{
+var indexstatdir = [INDEX_UNMODIFIED+1]string{
 	"UNKNOWN",
 	"MODIFIED",
 	"UNMODIFIED",
