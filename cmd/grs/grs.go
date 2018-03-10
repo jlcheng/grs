@@ -10,6 +10,7 @@ import (
 	"jcheng/grs/status"
 	"jcheng/grs/config"
 	"jcheng/grs/grsdb"
+	"time"
 )
 
 type Args struct {
@@ -56,7 +57,13 @@ func main() {
 		}
 
 
-		if script.AutoFFMerge(ctx, runner, rstat) {
+		merged := false
+		if atime, err := script.GetActivityTime(repo.Path);
+			err == nil && time.Now().After(atime.Add(ctx.ActivityTimeout)) {
+			merged = script.AutoFFMerge(ctx, runner, rstat)
+		}
+
+		if merged {
 			grs.Info("repo [%v] auto fast-foward to latest", repo.Path)
 		} else {
 			grs.Info("repo [%v] status is %v, %v", repo.Path, rstat.Branch, rstat.Index)

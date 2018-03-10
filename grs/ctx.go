@@ -5,6 +5,7 @@ import (
 	"jcheng/grs/grsdb"
 	"path/filepath"
 	"os"
+	"time"
 )
 
 type AppContext struct {
@@ -14,6 +15,7 @@ type AppContext struct {
 	dbWriter grsdb.DBWriter
 	db *grsdb.DB
 	MinFetchSec int
+	ActivityTimeout time.Duration
 	DbPath string
 }
 
@@ -25,6 +27,7 @@ func NewAppContext() *AppContext {
 		dbWriter: grsdb.FileDBWriter,
 		db: &grsdb.DB{Repos:make([]grsdb.Repo,0)},
 		MinFetchSec: 60 * 60,
+		ActivityTimeout: 2 * time.Hour,
 		DbPath: filepath.Join(os.ExpandEnv("${HOME}"),".grsdb.json"),
 	}
 }

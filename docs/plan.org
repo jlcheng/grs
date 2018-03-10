@@ -6,11 +6,15 @@
 * // S-TAB cycle folding
 * == Dev Plan
 * DONE [#A] Clean up .gitignore. Remove 'ad-hoc' lines
-* TODO DEV: Add makefile or gb for running tests
+* DONE DEV: Add makefile or gb for running tests
 * DONE UX: Automatically merge when it is safe to do so
-* TODO UX: Update design documnt to reflect current state of the project
-* TODO UX: 0Don't AutoFFMerge when the repo has recently been worked on
+* DONE UX: Update design documnt to reflect current state of the project
+* TODO UX: Don't AutoFFMerge when the repo has recently been worked on
+* TODO DEV: Amend Makefile to output grs in output
+* TODO UX: Do not set directory status to UNKNOWN if `git fetch` fails
 * TODO UX: Print error messsage when .grs.json is missing a ',' - now it just silently fails (user, "why is it not using the repos in the file?")
+* TODO DEV: Manually gofmt all files
+* TODO DEV: Replace `lut` with `ltime` or some other reasonable name "for last used time"
 * TODO BUG: Handle case when the current branch is untracked
 * TODO UX: logging.Info should output only when running from cli
 * TODO Rename grs.Command to something that is not so much like 'Cmd'

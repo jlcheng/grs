@@ -5,6 +5,10 @@ import (
 	"jcheng/grs/grs"
 	"jcheng/grs/script"
 	"jcheng/grs/status"
+	"os"
+	"io/ioutil"
+	"path/filepath"
+	"time"
 )
 
 // TestAutoFFMerge_Fail verifies that merge --ff-only is not invoked
@@ -51,3 +55,44 @@ func verifiedGitNotCalled(t *testing.T, dir status.Dirstat, branch status.Branch
 		t.Errorf("unexpected `git merge` when dirstat=%v, branchstat=%v, indexstat=%v\n", dir, branch, index)
 	}
 }
+
+func TestGetActivityTime(t *testing.T) {
+	oldwd, err := os.Getwd()
+	d, err := ioutil.TempDir("", "grstest")
+	if err != nil {
+		t.Fatalf("TestGetActivityTime: %v", err)
+	}
+	defer func() {
+		if err := os.Chdir(oldwd); err != nil {
+			t.Fatal("TestGetActivityTime.defer: ", err)
+		}
+		if err := os.RemoveAll(d); err != nil {
+			t.Fatal("TestGetActivityTime.defer: ", err)
+		}
+	}()
+
+	if err := os.Chdir(d); err != nil {
+		t.Fatalf("TestGetActivityTime: %v", err)
+	}
+
+
+	os.Mkdir(filepath.Join(d, ".git"), 0777)
+	fname := filepath.Join(d, ".git", "HEAD")
+	fh, err := os.Create(fname)
+	fh.Close()
+
+	atime := time.Date(1900, time.January, 1, 1, 0, 0, 0, time.UTC)
+	mtime := time.Date(2000, time.January, 1, 1, 0, 0, 0, time.UTC)
+	if err := os.Chtimes(fname, atime, mtime); err != nil {
+		t.Fatal("TestGetActivityTime: %v", err)
+	}
+
+	activity, err := script.GetActivityTime(d)
+	if err != nil {
+		t.Fatal("unexpected error", err)
+	}
+	if !activity.Equal(mtime) {
+		t.Error("unexpected last activity time: ", activity)
+	}
+}
+
