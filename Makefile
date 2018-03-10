@@ -5,11 +5,11 @@ GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
 GORUN=$(GOCMD) run
-GOMAIN=cmd/v2/grs2.go
-BINARY_NAME=grs2
+GOMAIN=cmd/grs/grs.go
+BINARY_NAME=grs
 
 ifeq ($(OS),Windows_NT)
-	BINARY_NAME=grs2.exe
+	BINARY_NAME=grs.exe
 endif
 
 
@@ -24,7 +24,7 @@ clean:
 	$(GOCLEAN)
 	rm -f $(BINARY_NAME)
 
-install: build
+install: all
 	mv $(BINARY_NAME) $(HOME)/bin
 
 run:
