@@ -7,6 +7,7 @@ GOGET=$(GOCMD) get
 GORUN=$(GOCMD) run
 GOMAIN=cmd/grs/grs.go
 BINARY_NAME=grs
+OUTDIR=out
 
 ifeq ($(OS),Windows_NT)
 	BINARY_NAME=grs.exe
@@ -14,18 +15,21 @@ endif
 
 
 all: test build
-build: 
-	$(GOBUILD) -o $(BINARY_NAME) $(GOMAIN)
+build: | $(OUTDIR)
+	$(GOBUILD) -o $(OUTDIR)/$(BINARY_NAME) $(GOMAIN)
 
 .PHONY: test
 test: 
 	$(GOTEST) -v ./...
 clean: 
 	$(GOCLEAN)
-	rm -f $(BINARY_NAME)
+	rm -rf $(OUTDIR)
 
 install: all
-	mv $(BINARY_NAME) $(HOME)/bin
+	mv $(OUTDIR)/$(BINARY_NAME) $(HOME)/bin
 
 run:
 	$(GORUN) $(GOMAIN)
+
+$(OUTDIR):
+	mkdir -p $(OUTDIR)
