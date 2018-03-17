@@ -1,15 +1,13 @@
 package main
 
 import (
-	"jcheng/grs/grs"
-	"os"
 	"flag"
 	"fmt"
-	"jcheng/grs/script"
-	"strings"
-	"jcheng/grs/status"
-	"jcheng/grs/config"
+	"jcheng/grs/grs"
 	"jcheng/grs/grsdb"
+	"jcheng/grs/script"
+	"jcheng/grs/status"
+	"os"
 	"time"
 )
 
@@ -32,17 +30,20 @@ func main() {
 	}
 
 	runner := grs.ExecRunner{}
-	repos := defaultRepos(args)
+
+	ctx := grs.NewAppContext()
+	repos := ctx.GetRepos()
 	if len(repos) == 0 {
 		fmt.Println("repos not specified")
 		os.Exit(1)
 	}
 
-	ctx := grs.NewAppContext()
 	if db, err := grsdb.LoadFile(ctx.DbPath); err == nil {
 		ctx.SetDB(db)
 	}
-	for _, repo := range repos {
+
+	for _, repoId := range repos {
+		repo := grs.Repo{Path: repoId}
 		rstat := status.NewRStat()
 		script.BeforeScript(ctx, repo, runner, rstat)
 		if rstat.Dir == status.DIR_VALID {
@@ -56,10 +57,8 @@ func main() {
 			script.GetIndexStatus(ctx, runner, rstat)
 		}
 
-
 		merged := false
-		if atime, err := script.GetActivityTime(repo.Path);
-			err == nil && time.Now().After(atime.Add(ctx.ActivityTimeout)) {
+		if atime, err := script.GetActivityTime(repo.Path); err == nil && time.Now().After(atime.Add(ctx.ActivityTimeout)) {
 			merged = script.AutoFFMerge(ctx, runner, rstat)
 		}
 
@@ -70,28 +69,4 @@ func main() {
 		}
 	}
 	grsdb.SaveFile(ctx.DBWriter(), ctx.DbPath, ctx.DB())
-}
-
-
-
-// defaultRepo returns a Repo based on CLI args, Env variable, then defaults to "$HOME/grstest"
-func defaultRepos(args Args) []grs.Repo {
-	if len(args.repos) != 0 {
-		grs.Debug("Using repos from CLI: %v", args.repos)
-		return mkrepos(args.repos)
-	}
-
-	p := config.NewConfigParams()
-	if c, _ := config.GetCurrConfig(p); c != nil {
-		return grs.ReposFromConf(c.Repos)
-	}
-	return []grs.Repo{}
-}
-
-func mkrepos(s string) []grs.Repo {
-	res := make([]grs.Repo, 0, 1)
-	for _, elem := range strings.Split(s, string(os.PathListSeparator)) {
-		res = append(res, grs.Repo{Path:elem})
-	}
-	return res
 }
