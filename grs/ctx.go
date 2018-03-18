@@ -4,31 +4,30 @@ import (
 	"jcheng/grs/config"
 	"jcheng/grs/grsdb"
 	"path/filepath"
-	"os"
 	"time"
 )
 
 type AppContext struct {
-	confParams *config.ConfigParams
-	cliRepos []string
-	defaultGitExec string
-	dbWriter grsdb.DBWriter
-	db *grsdb.DB
-	MinFetchSec int
+	confParams      *config.ConfigParams
+	cliRepos        []string
+	defaultGitExec  string
+	dbWriter        grsdb.DBWriter
+	db              *grsdb.DB
+	MinFetchSec     int
 	ActivityTimeout time.Duration
-	DbPath string
+	DbPath          string
 }
 
 func NewAppContext() *AppContext {
 	return &AppContext{
-		confParams: config.NewConfigParams(),
-		defaultGitExec: "git",
-		cliRepos: []string{},
-		dbWriter: grsdb.FileDBWriter,
-		db: &grsdb.DB{Repos:make([]grsdb.Repo,0)},
-		MinFetchSec: 60 * 60,
+		confParams:      config.NewConfigParams(),
+		defaultGitExec:  "git",
+		cliRepos:        []string{},
+		dbWriter:        grsdb.FileDBWriter,
+		db:              &grsdb.DB{Repos: make([]grsdb.Repo, 0)},
+		MinFetchSec:     60 * 60,
 		ActivityTimeout: 2 * time.Hour,
-		DbPath: filepath.Join(os.ExpandEnv("${HOME}"),".grsdb.json"),
+		DbPath:          filepath.Join(config.UserDB),
 	}
 }
 
@@ -46,17 +45,17 @@ func (ctx *AppContext) GetRepos() []string {
 	}
 
 	if c, err := config.GetCurrConfig(ctx.confParams); err == nil {
-		r := make([]string,len(c.Repos))
-		for idx,elem := range c.Repos {
+		r := make([]string, len(c.Repos))
+		for idx, elem := range c.Repos {
 			r[idx] = elem.Path
 		}
 		return r
 	}
-	return make([]string,0)
+	return make([]string, 0)
 }
 
 func (ctx *AppContext) GetGitExec() string {
-	if c, err := config.GetCurrConfig(ctx.confParams); err == nil && len(c.Git) != 0  {
+	if c, err := config.GetCurrConfig(ctx.confParams); err == nil && len(c.Git) != 0 {
 		return c.Git
 	}
 

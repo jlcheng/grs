@@ -1,14 +1,14 @@
 package config
 
 import (
-	"os"
 	"encoding/json"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 )
 
 type Config struct {
-	Git string
+	Git   string
 	Repos []RepoConf
 }
 
@@ -17,14 +17,14 @@ type RepoConf struct {
 }
 
 type ConfigParams struct {
-	Env string
+	Env  string
 	User string
 }
 
 func NewConfigParams() *ConfigParams {
 	return &ConfigParams{
-		Env: os.Getenv("GRS_CONF"),
-		User: filepath.Join(os.ExpandEnv("${HOME}"),".grs.json"),
+		Env:  os.Getenv("GRS_CONF"),
+		User: UserConf,
 	}
 }
 

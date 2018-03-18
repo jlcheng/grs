@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"jcheng/grs/config"
 	"jcheng/grs/grs"
 	"jcheng/grs/grsdb"
 	"jcheng/grs/script"
@@ -27,6 +28,11 @@ func main() {
 
 	if args.verbose {
 		grs.SetLogLevel(grs.DEBUG)
+	}
+
+	if err := config.SetupUserPrefDir(config.UserPrefDir); err != nil {
+		grs.Info("Cannot create user preference directory [%v]:%v", err)
+		return
 	}
 
 	runner := grs.ExecRunner{}
