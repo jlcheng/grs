@@ -10,6 +10,11 @@
 * DONE UX: Automatically merge when it is safe to do so
 * DONE UX: Update design documnt to reflect current state of the project
 * DONE UX: Don't AutoFFMerge when the repo has recently been worked on
+* TODO UX: Add an -init option that creates a mock ~/.grs.d/config.json
+* TODO UX: Persist other repo-data
+  - Note taken on [2018-03-17 Sat 20:31] \\
+    . the last commit that was (auto) pulled in from remote
+    . the repo status (ahead/behind/modified)
 * DONE DEV: Amend Makefile to output grs in output
 * TODO UX: Do not set directory status to UNKNOWN if `git fetch` fails
 * TODO UX: Print error messsage when .grs.json is missing a ',' - now it just silently fails (user, "why is it not using the repos in the file?")

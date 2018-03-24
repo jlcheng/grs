@@ -1,9 +1,12 @@
 package grsdb
 
 import (
-	"io/ioutil"
-	"path/filepath"
 	"encoding/json"
+	"io"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"strings"
 )
 
 type DB struct {
@@ -11,12 +14,13 @@ type DB struct {
 }
 
 type Repo struct {
-	Id         string `json:"id"`
-	FetchedSec int64  `json:"fetched_sec"`
+	Id         string     `json:"id"`
+	FetchedSec int64      `json:"fetched_sec"`
+	RStat      RStat_Json `json:"rstat,omitempty"`
 }
 
-func LoadFile(filename string) (*DB, error) {
-	bytes, err := ioutil.ReadFile(filepath.FromSlash(filename))
+func LoadBytes(reader io.Reader) (*DB, error) {
+	bytes, err := ioutil.ReadAll(reader)
 	if err != nil {
 		return nil, err
 	}
@@ -26,6 +30,14 @@ func LoadFile(filename string) (*DB, error) {
 		return nil, err
 	}
 	return db, nil
+}
+
+func LoadFile(filename string) (*DB, error) {
+	reader, err := os.Open(filepath.FromSlash(filename))
+	if err != nil {
+		return nil, err
+	}
+	return LoadBytes(reader)
 }
 
 func SaveFile(writer DBWriter, filename string, db *DB) error {
@@ -46,10 +58,20 @@ func FileDBWriter(filename string, bytes []byte) error {
 type BufferedDBWriter struct {
 	Bytes []byte
 }
+
 func (w *BufferedDBWriter) Write(filename string, bytes []byte) error {
-	w.Bytes = make([]byte,len(bytes))
-	for i,b := range(bytes) {
+	w.Bytes = make([]byte, len(bytes))
+	for i, b := range bytes {
 		w.Bytes[i] = b
+	}
+	return nil
+}
+
+func (db DB) FindRepo(id string) *Repo {
+	for idx, r := range db.Repos {
+		if strings.Compare(id, r.Id) == 0 {
+			return &db.Repos[idx]
+		}
 	}
 	return nil
 }

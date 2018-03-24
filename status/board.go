@@ -2,12 +2,12 @@ package status
 
 type Dirstat int
 const (
-	DIR_VALID Dirstat = iota
-	DIR_INVALID
+	DIR_INVALID Dirstat = iota
+	DIR_VALID
 )
-var dirstatStr = [DIR_INVALID+1]string{
-	"VALID",
+var dirstatStr = [DIR_VALID+1]string{
 	"INVALID",
+	"VALID",
 }
 func (i Dirstat) String() string { return dirstatStr[i] }
 type Branchstat int

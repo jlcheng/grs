@@ -41,6 +41,7 @@ func main() {
 	repos := ctx.GetRepos()
 	if len(repos) == 0 {
 		fmt.Println("repos not specified")
+		fmt.Printf("create %v if it doesn't exist\n", config.UserConf)
 		os.Exit(1)
 	}
 
@@ -66,6 +67,10 @@ func main() {
 		merged := false
 		if atime, err := script.GetActivityTime(repo.Path); err == nil && time.Now().After(atime.Add(ctx.ActivityTimeout)) {
 			merged = script.AutoFFMerge(ctx, runner, rstat)
+		}
+
+		if repoPtr := ctx.DB().FindRepo(repoId); repoPtr != nil {
+			repoPtr.RStat.Update(*rstat)
 		}
 
 		if merged {
