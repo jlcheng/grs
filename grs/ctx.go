@@ -40,26 +40,19 @@ func (ctx *AppContext) ConfParams(confParams *config.ConfigParams) {
 }
 
 func (ctx *AppContext) GetRepos() []string {
-	if len(ctx.cliRepos) != 0 {
-		return ctx.cliRepos
-	}
+	return ctx.cliRepos
+}
 
-	if c, err := config.GetCurrConfig(ctx.confParams); err == nil {
-		r := make([]string, len(c.Repos))
-		for idx, elem := range c.Repos {
-			r[idx] = elem.Path
-		}
-		return r
-	}
-	return make([]string, 0)
+func (ctx *AppContext) SetRepos(repos []string) {
+	ctx.cliRepos = repos
 }
 
 func (ctx *AppContext) GetGitExec() string {
-	if c, err := config.GetCurrConfig(ctx.confParams); err == nil && len(c.Git) != 0 {
-		return c.Git
-	}
-
 	return ctx.defaultGitExec
+}
+
+func (ctx *AppContext) SetGitExec(defaultGitExec string) {
+	ctx.defaultGitExec = defaultGitExec
 }
 
 func (ctx *AppContext) DBWriter() grsdb.DBWriter {
@@ -72,4 +65,20 @@ func (ctx *AppContext) DB() *grsdb.DB {
 
 func (ctx *AppContext) SetDB(db *grsdb.DB) {
 	ctx.db = db
+}
+
+
+func (ctx *AppContext) InitAppContext(p *config.ConfigParams) {
+	c, err := config.GetCurrConfig(p)
+	if err != nil {
+		Debug("Unknown error in initAppContext")
+		ctx.SetGitExec("git")
+		ctx.SetRepos(make([]string,0))
+	}
+	ctx.SetGitExec(c.Git)
+	repos := make([]string, len(c.Repos))
+	for i, r := range c.Repos {
+		repos[i] = r.Path
+	}
+	ctx.SetRepos(repos)
 }

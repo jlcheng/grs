@@ -42,7 +42,8 @@ func TestGetRepoStatus_Git_From_Ctx(t *testing.T) {
 	runner.AddMap("^/path/to/git", Ok("0\t0\n"))
 
 	ctx := grs.NewAppContext()
-	ctx.ConfParams(&config.ConfigParams{User:"data/config.json"})
+	cp := &config.ConfigParams{User:"data/config.json"}
+	ctx.InitAppContext(cp)
 
 	rstat := status.NewRStat()
 	rstat.Dir = status.DIR_VALID

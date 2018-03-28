@@ -17,6 +17,7 @@
     . the repo status (ahead/behind/modified)
 * DONE DEV: Amend Makefile to output grs in output
 * TODO UX: Do not set directory status to UNKNOWN if `git fetch` fails
+* TODO DEV: Get rid of GetRepos() - the list of repos is only ever used in grs.go
 * TODO UX: Print error messsage when .grs.json is missing a ',' - now it just silently fails (user, "why is it not using the repos in the file?")
 * TODO DEV: Ensure ~/.grs.d/grs.conf is not used during unit tests
 * TODO UX: A basic terminal for output message

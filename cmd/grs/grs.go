@@ -38,6 +38,10 @@ func main() {
 	runner := grs.ExecRunner{}
 
 	ctx := grs.NewAppContext()
+
+	cp := config.NewConfigParams()
+	ctx.InitAppContext(cp)
+
 	repos := ctx.GetRepos()
 	if len(repos) == 0 {
 		fmt.Println("repos not specified")

@@ -23,17 +23,20 @@ func TestGetRepos_ConfFile(t *testing.T) {
 	ctx := grs.NewAppContext()
 	ctx.CliRepos([]string{})
 
-	ctx.ConfParams(&config.ConfigParams{Env: "data/config.json", User: "data/empty_config.json"})
+	cp := &config.ConfigParams{Env: "data/config.json", User: "data/empty_config.json"}
+	ctx.InitAppContext(cp)
 	if r := ctx.GetRepos(); !reflect.DeepEqual([]string{"rel/repo1","/abs/repo2"}, r) {
 		t.Error("Unexpected repos. Got: ", r)
 	}
 
-	ctx.ConfParams(&config.ConfigParams{User: "data/config.json"})
+	cp = &config.ConfigParams{User: "data/config.json"}
+	ctx.InitAppContext(cp)
 	if r := ctx.GetRepos(); !reflect.DeepEqual([]string{"rel/repo1","/abs/repo2"}, r) {
 		t.Error("Unexpected repos. Got: ", r)
 	}
 
-	ctx.ConfParams(&config.ConfigParams{})
+	cp = &config.ConfigParams{}
+	ctx.InitAppContext(cp)
 	if r := ctx.GetRepos(); !reflect.DeepEqual([]string{}, r) {
 		t.Error("Unexpected repos. Got: ", r)
 	}
@@ -54,7 +57,8 @@ func TestGetRepos_Cli_And_ConfFile(t *testing.T) {
 // TestGetGitExec_ConfFile verifies that GetGitExec() is controlled by ConfigParams
 func TestGetGitExec_ConfFile(t *testing.T) {
 	ctx := grs.NewAppContext()
-	ctx.ConfParams(&config.ConfigParams{User: "data/config.json"})
+	cp := &config.ConfigParams{User: "data/config.json"}
+	ctx.InitAppContext(cp)
 
 	if r := ctx.GetGitExec(); r != "/path/to/git" {
 		t.Error("Unexpected git executable. Got:", r)

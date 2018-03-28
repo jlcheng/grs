@@ -50,3 +50,4 @@ func readConfFile(filename string) (*Config, error) {
 	}
 	return c, nil
 }
+
