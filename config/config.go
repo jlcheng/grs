@@ -28,7 +28,7 @@ func NewConfigParams() *ConfigParams {
 	}
 }
 
-func GetCurrConfig(p *ConfigParams) (*Config, error) {
+func ReadConfig(p *ConfigParams) (*Config, error) {
 	if len(p.Env) != 0 {
 		return readConfFile(p.Env)
 	}

@@ -18,8 +18,6 @@ type Result struct {
 	Stdout string
 }
 
-
-
 func Status(repo Repo) (*Result, error) {
 	cmd := new(Result)
 	err := os.Chdir(repo.Path)
@@ -118,7 +116,7 @@ func (cmd *Result) String() string {
 }
 
 func ReposFromConf(rc []config.RepoConf) []Repo {
-	var r []Repo = make([]Repo,len(rc))
+	var r = make([]Repo,len(rc))
 	for idx, elem := range rc {
 		r[idx] = Repo{Path:elem.Path}
 	}

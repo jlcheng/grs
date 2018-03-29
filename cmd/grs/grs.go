@@ -40,9 +40,16 @@ func main() {
 	ctx := grs.NewAppContext()
 
 	cp := config.NewConfigParams()
-	ctx.InitAppContext(cp)
+	conf, err := config.ReadConfig(cp)
+	if conf != nil {
+		if conf.Git != "" {
+			ctx.SetGitExec(conf.Git)
+		}
+	} else {
+		grs.Debug("configuration error: %v", err)
+	}
 
-	repos := ctx.GetRepos()
+	repos := grs.ReposFromConf(conf.Repos)
 	if len(repos) == 0 {
 		fmt.Println("repos not specified")
 		fmt.Printf("create %v if it doesn't exist\n", config.UserConf)
@@ -53,8 +60,7 @@ func main() {
 		ctx.SetDB(db)
 	}
 
-	for _, repoId := range repos {
-		repo := grs.Repo{Path: repoId}
+	for _, repo := range repos {
 		rstat := status.NewRStat()
 		script.BeforeScript(ctx, repo, runner, rstat)
 		if rstat.Dir == status.DIR_VALID {
@@ -73,7 +79,7 @@ func main() {
 			merged = script.AutoFFMerge(ctx, runner, rstat)
 		}
 
-		if repoPtr := ctx.DB().FindRepo(repoId); repoPtr != nil {
+		if repoPtr := ctx.DB().FindRepo(repo.Path); repoPtr != nil {
 			repoPtr.RStat.Update(*rstat)
 		}
 

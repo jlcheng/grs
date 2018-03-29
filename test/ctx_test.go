@@ -23,21 +23,23 @@ func TestGetRepos_ConfFile(t *testing.T) {
 	ctx := grs.NewAppContext()
 	ctx.CliRepos([]string{})
 
+	var conf *config.Config
 	cp := &config.ConfigParams{Env: "data/config.json", User: "data/empty_config.json"}
-	ctx.InitAppContext(cp)
-	if r := ctx.GetRepos(); !reflect.DeepEqual([]string{"rel/repo1","/abs/repo2"}, r) {
+	conf, _ = config.ReadConfig(cp)
+
+	if r := RepoIds(conf.Repos); !reflect.DeepEqual([]string{"rel/repo1","/abs/repo2"}, r) {
 		t.Error("Unexpected repos. Got: ", r)
 	}
 
 	cp = &config.ConfigParams{User: "data/config.json"}
-	ctx.InitAppContext(cp)
-	if r := ctx.GetRepos(); !reflect.DeepEqual([]string{"rel/repo1","/abs/repo2"}, r) {
+	conf, _ = config.ReadConfig(cp)
+	if r := RepoIds(conf.Repos); !reflect.DeepEqual([]string{"rel/repo1","/abs/repo2"}, r) {
 		t.Error("Unexpected repos. Got: ", r)
 	}
 
 	cp = &config.ConfigParams{}
-	ctx.InitAppContext(cp)
-	if r := ctx.GetRepos(); !reflect.DeepEqual([]string{}, r) {
+	conf, _ = config.ReadConfig(cp)
+	if r := RepoIds(conf.Repos); !reflect.DeepEqual([]string{}, r) {
 		t.Error("Unexpected repos. Got: ", r)
 	}
 }
@@ -58,7 +60,9 @@ func TestGetRepos_Cli_And_ConfFile(t *testing.T) {
 func TestGetGitExec_ConfFile(t *testing.T) {
 	ctx := grs.NewAppContext()
 	cp := &config.ConfigParams{User: "data/config.json"}
-	ctx.InitAppContext(cp)
+	if conf, _ := config.ReadConfig(cp); conf != nil {
+		ctx.SetGitExec(conf.Git)
+	}
 
 	if r := ctx.GetGitExec(); r != "/path/to/git" {
 		t.Error("Unexpected git executable. Got:", r)
@@ -72,4 +76,12 @@ func TestGetGitExecDefault(t *testing.T) {
 	if r := ctx.GetGitExec(); r != "git" {
 		t.Error("Unexpected git executable. Got:", r)
 	}
+}
+
+func RepoIds(repos []config.RepoConf) ([]string) {
+	retval := make([]string, len(repos))
+	for i, repo := range repos {
+		retval[i] = repo.Path
+	}
+	return retval
 }

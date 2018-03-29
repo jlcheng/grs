@@ -43,7 +43,9 @@ func TestGetRepoStatus_Git_From_Ctx(t *testing.T) {
 
 	ctx := grs.NewAppContext()
 	cp := &config.ConfigParams{User:"data/config.json"}
-	ctx.InitAppContext(cp)
+	if conf, _ := config.ReadConfig(cp); conf != nil {
+		ctx.SetGitExec(conf.Git)
+	}
 
 	rstat := status.NewRStat()
 	rstat.Dir = status.DIR_VALID

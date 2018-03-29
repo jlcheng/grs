@@ -66,19 +66,3 @@ func (ctx *AppContext) DB() *grsdb.DB {
 func (ctx *AppContext) SetDB(db *grsdb.DB) {
 	ctx.db = db
 }
-
-
-func (ctx *AppContext) InitAppContext(p *config.ConfigParams) {
-	c, err := config.GetCurrConfig(p)
-	if err != nil {
-		Debug("Unknown error in initAppContext")
-		ctx.SetGitExec("git")
-		ctx.SetRepos(make([]string,0))
-	}
-	ctx.SetGitExec(c.Git)
-	repos := make([]string, len(c.Repos))
-	for i, r := range c.Repos {
-		repos[i] = r.Path
-	}
-	ctx.SetRepos(repos)
-}

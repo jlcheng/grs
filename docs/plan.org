@@ -10,6 +10,7 @@
 * DONE UX: Automatically merge when it is safe to do so
 * DONE UX: Update design documnt to reflect current state of the project
 * DONE UX: Don't AutoFFMerge when the repo has recently been worked on
+* TODO DEV: Remove unused func, e.g., basic.go:Rebase
 * TODO UX: Add an -init option that creates a mock ~/.grs.d/config.json
 * TODO UX: Persist other repo-data
   - Note taken on [2018-03-17 Sat 20:31] \\

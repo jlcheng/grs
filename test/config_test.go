@@ -8,14 +8,14 @@ import (
 func TestConfigFromEnv(t *testing.T) {
 	p := config.NewConfigParams()
 	p.Env = "data/config.json"
-	c, e := config.GetCurrConfig(p)
+	c, e := config.ReadConfig(p)
 	verifyConfigJson(t, c, e)
 }
 
 func TestConfigFromUserConf(t *testing.T) {
 	p := config.NewConfigParams()
 	p.User = "data/config.json"
-	c, e := config.GetCurrConfig(p)
+	c, e := config.ReadConfig(p)
 	verifyConfigJson(t, c, e)
 }
 
@@ -23,7 +23,7 @@ func TestPriorityEnv(t *testing.T) {
 	p := config.NewConfigParams()
 	p.Env = "data/config.json"
 	p.User = "data/empty_config.json"
-	c, e := config.GetCurrConfig(p)
+	c, e := config.ReadConfig(p)
 	verifyConfigJson(t, c, e)
 }
 
