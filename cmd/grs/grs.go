@@ -10,6 +10,7 @@ import (
 	"jcheng/grs/status"
 	"os"
 	"time"
+	"jcheng/grs/display"
 )
 
 type Args struct {
@@ -60,7 +61,11 @@ func main() {
 		ctx.SetDB(db)
 	}
 
-	for _, repo := range repos {
+
+	var screen display.Display = display.NewAnsiDisplay(os.Stdout)
+
+	var repoStatusList = make([]display.RepoStatus, len(repos))
+	for idx, repo := range repos {
 		rstat := status.NewRStat()
 		script.BeforeScript(ctx, repo, runner, rstat)
 		if rstat.Dir == status.DIR_VALID {
@@ -83,11 +88,13 @@ func main() {
 			repoPtr.RStat.Update(*rstat)
 		}
 
-		if merged {
-			grs.Info("repo [%v] auto fast-foward to latest", repo.Path)
-		} else {
-			grs.Info("repo [%v] status is %v, %v", repo.Path, rstat.Branch, rstat.Index)
+		repoStatusList[idx] = display.RepoStatus{
+			Path: repo.Path,
+			Rstat: *rstat,
+			Merged: merged,
 		}
 	}
 	grsdb.SaveFile(ctx.DBWriter(), ctx.DbPath, ctx.DB())
+	screen.SummarizeRepos(repoStatusList)
+	screen.Update()
 }
