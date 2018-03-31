@@ -16,6 +16,18 @@
   - Note taken on [2018-03-17 Sat 20:31] \\
     . the last commit that was (auto) pulled in from remote
     . the repo status (ahead/behind/modified)
+* TODO UX: GRS should track whether a user has acknowledged the last automerge/update.
+  - Note taken on [2018-03-30 Fri 17:05] \\
+    Make users feel that grs was useful. When grs auto merges the latest remote changes into the local workspace, it should show a notification until the user dismisses it. 
+    
+    This means grs must track two things
+    1. The last time a user 'acknowledged' the state of a local repo
+    2. The last time we detected changes in remote that is not local.  
+    If ack_time <= change_time, then show something like
+    
+    repo [foo] has 15 changes since <last tuesday> and is up-to-date
+    
+    press any key to dismiss
 * DONE DEV: Amend Makefile to output grs in output
 * TODO UX: Do not set directory status to UNKNOWN if `git fetch` fails
 * TODO DEV: Get rid of GetRepos() - the list of repos is only ever used in grs.go
