@@ -5,12 +5,6 @@
 * // M-Shift-Ret add new TODO
 * // S-TAB cycle folding
 * == Dev Plan
-* DONE [#A] Clean up .gitignore. Remove 'ad-hoc' lines
-* DONE DEV: Add makefile or gb for running tests
-* DONE UX: Automatically merge when it is safe to do so
-* DONE UX: Update design documnt to reflect current state of the project
-* DONE UX: Don't AutoFFMerge when the repo has recently been worked on
-* DONE DEV: Remove unused func, e.g., basic.go:Rebase
 * TODO UX: Add an -init option that creates a mock ~/.grs.d/config.json
 * TODO UX: Persist the timestamp of the last time auto-merge occured
   - Note taken on [2018-04-08 Sun 11:17] \\
@@ -31,36 +25,12 @@
     
     press any key to dismiss
 * TODO UX: Repos that are "behind" with only untracked changes should be eligible for auto-forward
-* DONE DEV: Amend Makefile to output grs in output
 * TODO UX: Show last fetch date if more than 2 days old
-* DONE UX: Do not set directory status to DIR_INVALID if `git fetch` fails
-* DONE DEV: Get rid of GetRepos() - the list of repos is only ever used in grs.go
 * TODO UX: Print error messsage when .grs.json is missing a ',' - now it just silently fails (user, "why is it not using the repos in the file?")
-* DONE DEV: Ensure ~/.grs.d/grs.conf is not used during unit tests
-* TODO UX: A basic terminal for output message
-  - Note taken on [2018-03-24 Sat 19:15] \\
-    Code	Effect
-    "\033[0m"	Reset special formatting (such as colour).
-    "\033[30m"	Black text.
-    "\033[31m"	Red text.
-    "\033[32m"	Green text.
-    "\033[33m"	Yellow text.
-    "\033[34m"	Blue text.
-    "\033[35m"	Magenta text.
-    "\033[36m"	Cyan text.
-    "\033[37m"	White text.
-    
-    "\033[2J"	Clear the screen.
-    "\033[H"	Move the cursor to the upper-left corner of the screen.
-    "\033[r;cH"	Move the cursor to row r, column c. Note that both the rows and columns are indexed starting at 1.
-    "\033[?25l"	Hide the cursor.
-    "\033[K"	Delete everything from the cursor to the end of the line.
 * TODO DEV: Manually gofmt all files
-* DONE DEV: Replace `lut` with `ltime` or some other reasonable name "for last used time"
 * TODO BUG: Handle case when the current branch is untracked
 * TODO UX: logging.Info should output only when running from cli
-* TODO DEV: Remove deprecated ctx.Set/DB() methods 
+* DONE DEV: Remove deprecated ctx.Set/DB() methods 
 * TODO DEV: Add unit test for AddOrCreateRepo
 * TODO Rename grs.Command to something that is not so much like 'Cmd'
 * TODO DEV: Refactor scripts.go to use FindOrCreateRepo() instead of `for i, r := range db.Repos {...`
-* DONE DRY: `if d, e := os.Getwd(); e != nil {` in 3 different places
