@@ -31,6 +31,6 @@
 * TODO BUG: Handle case when the current branch is untracked
 * TODO UX: logging.Info should output only when running from cli
 * DONE DEV: Remove deprecated ctx.Set/DB() methods 
-* TODO DEV: Add unit test for AddOrCreateRepo
+* DONE DEV: Add unit test for AddOrCreateRepo
 * TODO Rename grs.Command to something that is not so much like 'Cmd'
 * TODO DEV: Refactor scripts.go to use FindOrCreateRepo() instead of `for i, r := range db.Repos {...`
