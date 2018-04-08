@@ -34,9 +34,9 @@
 * DONE DEV: Amend Makefile to output grs in output
 * TODO UX: Show last fetch date if more than 2 days old
 * DONE UX: Do not set directory status to DIR_INVALID if `git fetch` fails
-* TODO DEV: Get rid of GetRepos() - the list of repos is only ever used in grs.go
+* DONE DEV: Get rid of GetRepos() - the list of repos is only ever used in grs.go
 * TODO UX: Print error messsage when .grs.json is missing a ',' - now it just silently fails (user, "why is it not using the repos in the file?")
-* TODO DEV: Ensure ~/.grs.d/grs.conf is not used during unit tests
+* DONE DEV: Ensure ~/.grs.d/grs.conf is not used during unit tests
 * TODO UX: A basic terminal for output message
   - Note taken on [2018-03-24 Sat 19:15] \\
     Code	Effect
@@ -56,7 +56,7 @@
     "\033[?25l"	Hide the cursor.
     "\033[K"	Delete everything from the cursor to the end of the line.
 * TODO DEV: Manually gofmt all files
-* TODO DEV: Replace `lut` with `ltime` or some other reasonable name "for last used time"
+* DONE DEV: Replace `lut` with `ltime` or some other reasonable name "for last used time"
 * TODO BUG: Handle case when the current branch is untracked
 * TODO UX: logging.Info should output only when running from cli
 * TODO DEV: Remove deprecated ctx.Set/DB() methods 
