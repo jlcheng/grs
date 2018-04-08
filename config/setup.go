@@ -8,6 +8,7 @@ import (
 var UserPrefDir = filepath.Join(os.ExpandEnv("${HOME}"), ".grs.d")
 var UserConf = filepath.Join(UserPrefDir, "config.json")
 var UserDB = filepath.Join(UserPrefDir, "grs.db")
+var UserDBName = "grs.db"
 
 // SetupUser creates the $HOME/.grs.d directory if needed.
 func SetupUserPrefDir(basedir string) error {

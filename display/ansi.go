@@ -20,12 +20,8 @@ func (ansi *AnsiDisplay) SummarizeRepos(repos []RepoStatus) {
 
 	// write out the status of each repository
 	for _, repo := range repos {
-		if repo.Merged {
-			ansi.writer.WriteString(fmt.Sprintf("repo [%v] auto fast-foward to latest\n", repo.Path))
-		} else {
-			ansi.writer.WriteString(fmt.Sprintf("repo [%v] status is %v, %v\n", repo.Path, repo.Rstat.Branch,
-				repo.Rstat.Index))
-		}
+		ansi.writer.WriteString(fmt.Sprintf("repo [%v] status is %v, %v. %v auto-merges performed.\n",
+			repo.Path, repo.Rstat.Branch, repo.Rstat.Index, repo.MergeCnt))
 	}
 
 }

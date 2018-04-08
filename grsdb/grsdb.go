@@ -2,10 +2,6 @@ package grsdb
 
 import (
 	"encoding/json"
-	"io"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 	"strings"
 )
 
@@ -17,10 +13,34 @@ type Repo struct {
 	Id         string     `json:"id"`
 	FetchedSec int64      `json:"fetched_sec"`
 	RStat      RStat_Json `json:"rstat,omitempty"`
+	MergedCnt  int        `json:"merged_cnt"`
 }
 
-func LoadBytes(reader io.Reader) (*DB, error) {
-	bytes, err := ioutil.ReadAll(reader)
+type DBService interface {
+	SaveDB(key string, root *DB) error
+	LoadDB(key string) (*DB, error)
+}
+
+type DBServiceImpl struct {
+	kvstore KVStore
+}
+
+func NewDBService(kvstore KVStore) (DBService) {
+	return &DBServiceImpl{
+		kvstore: kvstore,
+	}
+}
+
+func (s *DBServiceImpl) SaveDB(key string, db *DB) error {
+	bytes, err := json.Marshal(db)
+	if err != nil {
+		return err
+	}
+	return s.kvstore.SaveBytes(key, bytes)
+}
+
+func (s *DBServiceImpl) LoadDB(key string) (*DB, error) {
+	bytes, err := s.kvstore.LoadBytes(key)
 	if err != nil {
 		return nil, err
 	}
@@ -32,46 +52,28 @@ func LoadBytes(reader io.Reader) (*DB, error) {
 	return db, nil
 }
 
-func LoadFile(filename string) (*DB, error) {
-	reader, err := os.Open(filepath.FromSlash(filename))
-	if err != nil {
-		return nil, err
-	}
-	return LoadBytes(reader)
-}
-
-func SaveFile(writer DBWriter, filename string, db *DB) error {
-	bytes, err := json.Marshal(db)
-	if err != nil {
-		return err
-	}
-	return writer(filename, bytes)
-}
-
-// DBWriter allows one to mock the API for writing to disk
-type DBWriter func(filename string, bytes []byte) error
-
-func FileDBWriter(filename string, bytes []byte) error {
-	return ioutil.WriteFile(filepath.FromSlash(filename), bytes, 0644)
-}
-
-type BufferedDBWriter struct {
-	Bytes []byte
-}
-
-func (w *BufferedDBWriter) Write(filename string, bytes []byte) error {
-	w.Bytes = make([]byte, len(bytes))
-	for i, b := range bytes {
-		w.Bytes[i] = b
-	}
-	return nil
-}
-
-func (db DB) FindRepo(id string) *Repo {
+func (db *DB) FindRepo(id string) *Repo {
 	for idx, r := range db.Repos {
 		if strings.Compare(id, r.Id) == 0 {
 			return &db.Repos[idx]
 		}
 	}
 	return nil
+}
+
+
+func (db *DB) FindOrCreateRepo(id string) *Repo {
+	for idx, r := range db.Repos {
+		if strings.Compare(id, r.Id) == 0 {
+			return &db.Repos[idx]
+		}
+	}
+	r := Repo{
+		Id: id,
+		FetchedSec: 0,
+		RStat: RStat_Json{},
+		MergedCnt: 0,
+	}
+	db.Repos = append(db.Repos, r)
+	return &db.Repos[len(db.Repos)-1]
 }

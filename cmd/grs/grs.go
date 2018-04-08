@@ -6,7 +6,6 @@ import (
 	"jcheng/grs/config"
 	"jcheng/grs/display"
 	"jcheng/grs/grs"
-	"jcheng/grs/grsdb"
 	"jcheng/grs/script"
 	"jcheng/grs/status"
 	"os"
@@ -15,11 +14,12 @@ import (
 )
 
 type Args struct {
-	repos   string
-	verbose bool
-	command string
-	daemon  bool
-	refresh int
+	repos       string
+	verbose     bool
+	command     string
+	daemon      bool
+	refresh     int
+	force_merge bool
 }
 
 func main() {
@@ -30,40 +30,25 @@ func main() {
 	flag.BoolVar(&args.verbose, "verbose", false, "verbosity")
 	flag.BoolVar(&args.daemon, "d", false, "[daemon mode] enable daemon mode")
 	flag.IntVar(&args.refresh, "r", 300, "[daemon mode] How often to check for changes, in seconds.")
+	flag.BoolVar(&args.force_merge, "merge", false, "ignore access time check when auto-merging")
 	flag.Parse()
 
 	if args.verbose {
 		grs.SetLogLevel(grs.DEBUG)
 	}
 
-	if err := config.SetupUserPrefDir(config.UserPrefDir); err != nil {
-		grs.Info("Cannot create user preference directory [%v]:%v", err)
-		return
-	}
-
-	runner := grs.ExecRunner{}
-
 	ctx := grs.NewAppContext()
-
-	cp := config.NewConfigParams()
-	conf, err := config.ReadConfig(cp)
-	if conf != nil {
-		if conf.Git != "" {
-			ctx.SetGitExec(conf.Git)
-		}
-	} else {
-		grs.Debug("configuration error: %v", err)
+	sctx, err := grs.InitScriptCtx(config.NewConfigParams(), ctx)
+	if err != nil {
+		grs.Info("%v", err)
+		os.Exit(1)
 	}
 
-	repos := grs.ReposFromConf(conf.Repos)
+	repos := sctx.Repos
 	if len(repos) == 0 {
 		fmt.Println("repos not specified")
 		fmt.Printf("create %v if it doesn't exist\n", config.UserConf)
 		os.Exit(1)
-	}
-
-	if db, err := grsdb.LoadFile(ctx.DbPath); err == nil {
-		ctx.SetDB(db)
 	}
 
 	var screen display.Display = display.NewAnsiDisplay(os.Stdout)
@@ -78,6 +63,7 @@ func main() {
 		}
 	}()
 
+	runner := grs.ExecRunner{}
 	var repeat = true
 	for repeat {
 		for idx, repo := range repos {
@@ -95,21 +81,35 @@ func main() {
 			}
 
 			merged := false
-			if atime, err := script.GetActivityTime(repo.Path); err == nil && time.Now().After(atime.Add(ctx.ActivityTimeout)) {
+			do_merge := false
+
+			// check for recency when in daemon mode, allow forced merge in non-deamon mode
+			if args.daemon || !args.force_merge {
+				atime, err := script.GetActivityTime(repo.Path)
+				do_merge = (err == nil) && time.Now().After(atime.Add(ctx.ActivityTimeout))
+			}
+			if do_merge {
 				merged = script.AutoFFMerge(ctx, runner, rstat)
 			}
 
-			if repoPtr := ctx.DB().FindRepo(repo.Path); repoPtr != nil {
+			repoPtr := ctx.DB().FindOrCreateRepo(repo.Path)
+			if repoPtr != nil {
 				repoPtr.RStat.Update(*rstat)
-			}
-
-			repoStatusList[idx] = display.RepoStatus{
-				Path:   repo.Path,
-				Rstat:  *rstat,
-				Merged: merged,
+				if merged {
+					repoPtr.MergedCnt = repoPtr.MergedCnt + 1
+				}
+				repoStatusList[idx] = display.RepoStatus{
+					Path:     repo.Path,
+					Rstat:    *rstat,
+					Merged:   merged,
+					MergeCnt: repoPtr.MergedCnt,
+				}
 			}
 		}
-		grsdb.SaveFile(ctx.DBWriter(), ctx.DbPath, ctx.DB())
+		err := ctx.DBService().SaveDB(config.UserDBName, ctx.DB())
+		if err != nil {
+			grs.Info("cannot save db %v", err)
+		}
 		screen.SummarizeRepos(repoStatusList)
 		screen.Update()
 

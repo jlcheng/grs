@@ -28,8 +28,9 @@
     repo [foo] has 15 changes since <last tuesday> and is up-to-date
     
     press any key to dismiss
+* TODO UX: Repos that are "behind" with only untracked changes should be eligible for auto-forward
 * DONE DEV: Amend Makefile to output grs in output
-* TODO UX: Do not set directory status to UNKNOWN if `git fetch` fails
+* TODO UX: Do not set directory status to DIR_INVALID if `git fetch` fails
 * TODO DEV: Get rid of GetRepos() - the list of repos is only ever used in grs.go
 * TODO UX: Print error messsage when .grs.json is missing a ',' - now it just silently fails (user, "why is it not using the repos in the file?")
 * TODO DEV: Ensure ~/.grs.d/grs.conf is not used during unit tests
@@ -55,5 +56,8 @@
 * TODO DEV: Replace `lut` with `ltime` or some other reasonable name "for last used time"
 * TODO BUG: Handle case when the current branch is untracked
 * TODO UX: logging.Info should output only when running from cli
+* TODO DEV: Remove deprecated ctx.Set/DB() methods 
+* TODO DEV: Add unit test for AddOrCreateRepo
 * TODO Rename grs.Command to something that is not so much like 'Cmd'
+* TODO DEV: Refactor scripts.go to use FindOrCreateRepo() instead of `for i, r := range db.Repos {...`
 * DONE DRY: `if d, e := os.Getwd(); e != nil {` in 3 different places

@@ -3,7 +3,6 @@ package grs
 import (
 	"jcheng/grs/config"
 	"jcheng/grs/grsdb"
-	"path/filepath"
 	"time"
 )
 
@@ -11,11 +10,11 @@ type AppContext struct {
 	confParams      *config.ConfigParams
 	cliRepos        []string
 	defaultGitExec  string
-	dbWriter        grsdb.DBWriter
 	db              *grsdb.DB
 	MinFetchSec     int
 	ActivityTimeout time.Duration
 	DbPath          string
+	dbService       grsdb.DBService
 }
 
 func NewAppContext() *AppContext {
@@ -23,11 +22,10 @@ func NewAppContext() *AppContext {
 		confParams:      config.NewConfigParams(),
 		defaultGitExec:  "git",
 		cliRepos:        []string{},
-		dbWriter:        grsdb.FileDBWriter,
 		db:              &grsdb.DB{Repos: make([]grsdb.Repo, 0)},
 		MinFetchSec:     60 * 60,
 		ActivityTimeout: 2 * time.Hour,
-		DbPath:          filepath.Join(config.UserDB),
+		DbPath:          config.UserDB,
 	}
 }
 
@@ -55,9 +53,6 @@ func (ctx *AppContext) SetGitExec(defaultGitExec string) {
 	ctx.defaultGitExec = defaultGitExec
 }
 
-func (ctx *AppContext) DBWriter() grsdb.DBWriter {
-	return ctx.dbWriter
-}
 
 func (ctx *AppContext) DB() *grsdb.DB {
 	return ctx.db
@@ -65,4 +60,20 @@ func (ctx *AppContext) DB() *grsdb.DB {
 
 func (ctx *AppContext) SetDB(db *grsdb.DB) {
 	ctx.db = db
+}
+
+func (ctx *AppContext) DBService() grsdb.DBService {
+	return ctx.dbService
+}
+
+type ScriptContext struct {
+	Ctx *AppContext
+	Repos []Repo
+}
+
+func NewScriptContext(ctx *AppContext) *ScriptContext {
+	return &ScriptContext{
+		Ctx: ctx,
+		Repos: make([]Repo, 0),
+	}
 }
