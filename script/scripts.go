@@ -1,14 +1,14 @@
 package script
 
 import (
-	"jcheng/grs/grs"
-	"jcheng/grs/status"
-	"fmt"
-	"os"
-	"strings"
 	"errors"
-	"strconv"
+	"fmt"
+	"jcheng/grs/grs"
 	"jcheng/grs/grsdb"
+	"jcheng/grs/status"
+	"os"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -61,11 +61,12 @@ func Fetch(ctx *grs.AppContext, runner grs.CommandRunner, rstat *status.RStat, r
 
 	command := *runner.Command(git, "fetch")
 	if out, err := command.CombinedOutput(); err != nil {
-		grs.Debug("fetch failed: %v\n%v", err, string(out))
-		rstat.Dir = status.DIR_INVALID
+		// fetch may have failed for common reasons, such as not adding your ssh key to the agent
+		grs.Debug("git fetch failed: %v\n%v", err, string(out))
 		return
+	} else {
+		grs.Debug("git fetch ok: %v", repo.Path)
 	}
-	grs.Debug("git fetch for %v", repo.Path)
 
 	db.Repos[rIdx].FetchedSec = time.Now().Unix()
 }
@@ -116,7 +117,7 @@ func GetRepoStatus(ctx *grs.AppContext, runner grs.CommandRunner, rstat *status.
 }
 
 type RemoteDiff struct {
-	local int
+	local  int
 	remote int
 }
 
