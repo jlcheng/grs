@@ -8,7 +8,6 @@ import (
 
 type AppContext struct {
 	confParams      *config.ConfigParams
-	cliRepos        []string
 	defaultGitExec  string
 	db              *grsdb.DB
 	MinFetchSec     int
@@ -21,7 +20,6 @@ func NewAppContext() *AppContext {
 	return &AppContext{
 		confParams:      config.NewConfigParams(),
 		defaultGitExec:  "git",
-		cliRepos:        []string{},
 		db:              &grsdb.DB{Repos: make([]grsdb.Repo, 0)},
 		MinFetchSec:     60 * 60,
 		ActivityTimeout: 2 * time.Hour,
@@ -29,20 +27,8 @@ func NewAppContext() *AppContext {
 	}
 }
 
-func (ctx *AppContext) CliRepos(cliRepos []string) {
-	ctx.cliRepos = cliRepos
-}
-
 func (ctx *AppContext) ConfParams(confParams *config.ConfigParams) {
 	ctx.confParams = confParams
-}
-
-func (ctx *AppContext) GetRepos() []string {
-	return ctx.cliRepos
-}
-
-func (ctx *AppContext) SetRepos(repos []string) {
-	ctx.cliRepos = repos
 }
 
 func (ctx *AppContext) GetGitExec() string {
