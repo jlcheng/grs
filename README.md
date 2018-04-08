@@ -18,7 +18,7 @@ $ go test ./...
 ## Testing
 Run the entire test suite before committing any changes
 
-    $ go test -v ./...
+    $ go test -v ./test
     ?       jcheng/grs/cmd/grsp     [no test files]
     <snipped> 
     PASS
@@ -27,4 +27,4 @@ Run the entire test suite before committing any changes
 
 Run a single test
 
-    $ go test -v ./... -run TestMockCommandMapOk
+    $ go test -v ./test -run TestMockCommandMapOk

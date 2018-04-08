@@ -1,22 +1,14 @@
 package test
 
 import (
-	"testing"
-	"os"
 	"fmt"
+	"jcheng/grs/config"
+	"jcheng/grs/grs"
+	"os"
 	"os/exec"
 	"strings"
-	"jcheng/grs/grs"
-	"jcheng/grs/config"
+	"testing"
 )
-
-func TestRepoPath(t *testing.T) {
-	repo := grs.Repo{"/foo/bar"}
-	result, _ := grs.RepoPath(repo)
-	if result.String() != "/foo/bar" {
-		t.Fail()
-	}
-}
 
 func TestHelperProcess(*testing.T) {
 	if os.Getenv("GO_WANT_HELPER_PROCESS") != "1" {
@@ -69,7 +61,7 @@ func TestFail(t *testing.T) {
 }
 
 func TestReposFromConf(t *testing.T) {
-	rc := []config.RepoConf{config.RepoConf{Path:"rel/repo1"}, config.RepoConf{Path:"abs/repo2"}}
+	rc := []config.RepoConf{config.RepoConf{Path: "rel/repo1"}, config.RepoConf{Path: "abs/repo2"}}
 	r := grs.ReposFromConf(rc)
 	if len(r) != 2 {
 		t.Error("Unexpected length:", 2)
