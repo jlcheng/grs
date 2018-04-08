@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"jcheng/grs/grs"
-	"jcheng/grs/grsdb"
 	"jcheng/grs/status"
 	"os"
 	"strconv"
@@ -38,22 +37,9 @@ func Fetch(ctx *grs.AppContext, runner grs.CommandRunner, rstat *status.RStat, r
 		return
 	}
 
-	var rIdx = -1
-	db := ctx.DB()
-
-	for i, r := range db.Repos {
-		if r.Id == repo.Path {
-			rIdx = i
-			break
-		}
-	}
-	if rIdx == -1 {
-		tmp := grsdb.Repo{Id: repo.Path}
-		db.Repos = append(db.Repos, tmp)
-		rIdx = len(db.Repos) - 1
-	}
+	dbRepo := ctx.DB().FindOrCreateRepo(repo.Path)
 	now := time.Now().Unix()
-	if db.Repos[rIdx].FetchedSec > (now - int64(ctx.MinFetchSec)) {
+	if dbRepo.FetchedSec > (now - int64(ctx.MinFetchSec)) {
 		return
 	}
 
@@ -64,11 +50,9 @@ func Fetch(ctx *grs.AppContext, runner grs.CommandRunner, rstat *status.RStat, r
 		// fetch may have failed for common reasons, such as not adding your ssh key to the agent
 		grs.Debug("git fetch failed: %v\n%v", err, string(out))
 		return
-	} else {
-		grs.Debug("git fetch ok: %v", repo.Path)
 	}
-
-	db.Repos[rIdx].FetchedSec = time.Now().Unix()
+	grs.Debug("git fetch ok: %v", repo.Path)
+	dbRepo.FetchedSec = now
 }
 
 // GetRepoStatus gives a summary of the repo's status. Sets a number of `rstat` properties.

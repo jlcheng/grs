@@ -33,4 +33,4 @@
 * DONE DEV: Remove deprecated ctx.Set/DB() methods 
 * DONE DEV: Add unit test for AddOrCreateRepo
 * TODO Rename grs.Command to something that is not so much like 'Cmd'
-* TODO DEV: Refactor scripts.go to use FindOrCreateRepo() instead of `for i, r := range db.Repos {...`
+* DONE DEV: Refactor scripts.go to use FindOrCreateRepo() instead of `for i, r := range db.Repos {...`

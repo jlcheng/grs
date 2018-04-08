@@ -1,39 +1,25 @@
 package test
 
 import (
-	"testing"
+	"jcheng/grs/config"
 	"jcheng/grs/grs"
 	"reflect"
-	"jcheng/grs/config"
+	"testing"
 )
-
-// TestGetReposCli verifies the getter/setter for CliRepos
-func TestGetRepos_Cli(t *testing.T) {
-	ctx := grs.NewAppContext()
-	in := []string{"cli/rel/repo1","/cli/abs/repo2"}
-	ctx.CliRepos(in)
-
-	if r := ctx.GetRepos(); !reflect.DeepEqual(in, r) {
-		t.Error("Unexpected repos. Got:", r)
-	}
-}
 
 // TestGetRepos_ConfFile verifies resolving repos from ConfigParams
 func TestGetRepos_ConfFile(t *testing.T) {
-	ctx := grs.NewAppContext()
-	ctx.CliRepos([]string{})
-
 	var conf *config.Config
 	cp := &config.ConfigParams{Env: "data/config.json", User: "data/empty_config.json"}
 	conf, _ = config.ReadConfig(cp)
 
-	if r := RepoIds(conf.Repos); !reflect.DeepEqual([]string{"rel/repo1","/abs/repo2"}, r) {
+	if r := RepoIds(conf.Repos); !reflect.DeepEqual([]string{"rel/repo1", "/abs/repo2"}, r) {
 		t.Error("Unexpected repos. Got: ", r)
 	}
 
 	cp = &config.ConfigParams{User: "data/config.json"}
 	conf, _ = config.ReadConfig(cp)
-	if r := RepoIds(conf.Repos); !reflect.DeepEqual([]string{"rel/repo1","/abs/repo2"}, r) {
+	if r := RepoIds(conf.Repos); !reflect.DeepEqual([]string{"rel/repo1", "/abs/repo2"}, r) {
 		t.Error("Unexpected repos. Got: ", r)
 	}
 
@@ -41,18 +27,6 @@ func TestGetRepos_ConfFile(t *testing.T) {
 	conf, _ = config.ReadConfig(cp)
 	if r := RepoIds(conf.Repos); !reflect.DeepEqual([]string{}, r) {
 		t.Error("Unexpected repos. Got: ", r)
-	}
-}
-
-// TestGetRepos_Cli_And_ConfFile verifies that CLI takes precedence
-func TestGetRepos_Cli_And_ConfFile(t *testing.T) {
-	ctx := grs.NewAppContext()
-	in := []string{"cli/rel/repo1","/cli/abs/repo2"}
-	ctx.CliRepos(in)
-	ctx.ConfParams(&config.ConfigParams{User: "data/config.json"})
-
-	if r := ctx.GetRepos(); !reflect.DeepEqual(in, r) {
-		t.Error("Unexpected repos. Got:", r)
 	}
 }
 
@@ -78,7 +52,7 @@ func TestGetGitExecDefault(t *testing.T) {
 	}
 }
 
-func RepoIds(repos []config.RepoConf) ([]string) {
+func RepoIds(repos []config.RepoConf) []string {
 	retval := make([]string, len(repos))
 	for i, repo := range repos {
 		retval[i] = repo.Path
