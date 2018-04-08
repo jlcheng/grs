@@ -6,14 +6,15 @@ import (
 )
 
 type DB struct {
-	Repos []Repo `json:"repos"`
+	Repos []RepoDTO `json:"repos"`
 }
 
-type Repo struct {
+type RepoDTO struct {
 	Id         string     `json:"id"`
 	FetchedSec int64      `json:"fetched_sec"`
 	RStat      RStat_Json `json:"rstat,omitempty"`
 	MergedCnt  int        `json:"merged_cnt"`
+	MergedSec  int64      `json:"merged_sec"`
 }
 
 type DBService interface {
@@ -52,7 +53,7 @@ func (s *DBServiceImpl) LoadDB(key string) (*DB, error) {
 	return db, nil
 }
 
-func (db *DB) FindRepo(id string) *Repo {
+func (db *DB) FindRepo(id string) *RepoDTO {
 	for idx, r := range db.Repos {
 		if strings.Compare(id, r.Id) == 0 {
 			return &db.Repos[idx]
@@ -62,18 +63,12 @@ func (db *DB) FindRepo(id string) *Repo {
 }
 
 
-func (db *DB) FindOrCreateRepo(id string) *Repo {
+func (db *DB) FindOrCreateRepo(id string) *RepoDTO {
 	for idx, r := range db.Repos {
 		if strings.Compare(id, r.Id) == 0 {
 			return &db.Repos[idx]
 		}
 	}
-	r := Repo{
-		Id: id,
-		FetchedSec: 0,
-		RStat: RStat_Json{},
-		MergedCnt: 0,
-	}
-	db.Repos = append(db.Repos, r)
+	db.Repos = append(db.Repos, RepoDTO{})
 	return &db.Repos[len(db.Repos)-1]
 }

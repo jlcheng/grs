@@ -5,23 +5,18 @@ import (
 )
 
 type Display interface {
-	SummarizeRepos(repos []RepoStatus)
+	SummarizeRepos(repos []RepoVO)
 	Update()
 }
 
-type RepoStatus struct {
-	Path     string
-	Rstat    status.RStat
-	Merged   bool
-	MergeCnt int
+type RepoVO struct {
+	Path      string
+	Rstat     status.RStat
+	Merged    bool
+	MergeCnt  int
+	MergedSec int64
 }
 
-type RepoStatusRoot struct {
-	Statuses map[string]*RepoStatus
-}
-
-func NewRepoStatusRoot() *RepoStatusRoot {
-	return &RepoStatusRoot{
-		Statuses: make(map[string]*RepoStatus),
-	}
+type RepoListVO struct {
+	Statuses map[string]*RepoVO
 }

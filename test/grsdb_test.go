@@ -6,7 +6,7 @@ import (
 )
 
 func TestFindRepo_Ok(t *testing.T) {
-	db := &grsdb.DB{Repos: make([]grsdb.Repo, 3)}
+	db := &grsdb.DB{Repos: make([]grsdb.RepoDTO, 3)}
 	db.Repos[0].Id = "foo"
 	db.Repos[0].FetchedSec = 1
 	db.Repos[1].Id = "bar"
@@ -22,7 +22,7 @@ func TestFindRepo_Ok(t *testing.T) {
 }
 
 func TestFindRepo_Fail(t *testing.T) {
-	db := &grsdb.DB{Repos: make([]grsdb.Repo, 3)}
+	db := &grsdb.DB{Repos: make([]grsdb.RepoDTO, 3)}
 	db.Repos[0].Id = "1"
 	db.Repos[0].FetchedSec = 1
 	db.Repos[1].Id = "11"
@@ -36,7 +36,7 @@ func TestFindRepo_Fail(t *testing.T) {
 }
 
 func TestFindOrCreateRepo_Ok(t *testing.T) {
-	db := &grsdb.DB{Repos: make([]grsdb.Repo, 3)}
+	db := &grsdb.DB{Repos: make([]grsdb.RepoDTO, 3)}
 	db.Repos[0].Id = "1"
 	db.Repos[0].FetchedSec = 1
 	db.Repos[1].Id = "11"

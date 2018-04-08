@@ -20,7 +20,7 @@ func NewAppContext() *AppContext {
 	return &AppContext{
 		confParams:      config.NewConfigParams(),
 		defaultGitExec:  "git",
-		db:              &grsdb.DB{Repos: make([]grsdb.Repo, 0)},
+		db:              &grsdb.DB{Repos: make([]grsdb.RepoDTO, 0)},
 		MinFetchSec:     60 * 60,
 		ActivityTimeout: 2 * time.Hour,
 		DbPath:          config.UserDB,

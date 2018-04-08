@@ -47,7 +47,7 @@ func Fetch(ctx *grs.AppContext, runner grs.CommandRunner, rstat *status.RStat, r
 
 	command := *runner.Command(git, "fetch")
 	if out, err := command.CombinedOutput(); err != nil {
-		// fetch may have failed for common reasons, such as not adding your ssh key to the agent
+		// fetch may have failed for common reasons, such as not adding yourxk ssh key to the agent
 		grs.Debug("git fetch failed: %v\n%v", err, string(out))
 		return
 	}

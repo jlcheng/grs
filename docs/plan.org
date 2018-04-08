@@ -6,13 +6,14 @@
 * // S-TAB cycle folding
 * == Dev Plan
 * TODO UX: Add an -init option that creates a mock ~/.grs.d/config.json
-* TODO UX: Persist the timestamp of the last time auto-merge occured
+* DONE UX: Persist the timestamp of the last time auto-merge occured
   - Note taken on [2018-04-08 Sun 11:17] \\
     This is user-interested information on how "up-to-date" her code is.
-* TODO UX: GRS should track whether a user has acknowledged the last automerge/update.
+* DONE UX: GRS should track whether a user has acknowledged the last automerge/update.
   - Note taken on [2018-04-08 Sun 11:17] \\
     If we persist and show the "last auto merge timestamp and commit" then 
     forcing users to ack that there had been merged chagnes is likely useless.
+    Killed this idea as stupid.
   - Note taken on [2018-03-30 Fri 17:05] \\
     Make users feel that grs was useful. When grs auto merges the laptest remote changes into the local workspace, it should show a notification until the user dismisses it. 
     
@@ -25,7 +26,7 @@
     
     press any key to dismiss
 * TODO UX: Repos that are "behind" with only untracked changes should be eligible for auto-forward
-* TODO UX: Show last fetch date if more than 2 days old
+* TODO DEV: Move code that sets MergeCnt into AutoFFerge and add test case
 * TODO UX: Print error messsage when .grs.json is missing a ',' - now it just silently fails (user, "why is it not using the repos in the file?")
 * TODO DEV: Manually gofmt all files
 * TODO BUG: Handle case when the current branch is untracked

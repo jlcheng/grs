@@ -52,7 +52,7 @@ func main() {
 	}
 
 	var screen display.Display = display.NewAnsiDisplay(os.Stdout)
-	var repoStatusList = make([]display.RepoStatus, len(repos))
+	var repoStatusList = make([]display.RepoVO, len(repos))
 
 	ctrl := make(chan os.Signal, 1)
 	signal.Notify(ctrl, os.Interrupt)
@@ -84,6 +84,9 @@ func main() {
 			do_merge := false
 
 			// check for recency when in daemon mode, allow forced merge in non-deamon mode
+			if !args.daemon && args.force_merge {
+				do_merge = true
+			}
 			if args.daemon || !args.force_merge {
 				atime, err := script.GetActivityTime(repo.Path)
 				do_merge = (err == nil) && time.Now().After(atime.Add(ctx.ActivityTimeout))
@@ -97,12 +100,14 @@ func main() {
 				repoPtr.RStat.Update(*rstat)
 				if merged {
 					repoPtr.MergedCnt = repoPtr.MergedCnt + 1
+					repoPtr.MergedSec = time.Now().Unix()
 				}
-				repoStatusList[idx] = display.RepoStatus{
+				repoStatusList[idx] = display.RepoVO{
 					Path:     repo.Path,
 					Rstat:    *rstat,
 					Merged:   merged,
 					MergeCnt: repoPtr.MergedCnt,
+					MergedSec: repoPtr.MergedSec,
 				}
 			}
 		}

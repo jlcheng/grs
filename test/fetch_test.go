@@ -56,7 +56,7 @@ func TestFetch_Modified_Update_Existing(t *testing.T) {
 	rstat := status.NewRStat()
 	rstat.Dir = status.DIR_VALID
 	ctx := grs.NewAppContext()
-	ctx.DB().Repos = append(ctx.DB().Repos, grsdb.Repo{Id:"/repo", FetchedSec:1})
+	ctx.DB().Repos = append(ctx.DB().Repos, grsdb.RepoDTO{Id:"/repo", FetchedSec:1})
 	script.Fetch(ctx, runner, rstat, grs.Repo{Path:"/repo"})
 	db := ctx.DB()
 	if l := len(db.Repos); l != 1 {
@@ -75,7 +75,7 @@ func TestFetch_Modified_Update_NOP(t *testing.T) {
 	rstat.Dir = status.DIR_VALID
 	ctx := grs.NewAppContext()
 	fetchTime := time.Now().Unix()
-	ctx.DB().Repos = append(ctx.DB().Repos, grsdb.Repo{Id:"/repo", FetchedSec:fetchTime})
+	ctx.DB().Repos = append(ctx.DB().Repos, grsdb.RepoDTO{Id:"/repo", FetchedSec:fetchTime})
 	script.Fetch(ctx, runner, rstat, grs.Repo{Path:"/repo"})
 	db := ctx.DB()
 	if l := len(db.Repos); l != 1 {
