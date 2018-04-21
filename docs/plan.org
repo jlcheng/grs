@@ -30,7 +30,7 @@
 * TODO DEV: Move code that sets MergeCnt into AutoFFerge and add test case
 * TODO UX: Print error messsage when .grs.json is missing a ',' - now it just silently fails (user, "why is it not using the repos in the file?")
 * TODO DEV: Manually gofmt all files
-* DONE BUG: Handle case when the current branch is untracked
+* DONE BUG: Handle case when the current branch is untracked (took only 40 minutes)
 * TODO UX: logging.Info should output only when running from cli
 * DONE DEV: Remove deprecated ctx.Set/DB() methods 
 * DONE DEV: Add unit test for AddOrCreateRepo
