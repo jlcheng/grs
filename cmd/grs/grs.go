@@ -94,7 +94,7 @@ func main() {
 				atime, err := script.GetActivityTime(repo.Path)
 				do_merge = (err == nil) && time.Now().After(atime.Add(ctx.ActivityTimeout))
 			}
-			if do_merge {
+			if rstat.Branch != status.BRANCH_UNTRACKED && do_merge {
 				merged = script.AutoFFMerge(ctx, runner, rstat)
 			}
 

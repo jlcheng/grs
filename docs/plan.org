@@ -30,9 +30,10 @@
 * TODO DEV: Move code that sets MergeCnt into AutoFFerge and add test case
 * TODO UX: Print error messsage when .grs.json is missing a ',' - now it just silently fails (user, "why is it not using the repos in the file?")
 * TODO DEV: Manually gofmt all files
-* TODO BUG: Handle case when the current branch is untracked
+* DONE BUG: Handle case when the current branch is untracked
 * TODO UX: logging.Info should output only when running from cli
 * DONE DEV: Remove deprecated ctx.Set/DB() methods 
 * DONE DEV: Add unit test for AddOrCreateRepo
 * TODO Rename grs.Command to something that is not so much like 'Cmd'
+* TODO DEV: ExecRunner.Command should have a pointer receiver
 * DONE DEV: Refactor scripts.go to use FindOrCreateRepo() instead of `for i, r := range db.Repos {...`

@@ -1,11 +1,11 @@
 package test
 
 import (
-	"testing"
+	"jcheng/grs/config"
 	"jcheng/grs/grs"
 	"jcheng/grs/script"
 	"jcheng/grs/status"
-	"jcheng/grs/config"
+	"testing"
 )
 
 // TestGetRepoStatus_Git_Fail verifies that git errors result in BRANCH_UNKNOWN
@@ -15,17 +15,17 @@ func TestGetRepoStatus_Git_Fail(t *testing.T) {
 	rstat := status.NewRStat()
 	rstat.Dir = status.DIR_VALID
 	script.GetRepoStatus(grs.NewAppContext(), runner, rstat)
-	if rstat.Branch != status.BRANCH_UNKNOWN {
-		t.Errorf("expected %s, got: %v\n", status.BRANCH_UNKNOWN, rstat.Branch)
+	if rstat.Branch != status.BRANCH_UNTRACKED {
+		t.Errorf("expected %s, got: %v\n", status.BRANCH_UNTRACKED, rstat.Branch)
 	}
 }
 
 // TestGetRepoStatus_Git_Ok verifies several happy paths
 func TestGetRepoStatus_Git_Ok(t *testing.T) {
 	var statustests = []struct {
-		out string
+		out      string
 		expected status.Branchstat
-	} {
+	}{
 		{"0\t1\n", status.BRANCH_AHEAD},
 		{"1\t0\n", status.BRANCH_BEHIND},
 		{"1\t1\n", status.BRANCH_DIVERGED},
@@ -39,10 +39,11 @@ func TestGetRepoStatus_Git_Ok(t *testing.T) {
 // TestGetRepoStatus_Git_From_Ctx Verifies that the TestGetRepo script gets its 'git' executable from ctx
 func TestGetRepoStatus_Git_From_Ctx(t *testing.T) {
 	runner := NewMockRunner()
-	runner.AddMap("^/path/to/git", Ok("0\t0\n"))
+	runner.AddMap("^/path/to/git rev-parse", Ok(""))
+	runner.AddMap("^/path/to/git rev-list", Ok("0\t0\n"))
 
 	ctx := grs.NewAppContext()
-	cp := &config.ConfigParams{User:"data/config.json"}
+	cp := &config.ConfigParams{User: "data/config.json"}
 	if conf, _ := config.ReadConfig(cp); conf != nil {
 		ctx.SetGitExec(conf.Git)
 	}
@@ -62,7 +63,8 @@ func TestGetRepoStatus_Git_From_Ctx(t *testing.T) {
 
 func helpGetRepoStatus(t *testing.T, out string, expected status.Branchstat) {
 	runner := NewMockRunner()
-	runner.Add(NewCommandHelper([]byte(out), nil))
+	runner.AddMap("git rev-parse", Ok("..."))
+	runner.AddMap("git rev-list", Ok(out))
 
 	rstat := status.NewRStat()
 	rstat.Dir = status.DIR_VALID

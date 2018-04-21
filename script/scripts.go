@@ -31,7 +31,7 @@ func BeforeScript(ctx *grs.AppContext, repo grs.Repo, runner grs.CommandRunner, 
 	rstat.Dir = status.DIR_VALID
 }
 
-// Fetch runs `git fetch`. Sets rstat.Dir to `DIR_INVALID` on error
+// Fetch runs `git fetch`.
 func Fetch(ctx *grs.AppContext, runner grs.CommandRunner, rstat *status.RStat, repo grs.Repo) {
 	if rstat.Dir != status.DIR_VALID {
 		return
@@ -62,11 +62,18 @@ func GetRepoStatus(ctx *grs.AppContext, runner grs.CommandRunner, rstat *status.
 	}
 
 	git := ctx.GetGitExec()
-
-	rstat.Dir = status.DIR_VALID
-	command := *runner.Command(git, "rev-list", "--left-right", "--count", "@{upstream}...HEAD")
+	var command grs.Command
 	var out []byte
 	var err error
+
+	command = *runner.Command(git, "rev-parse", "@{upstream}")
+	if out, err = command.CombinedOutput(); err != nil {
+		grs.Debug("GetRepoStatus: no upstream detected", err, string(out))
+		rstat.Branch = status.BRANCH_UNTRACKED
+		return
+	}
+
+	command = *runner.Command(git, "rev-list", "--left-right", "--count", "@{upstream}...HEAD")
 	if out, err = command.CombinedOutput(); err != nil {
 		grs.Debug("rev-list failed: %v\n%v", err, string(out))
 		rstat.Dir = status.DIR_INVALID
