@@ -44,7 +44,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	repos := sctx.Repos
+	repos := grs.ReposFromString(args.repos)
+	if repos[0].Path == "" {
+		repos = sctx.Repos
+	}
 	if len(repos) == 0 {
 		fmt.Println("repos not specified")
 		fmt.Printf("create %v if it doesn't exist\n", config.UserConf)
@@ -103,10 +106,10 @@ func main() {
 					repoPtr.MergedSec = time.Now().Unix()
 				}
 				repoStatusList[idx] = display.RepoVO{
-					Path:     repo.Path,
-					Rstat:    *rstat,
-					Merged:   merged,
-					MergeCnt: repoPtr.MergedCnt,
+					Path:      repo.Path,
+					Rstat:     *rstat,
+					Merged:    merged,
+					MergeCnt:  repoPtr.MergedCnt,
 					MergedSec: repoPtr.MergedSec,
 				}
 			}

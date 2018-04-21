@@ -61,7 +61,7 @@ func TestFail(t *testing.T) {
 }
 
 func TestReposFromConf(t *testing.T) {
-	rc := []config.RepoConf{config.RepoConf{Path: "rel/repo1"}, config.RepoConf{Path: "abs/repo2"}}
+	rc := []config.RepoConf{{Path: "rel/repo1"}, {Path: "abs/repo2"}}
 	r := grs.ReposFromConf(rc)
 	if len(r) != 2 {
 		t.Error("Unexpected length:", 2)
@@ -71,5 +71,26 @@ func TestReposFromConf(t *testing.T) {
 	}
 	if r[1].Path != "abs/repo2" {
 		t.Error("Unexpected path:", r[1].Path)
+	}
+}
+
+func TestReposFromString(t *testing.T) {
+	var r []grs.Repo
+
+	r = grs.ReposFromString("")
+	if r[0].Path != "" {
+		t.Error("TestReposFromgString")
+	}
+
+	r = grs.ReposFromString("foo")
+	if r[0].Path != "foo" {
+		t.Error("TestReposFromString")
+	}
+
+	path0 := "/foo bar/fib"
+	path1 := "file://fizz/fuzz"
+	r = grs.ReposFromString(path0 + string(os.PathListSeparator) + path1)
+	if r[0].Path != path0 && r[1].Path != path1 {
+		t.Error("TestReposFromString")
 	}
 }

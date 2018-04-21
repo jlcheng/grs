@@ -25,6 +25,7 @@
     repo [foo] has 15 changes since <last tuesday> and is up-to-date
     
     press any key to dismiss
+* DONE BUG: Fix support -repos argument
 * TODO UX: Repos that are "behind" with only untracked changes should be eligible for auto-forward
 * TODO DEV: Move code that sets MergeCnt into AutoFFerge and add test case
 * TODO UX: Print error messsage when .grs.json is missing a ',' - now it just silently fails (user, "why is it not using the repos in the file?")

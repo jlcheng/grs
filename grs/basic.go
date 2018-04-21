@@ -6,6 +6,7 @@ import (
 	"jcheng/grs/grsdb"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 type Repo struct {
@@ -25,6 +26,15 @@ func ReposFromConf(rc []config.RepoConf) []Repo {
 	var r = make([]Repo, len(rc))
 	for idx, elem := range rc {
 		r[idx] = Repo{Path: elem.Path}
+	}
+	return r
+}
+
+func ReposFromString(input string) []Repo {
+	tokens := strings.Split(input, string(os.PathListSeparator))
+	r := make([]Repo, len(tokens))
+	for idx, elem := range tokens {
+		r[idx] = Repo{Path: elem}
 	}
 	return r
 }
