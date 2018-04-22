@@ -1,0 +1,78 @@
+#    -*- mode: org -*-
+
+
+Archived entries from file /home/johnl/privprjs/grs/docs/plan.org
+
+
+* DONE UX: Persist the timestamp of the last time auto-merge occured
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2018-04-22 Sun 11:05
+  :ARCHIVE_FILE: ~/privprjs/grs/docs/plan.org
+  :ARCHIVE_CATEGORY: plan
+  :ARCHIVE_TODO: DONE
+  :END:
+  - Note taken on [2018-04-08 Sun 11:17] \\
+    This is user-interested information on how "up-to-date" her code is.
+
+* DONE UX: GRS should track whether a user has acknowledged the last automerge/update.
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2018-04-22 Sun 11:05
+  :ARCHIVE_FILE: ~/privprjs/grs/docs/plan.org
+  :ARCHIVE_CATEGORY: plan
+  :ARCHIVE_TODO: DONE
+  :END:
+  - Note taken on [2018-04-08 Sun 11:17] \\
+    If we persist and show the "last auto merge timestamp and commit" then 
+    forcing users to ack that there had been merged chagnes is likely useless.
+    Killed this idea as stupid.
+  - Note taken on [2018-03-30 Fri 17:05] \\
+    Make users feel that grs was useful. When grs auto merges the laptest remote changes into the local workspace, it should show a notification until the user dismisses it. 
+    
+    This means grs must track two things
+    1. The last time a user 'acknowledged' the state of a local repo
+    2. The last time we detected changes in remote that is not local.  
+    If ack_time <= change_time, then show something like
+    
+    repo [foo] has 15 changes since <last tuesday> and is up-to-date
+    
+    press any key to dismiss
+
+* DONE BUG: Fix support -repos argument
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2018-04-22 Sun 11:05
+  :ARCHIVE_FILE: ~/privprjs/grs/docs/plan.org
+  :ARCHIVE_CATEGORY: plan
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* DONE BUG: Handle case when the current branch is untracked
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2018-04-22 Sun 11:05
+  :ARCHIVE_FILE: ~/privprjs/grs/docs/plan.org
+  :ARCHIVE_CATEGORY: plan
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* DONE DEV: Remove deprecated ctx.Set/DB() methods 
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2018-04-22 Sun 11:05
+  :ARCHIVE_FILE: ~/privprjs/grs/docs/plan.org
+  :ARCHIVE_CATEGORY: plan
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* DONE DEV: Add unit test for AddOrCreateRepo
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2018-04-22 Sun 11:05
+  :ARCHIVE_FILE: ~/privprjs/grs/docs/plan.org
+  :ARCHIVE_CATEGORY: plan
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* DONE DEV: Refactor scripts.go to use FindOrCreateRepo() instead of `for i, r := range db.Repos {...`
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2018-04-22 Sun 11:05
+  :ARCHIVE_FILE: ~/privprjs/grs/docs/plan.org
+  :ARCHIVE_CATEGORY: plan
+  :ARCHIVE_TODO: DONE
+  :END:

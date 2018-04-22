@@ -7,36 +7,13 @@
 * // S-TAB cycle folding
 * == Dev Plan
 * TODO UX: Add an -init option that creates a mock ~/.grs.d/config.json
-* DONE UX: Persist the timestamp of the last time auto-merge occured
-  - Note taken on [2018-04-08 Sun 11:17] \\
-    This is user-interested information on how "up-to-date" her code is.
-* DONE UX: GRS should track whether a user has acknowledged the last automerge/update.
-  - Note taken on [2018-04-08 Sun 11:17] \\
-    If we persist and show the "last auto merge timestamp and commit" then 
-    forcing users to ack that there had been merged chagnes is likely useless.
-    Killed this idea as stupid.
-  - Note taken on [2018-03-30 Fri 17:05] \\
-    Make users feel that grs was useful. When grs auto merges the laptest remote changes into the local workspace, it should show a notification until the user dismisses it. 
-    
-    This means grs must track two things
-    1. The last time a user 'acknowledged' the state of a local repo
-    2. The last time we detected changes in remote that is not local.  
-    If ack_time <= change_time, then show something like
-    
-    repo [foo] has 15 changes since <last tuesday> and is up-to-date
-    
-    press any key to dismiss
-* DONE BUG: Fix support -repos argument
 * TODO UX: Repos that are "behind" with only untracked changes should be eligible for auto-forward
 * TODO DEV: Move code that sets MergeCnt into AutoFFerge and add test case
 * TODO UX: Print error messsage when .grs.json is missing a ',' - now it just silently fails (user, "why is it not using the repos in the file?")
 * TODO DEV: Manually gofmt all files
 * DONE BUG: Handle case when the current branch is untracked (took only 40 minutes)
 * TODO UX: logging.Info should output only when running from cli
-* DONE DEV: Remove deprecated ctx.Set/DB() methods 
-* DONE DEV: Add unit test for AddOrCreateRepo
 * TODO Rename grs.Command to something that is not so much like 'Cmd'
 * TODO DEV: Decouple persistence of user config from repo_metadata
 * TODO DEV: Rename DBService to DBRepository
 * TODO DEV: ExecRunner.Command should have a pointer receiver
-* DONE DEV: Refactor scripts.go to use FindOrCreateRepo() instead of `for i, r := range db.Repos {...`

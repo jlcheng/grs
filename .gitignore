@@ -19,7 +19,6 @@
 # Emacs
 .#*
 \#*#
-docs/*.org_archive
 
 # vi
 *.swp
