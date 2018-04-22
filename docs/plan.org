@@ -1,3 +1,4 @@
+#+ARCHIVE: %s_done::
 #+STARTUP: content
 #+PRIORITIES: A E C
 * // C-c C-z add notes
@@ -35,5 +36,7 @@
 * DONE DEV: Remove deprecated ctx.Set/DB() methods 
 * DONE DEV: Add unit test for AddOrCreateRepo
 * TODO Rename grs.Command to something that is not so much like 'Cmd'
+* TODO DEV: Decouple persistence of user config from repo_metadata
+* TODO DEV: Rename DBService to DBRepository
 * TODO DEV: ExecRunner.Command should have a pointer receiver
 * DONE DEV: Refactor scripts.go to use FindOrCreateRepo() instead of `for i, r := range db.Repos {...`
