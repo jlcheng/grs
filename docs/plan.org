@@ -18,3 +18,4 @@
 * TODO DEV: Rename DBService to DBRepository
 * TODO DEV: ExecRunner.Command should have a pointer receiver
 * TODO DEV: Consider moving foo_test.go files to their respective packages
+* TODO UX: Instead of fs-copying repos for rebasing, consider using git clone
