@@ -1,15 +1,13 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	"jcheng/grs/config"
 	"jcheng/grs/grs"
-	"jcheng/grs/status"
 	"os"
-	"path/filepath"
-	"strings"
+	"jcheng/grs/script"
+	"jcheng/grs/status"
 )
 
 type Args struct {
@@ -36,8 +34,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	_ = sctx
+	runner := grs.ExecRunner{}
 	for idx, elem := range repos {
 		_ = idx
-		_ = elem
+		rstat := &status.RStat{}
+		script.AutoRebase(ctx, runner, rstat, elem)
 	}
 }
