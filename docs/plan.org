@@ -16,7 +16,7 @@
 * TODO Rename grs.Command to something that is not so much like 'Cmd'
 * TODO DEV: Decouple persistence of user config from repo_metadata
 * TODO DEV: Rename DBService to DBRepository
-* TODO DEV: ExecRunner.Command() should use a pointer receiver
+* DONE DEV: CommandRunner.Command() should return a Command interface
 * TODO DEV: Consider moving foo_test.go files to their respective packages
 * TODO UX: Instead of fs-copying repos for rebasing, consider using git clone
 * TODO DEV: AutoRebase() to return err instead of printing to stdout

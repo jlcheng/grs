@@ -66,7 +66,7 @@ func main() {
 		}
 	}()
 
-	runner := grs.ExecRunner{}
+	runner := &grs.ExecRunner{}
 	var repeat = true
 	for repeat {
 		for idx, repo := range repos {

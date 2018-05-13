@@ -4,6 +4,7 @@ import (
 	"testing"
 	"errors"
 	"fmt"
+	"jcheng/grs/grs"
 )
 
 var echoOne = NewCommandHelper([]byte("one"), nil)
@@ -14,7 +15,7 @@ var failed = NewCommandHelper(make([]byte,0), errors.New("failed"))
 func TestMockCommand_Fail(t *testing.T) {
 	m := NewMockRunner()
 	m.Add(failed)
-	cmd := *m.Command("echo","one")
+	cmd := m.Command("echo","one")
 	out, err := cmd.CombinedOutput()
 	if err == nil {
 		t.Error("expected error, got nil")
@@ -26,7 +27,7 @@ func TestMockCommand_Fail(t *testing.T) {
 
 func TestMockCommand_Empty(t *testing.T) {
 	m := NewMockRunner()
-	cmd := *m.Command("echo","one")
+	cmd := m.Command("echo","one")
 	out, err := cmd.CombinedOutput()
 	if err == nil {
 		t.Error("expected error, got nil")
@@ -42,7 +43,7 @@ func TestMockCommand_Empty(t *testing.T) {
 func TestMockCommand_Ok(t *testing.T) {
 	m := NewMockRunner()
 	m.Add(echoOne)
-	cmd := *m.Command("echo","one")
+	cmd := m.Command("echo","one")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Errorf("expected ok, got error: %v\n", err)
@@ -57,17 +58,17 @@ func TestMockCommand_Multi_Ok(t *testing.T) {
 	m.Add(echoOne)
 	m.Add(echoTwo)
 	m.Add(failed)
-	cmd := *m.Command("echo","one")
+	cmd := m.Command("echo","one")
 	out, err := cmd.CombinedOutput()
 	if s := string(out); s != "one" {
 		t.Errorf("expected 'one', got %v", s)
 	}
-	cmd = *m.Command("echo","two")
+	cmd = m.Command("echo","two")
 	out, err = cmd.CombinedOutput()
 	if s := string(out); s != "two" {
 		t.Errorf("expected 'two', got %v", s)
 	}
-	cmd = *m.Command("invalid")
+	cmd = m.Command("invalid")
 	out, err = cmd.CombinedOutput()
 	if err == nil {
 		t.Error("expected error, got nil")
@@ -82,7 +83,7 @@ func TestMockCommandMap_Ok(t *testing.T) {
 	m.AddMap("date \\+%s", dateS) // Must to escape + as arg is a regexp
 	m.AddMap("echo one", echoOne)
 
-	cmd := *m.Command("echo", "one")
+	cmd := m.Command("echo", "one")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Errorf("expected ok, got error: %v\n", err)
@@ -91,7 +92,7 @@ func TestMockCommandMap_Ok(t *testing.T) {
 		t.Errorf("expected 'one', got %v", s)
 	}
 
-	cmd = *m.Command("date", "+%s")
+	cmd = m.Command("date", "+%s")
 	out, err = cmd.CombinedOutput()
 	if err != nil {
 		t.Errorf("expected ok, got error: %v\n", err)
@@ -118,4 +119,11 @@ func TestMockCommand_HistoryCount(t *testing.T) {
 	if c = m.HistoryCount("foo"); c != 2 {
 		t.Error("expected count(foo) == 2, got", c)
 	}
+}
+
+// Fails if ExecRunner does not implement CommandRunner
+func TestExecRunner(t *testing.T) {
+	var runner grs.CommandRunner
+	runner = &grs.ExecRunner{}
+	_ = runner
 }

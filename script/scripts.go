@@ -23,7 +23,7 @@ func BeforeScript(ctx *grs.AppContext, repo grs.Repo, runner grs.CommandRunner, 
 		rstat.Dir = status.DIR_INVALID
 		return
 	}
-	command := *runner.Command(git, "show-ref", "-q", "HEAD")
+	command := runner.Command(git, "show-ref", "-q", "HEAD")
 	if _, err := command.CombinedOutput(); err != nil {
 		rstat.Dir = status.DIR_INVALID
 		return
@@ -45,7 +45,7 @@ func Fetch(ctx *grs.AppContext, runner grs.CommandRunner, rstat *status.RStat, r
 
 	git := ctx.GetGitExec()
 
-	command := *runner.Command(git, "fetch")
+	command := runner.Command(git, "fetch")
 	if out, err := command.CombinedOutput(); err != nil {
 		// fetch may have failed for common reasons, such as not adding yourxk ssh key to the agent
 		grs.Debug("git fetch failed: %v\n%v", err, string(out))
@@ -66,14 +66,14 @@ func GetRepoStatus(ctx *grs.AppContext, runner grs.CommandRunner, rstat *status.
 	var out []byte
 	var err error
 
-	command = *runner.Command(git, "rev-parse", "@{upstream}")
+	command = runner.Command(git, "rev-parse", "@{upstream}")
 	if out, err = command.CombinedOutput(); err != nil {
 		grs.Debug("GetRepoStatus: no upstream detected", err, string(out))
 		rstat.Branch = status.BRANCH_UNTRACKED
 		return
 	}
 
-	command = *runner.Command(git, "rev-list", "--left-right", "--count", "@{upstream}...HEAD")
+	command = runner.Command(git, "rev-list", "--left-right", "--count", "@{upstream}...HEAD")
 	if out, err = command.CombinedOutput(); err != nil {
 		grs.Debug("rev-list failed: %v\n%v", err, string(out))
 		rstat.Dir = status.DIR_INVALID
@@ -139,7 +139,7 @@ func GetIndexStatus(ctx *grs.AppContext, runner grs.CommandRunner, rstat *status
 	git := ctx.GetGitExec()
 
 	rstat.Index = status.INDEX_UNKNOWN
-	command := *runner.Command(git, "ls-files", "--exclude-standard", "-om")
+	command := runner.Command(git, "ls-files", "--exclude-standard", "-om")
 	var out []byte
 	var err error
 	if out, err = command.CombinedOutput(); err != nil {
@@ -151,7 +151,7 @@ func GetIndexStatus(ctx *grs.AppContext, runner grs.CommandRunner, rstat *status
 		return
 	}
 
-	command = *runner.Command(git, "diff-index", "HEAD")
+	command = runner.Command(git, "diff-index", "HEAD")
 	if out, err = command.CombinedOutput(); err != nil {
 		grs.Debug("diff-index failed: %v\n%v\n", err, string(out))
 		return

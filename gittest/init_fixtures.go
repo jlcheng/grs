@@ -87,7 +87,7 @@ func InitTest1(tctx TestContext, tmpdir string) (err error) {
 }
 
 func (tctx TestContext) do(first string, arg ...string) error {
-	cmd := *tctx.runner.Command(first, arg...)
+	cmd := tctx.runner.Command(first, arg...)
 	if bytes, err := cmd.CombinedOutput(); err != nil {
 		return errors.New(fmt.Sprintf("%v %v", err, string(bytes)))
 	} else if tctx.debugExec {

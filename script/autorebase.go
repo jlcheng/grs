@@ -51,7 +51,7 @@ func AutoRebase(ctx *grs.AppContext, repo grs.Repo, runner grs.CommandRunner, rs
 
 	//  2. Identify merge-base
 	git := ctx.GetGitExec()
-	var cmd = *runner.Command(git, "merge-base", "HEAD", "master")
+	var cmd = runner.Command(git, "merge-base", "HEAD", "master")
 	bytes, err := cmd.CombinedOutput()
 	if err != nil {
 		fmt.Println(err)
@@ -60,7 +60,7 @@ func AutoRebase(ctx *grs.AppContext, repo grs.Repo, runner grs.CommandRunner, rs
 	mergeBase := strings.TrimSpace(string(bytes))
 
 	//  3. Identify the graph of child commits from merge-base to HEAD
-	cmd = *runner.Command(git, "rev-list", "master", "^"+mergeBase)
+	cmd = runner.Command(git, "rev-list", "master", "^"+mergeBase)
 	bytes, err = cmd.CombinedOutput()
 	if err != nil {
 		fmt.Println(err)
@@ -71,7 +71,7 @@ func AutoRebase(ctx *grs.AppContext, repo grs.Repo, runner grs.CommandRunner, rs
 	//  5. Rebase current branch against each child in lineage
 	for i := len(revlist)-1; i >=0; i-- {
 		commit := revlist[i]
-		cmd = *runner.Command(git, "rebase", commit)
+		cmd = runner.Command(git, "rebase", commit)
 		bytes, err = cmd.CombinedOutput()
 		if err != nil {
 			fmt.Println(err)

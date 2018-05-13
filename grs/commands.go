@@ -10,14 +10,13 @@ type Command interface {
 }
 
 type CommandRunner interface {
-	Command(name string, arg ...string) *Command
+	Command(name string, arg ...string) Command
 }
 
 type ExecRunner struct { }
 
-func (r ExecRunner) Command(name string, arg ...string) *Command {
+func (r *ExecRunner) Command(name string, arg ...string) Command {
 	c := exec.Command(name, arg...)
 	compat.BeforeCmd(c)
-	ref := Command(c)
-	return &ref
+	return Command(c)
 }

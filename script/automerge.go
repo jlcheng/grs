@@ -19,7 +19,7 @@ func AutoFFMerge(ctx *grs.AppContext, runner grs.CommandRunner, rstat *status.RS
 
 	git := ctx.GetGitExec()
 
-	command := *runner.Command(git, "merge", "--ff-only", "@{upstream}")
+	command := runner.Command(git, "merge", "--ff-only", "@{upstream}")
 	var out []byte
 	var err error
 	if out, err = command.CombinedOutput(); err != nil {
