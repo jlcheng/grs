@@ -1,7 +1,9 @@
 package test
 
 import (
+	"io/ioutil"
 	"jcheng/grs/config"
+	"jcheng/grs/gittest"
 	"jcheng/grs/grs"
 	"jcheng/grs/script"
 	"jcheng/grs/status"
@@ -31,8 +33,51 @@ func TestAutoRebase_Ok(t *testing.T) {
 	ctx := grs.NewAppContext()
 	rstat := status.NewRStat()
 	rstat.Dir = status.DIR_VALID
-
 	repo := grs.Repo{"foo"}
-	script.AutoRebase(ctx, runner, rstat, repo)
 
+	script.AutoRebase(ctx, repo, runner, rstat, false)
+
+}
+
+func TestAutoRebase_Test1(t *testing.T) {
+	tctx := gittest.NewTestContext()
+
+	oldwd, tmpdir := MkTmpDir(t, "AutoRebaseTest1", "TestAutoRebase_Test1")
+	defer CleanTmpDir(t, oldwd, tmpdir, "TestAutoRebase_Test1")
+
+	if err := gittest.InitTest1(tctx, tmpdir); err != nil {
+		t.Fatal(err, "TestAutoRebase_Test1")
+	}
+
+	ctx := grs.NewAppContext()
+	rstat := status.NewRStat()
+	rstat.Dir = status.DIR_VALID
+	repo := grs.Repo{"foo"}
+	runner := tctx.GetRunner()
+
+	script.AutoRebase(ctx, repo, runner, rstat, false)
+
+}
+
+func MkTmpDir(t *testing.T, prefix string, errid string) (oldwd string, d string) {
+	var err error
+	oldwd, err = os.Getwd()
+	if err != nil {
+		t.Fatal(errid, err)
+	}
+	d, err = ioutil.TempDir("", prefix)
+	if err != nil {
+		t.Fatal(errid, err)
+	}
+	return oldwd, d
+}
+
+func CleanTmpDir(t *testing.T, oldwd string, tmpdir string, errid string) {
+
+	if err := os.Chdir(oldwd); err != nil {
+		t.Fatal(errid, err)
+	}
+	if err := os.RemoveAll(tmpdir); err != nil {
+		t.Fatal(errid, err)
+	}
 }

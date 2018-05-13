@@ -39,6 +39,7 @@ func main() {
 	for idx, elem := range repos {
 		_ = idx
 		rstat := &status.RStat{}
-		script.AutoRebase(ctx, runner, rstat, elem)
+		script.BeforeScript(ctx, elem, runner, rstat)
+		script.AutoRebase(ctx, elem, runner, rstat, false)
 	}
 }

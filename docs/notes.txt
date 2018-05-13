@@ -1,0 +1,11 @@
+it_test_1:
+
+branch_A rebases without conflicts on to master
+
+a--b---d---h  master
+ \  \     /
+  \  f---g    branch_B
+   \
+    c---e     branch_A
+
+
