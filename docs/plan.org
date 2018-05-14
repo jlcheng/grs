@@ -22,3 +22,14 @@
 * TODO DEV: AutoRebase() to return err instead of printing to stdout
 * TODO DEV: TestAutoRebase_Test1 must validate AutoRebase() did not yield a git error
 * TODO DEV: Consider moving integration tests (TestAutoRebase_Test1) to IT directory
+* TODO DEV: Functions like AutoRebase should take "upstream" as a parameter. 
+  - Note taken on [2018-05-14 Mon 10:52] \\
+    This allows for doing things like 
+    
+    1. grs -d will rebase 'master on local file system' against 'master on <integration branch> on <team repo>'
+    2. grs -d will then rebase 'master on local file system' against 'master on <official repo>'
+    
+    and
+    
+    1. grs -d will rebase 'currently checked-out branch' against 'master on on local file system'
+    2. followed by rebasing 'currently checked-out branch' against 'master on <integration branch> on <team repo>'
