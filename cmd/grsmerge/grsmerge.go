@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"jcheng/grs/config"
 	"jcheng/grs/grs"
-	"os"
 	"jcheng/grs/script"
 	"jcheng/grs/status"
+	"os"
 )
 
 type Args struct {
@@ -35,7 +35,7 @@ func main() {
 	}
 
 	_ = sctx
-	runner := grs.ExecRunner{}
+	runner := &grs.ExecRunner{}
 	for idx, elem := range repos {
 		_ = idx
 		rstat := &status.RStat{}
