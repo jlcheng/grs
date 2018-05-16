@@ -25,20 +25,6 @@ func TestToClonePath(t *testing.T) {
 	}
 }
 
-func TestAutoRebase_Ok(t *testing.T) {
-	runner := NewMockRunner()
-	runner.AddMap("^/path/to/git rev-parse", Ok(""))
-	runner.AddMap("^/path/to/git rev-list", Ok("0\t0\n"))
-
-	ctx := grs.NewAppContext()
-	rstat := status.NewRStat()
-	rstat.Dir = status.DIR_VALID
-	repo := grs.Repo{"foo"}
-
-	script.AutoRebase(ctx, repo, runner, rstat, false)
-
-}
-
 func TestAutoRebase_Test1(t *testing.T) {
 	tctx := gittest.NewTestContext()
 

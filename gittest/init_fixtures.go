@@ -23,78 +23,51 @@ func InitTest1(tctx TestContext, tmpdir string) (err error) {
 		return err
 	}
 
+	defer func() {
+		if r := recover(); r != nil {
+			var ok bool
+			err, ok = r.(error)
+			if !ok {
+				err = fmt.Errorf("error %v", r)
+			}
+		}
+	}()
+
 	git := tctx.git
-	if err = tctx.do(git, "init"); err != nil {
-		return err
-	}
-	if err = tctx.touchAndCommit(".gitignore", "Commit_A"); err != nil {
-		return err
-	}
-
-	if err = tctx.touchAndCommit("b.txt", "Commit_B"); err != nil {
-		return err
-	}
-
-	if err = tctx.do(git, "checkout", "-b", "branch_A", "master~1"); err != nil {
-		return err
-	}
-
-	if err = tctx.touchAndCommit("c.txt", "Commit_C"); err != nil {
-		return err
-	}
-
-	if err = tctx.do(git, "checkout", "master"); err != nil {
-		return err
-	}
-
-	if err = tctx.touchAndCommit("d.txt", "Commit_D"); err != nil {
-		return err
-	}
-
-	if err = tctx.do(git, "checkout", "branch_A"); err != nil {
-		return err
-	}
-
-	if err = tctx.touchAndCommit("e.txt", "Commit_E"); err != nil {
-		return err
-	}
-
-	if err = tctx.do(git, "checkout", "-b", "branch_B", "master~1"); err != nil {
-		return err
-	}
-
-	if err = tctx.touchAndCommit("f.txt", "Commit_F"); err != nil {
-		return err
-	}
-
-	if err = tctx.touchAndCommit("g.txt", "Commit_G"); err != nil {
-		return err
-	}
-
-	if err = tctx.do(git, "checkout", "master"); err != nil {
-		return err
-	}
-
-	if err = tctx.do(git, "merge", "branch_B", "-m", "merge branch_B onto master"); err != nil {
-		return err
-	}
-
-	if err = tctx.do(git, "checkout", "branch_A"); err != nil {
-		return err
-	}
-
+	tctx.do(git, "init")
+	tctx.touchAndCommit(".gitignore", "Commit_A")
+	tctx.touchAndCommit("b.txt", "Commit_B")
+	tctx.do(git, "checkout", "-b", "branch_A", "master~1")
+	tctx.touchAndCommit("c.txt", "Commit_C")
+	tctx.do(git, "checkout", "master")
+	tctx.touchAndCommit("d.txt", "Commit_D")
+	tctx.do(git, "checkout", "branch_A")
+	tctx.touchAndCommit("e.txt", "Commit_E")
+	tctx.do(git, "checkout", "-b", "branch_B", "master~1")
+	tctx.touchAndCommit("f.txt", "Commit_F")
+	tctx.touchAndCommit("g.txt", "Commit_G")
+	tctx.do(git, "checkout", "master")
+	tctx.do(git, "merge", "branch_B", "-m", "merge branch_B onto master")
+	tctx.do(git, "checkout", "branch_A")
 	return err
 }
 
-func (tctx TestContext) do(first string, arg ...string) error {
+func (tctx TestContext) do(first string, arg ...string) {
 	cmd := tctx.runner.Command(first, arg...)
 	if bytes, err := cmd.CombinedOutput(); err != nil {
-		return errors.New(fmt.Sprintf("%v %v", err, string(bytes)))
+		panic(errors.New(fmt.Sprintf("%v %v", err, string(bytes))))
 	} else if tctx.debugExec {
 		fmt.Println(string(bytes))
 	}
+}
 
-	return nil
+func (tctx TestContext) touchAndCommit(file string, commitMsg string) {
+	git := tctx.git
+	if err := touch(file); err != nil {
+		panic(err)
+	}
+	tctx.do(git, "add", file)
+	tctx.do(git, "commit", "-m", commitMsg)
 }
 
 func touch(file string) error {
@@ -102,20 +75,6 @@ func touch(file string) error {
 	if f != nil {
 		f.Close()
 	} else if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (tctx TestContext) touchAndCommit(file string, commitMsg string) (err error) {
-	git := tctx.git
-	if err = touch(file); err != nil {
-		return err
-	}
-	if err = tctx.do(git, "add", "-A"); err != nil {
-		return err
-	}
-	if err = tctx.do(git, "commit", "-m", commitMsg); err != nil {
 		return err
 	}
 	return nil

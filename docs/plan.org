@@ -17,7 +17,7 @@
 * TODO DEV: Decouple persistence of user config from repo_metadata
 * TODO DEV: Rename DBService to DBRepository
 * DONE DEV: CommandRunner.Command() should return a Command interface
-* TODO DEV: Rewrite InitTest1 to use panic/recover instead of multiple 'return error'
+* DONE DEV: Rewrite InitTest1 to use panic/recover instead of multiple 'return error'
 * TODO DEV: Consider moving foo_test.go files to their respective packages
 * TODO UX: Instead of fs-copying repos for rebasing, consider using git clone
 * TODO DEV: AutoRebase() to return err instead of printing to stdout
