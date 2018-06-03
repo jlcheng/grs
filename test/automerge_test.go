@@ -84,7 +84,7 @@ func TestGetActivityTime(t *testing.T) {
 	atime := time.Date(1900, time.January, 1, 1, 0, 0, 0, time.UTC)
 	mtime := time.Date(2000, time.January, 1, 1, 0, 0, 0, time.UTC)
 	if err := os.Chtimes(fname, atime, mtime); err != nil {
-		t.Fatal("TestGetActivityTime: %v", err)
+		t.Fatalf("TestGetActivityTime: %v", err)
 	}
 
 	activity, err := script.GetActivityTime(d)
