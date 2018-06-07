@@ -1,4 +1,4 @@
-it_test_1:
+IT_Test_1:
 
 branch_A rebases without conflicts on to master
 
@@ -7,5 +7,16 @@ a--b---d---h  master
   \  f---g    branch_B
    \
     c---e     branch_A
+
+
+IT_Test_2:
+
+branch_A rebases without conflicts on to @{UPSTREAM}
+
+a--b---c---f  @{UPSTREAM}
+ \  \     /
+  \  d---e    origin/branch_B
+   \
+    g---h     cloned_repo/branch_A
 
 

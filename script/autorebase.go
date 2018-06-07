@@ -11,13 +11,14 @@ import (
 	"io"
 	"os"
 	"strings"
+	"errors"
 )
 
 const (
 	CLONE_BASEDIR = "clones"
 )
 
-func AutoRebase(ctx *grs.AppContext, repo grs.Repo, runner grs.CommandRunner, rstat *status.RStat, clone bool) {
+func AutoRebase(ctx *grs.AppContext, repo grs.Repo, runner grs.CommandRunner, rstat *status.RStat, clone bool) error {
 	// Set up a working directory and update some sort of metadata object (grsdb)
 	// for any repo that requires rebasing (branch == diverged):
 	//  1. Set up a clone directory
@@ -31,58 +32,55 @@ func AutoRebase(ctx *grs.AppContext, repo grs.Repo, runner grs.CommandRunner, rs
 		_, err = os.Stat(GetCloneBaseDir())
 		if os.IsNotExist(err) {
 			if err := CreateCloneDir(); err != nil {
-				fmt.Println(err)
-				return
+				return err
 			}
 		}
 
 		err = grsio.CopyDir(repo.Path, clnpath)
 		if err != nil {
-			fmt.Println(err)
-			return
+			return err
 		}
 
 		err = os.Chdir(clnpath)
 		if err != nil {
-			fmt.Println(err)
-			return
+			return err
 		}
 	}
 
 	//  2. Identify merge-base
 	git := ctx.GetGitExec()
-	var cmd = runner.Command(git, "merge-base", "HEAD", "master")
+	p := "@{upstream}"
+	cmd := runner.Command(git, "merge-base", "HEAD", p)
 	bytes, err := cmd.CombinedOutput()
 	if err != nil {
-		fmt.Println(err)
-		return
+		return errors.New(fmt.Sprintf("%v %v", err, string(bytes)))
 	}
 	mergeBase := strings.TrimSpace(string(bytes))
 
 	//  3. Identify the graph of child commits from merge-base to HEAD
-	cmd = runner.Command(git, "rev-list", "master", "^"+mergeBase)
+	cmd = runner.Command(git, "rev-list", p, "^"+mergeBase)
 	bytes, err = cmd.CombinedOutput()
 	if err != nil {
-		fmt.Println(err)
-		return
+		return errors.New(fmt.Sprintf("%v %v", err, string(bytes)))
 	}
-
 	revlist := strings.Split(strings.TrimSpace(string(bytes)),"\n")
+
 	//  5. Rebase current branch against each child in lineage
 	for i := len(revlist)-1; i >=0; i-- {
 		commit := revlist[i]
 		cmd = runner.Command(git, "rebase", commit)
 		bytes, err = cmd.CombinedOutput()
 		if err != nil {
-			fmt.Println(err)
-			return
+			cmd = runner.Command(git, "rebase", "--abort")
+			bytes, err = cmd.CombinedOutput()
+			if err != nil {
+				return errors.New(fmt.Sprintf("%s %s", err, string(bytes)))
+			}
 		}
 	}
 
 	//  6. Stop when conflict is detected
-
-
-
+	return nil
 }
 
 func ToClonePath(repoPath string) string {
