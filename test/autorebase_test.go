@@ -10,7 +10,6 @@ import (
 	"os"
 	"strings"
 	"testing"
-	"fmt"
 )
 
 func TestToClonePath(t *testing.T) {
@@ -106,11 +105,82 @@ func TestAutoRebase_IT_Test_2(t *testing.T) {
 
 	err := script.AutoRebase(ctx, repo, runner, rstat, false)
 	if err != nil {
-		fmt.Println(err)
 		t.Fatal(err)
 	}
 
 }
+
+/*
+cloned_repo/master rebases with conflicts on to @{UPSTREAM}
+
+a--b---c---f  @{UPSTREAM} origin/master
+ \  \     /
+  \  d---e    origin/branch_B
+   \
+    g---h     cloned_repo/master (g has a conflict with commit d)
+*/
+func TestAutoRebase_IT_Test_3(t *testing.T) {
+	tctx := gittest.NewTestContext()
+
+	oldwd, tmpdir := MkTmpDir(t, "AutoRebase_IT_Test_3", "TestAutoRebase_IT_Test_3")
+	defer CleanTmpDir(t, oldwd, tmpdir, "TestAutoRebase_IT_Test_3")
+
+	defer func() {
+		if r := recover(); r != nil {
+			var ok bool
+			err, ok := r.(error)
+			if ok {
+				t.Fatal(err)
+			}
+		}
+	}()
+
+	if err := os.Chdir(tmpdir); err != nil {
+		t.Fatal(err)
+	}
+
+	git := tctx.Git()
+	tctx.Mkdir("source")
+	tctx.Chdir("source")
+	tctx.Exec(git, "init")
+	tctx.TouchAndCommit(".gitignore", "Commit_A")
+	tctx.Chdir("..")
+	tctx.Exec(git, "clone", "source", "dest")
+
+	tctx.Chdir("./source")
+	tctx.TouchAndCommit("b.txt", "Commit_B")
+	tctx.TouchAndCommit("c.txt", "Commit_C")
+	tctx.Exec(git, "checkout", "-b", "branch_B")
+	tctx.SetContents("conflict.txt", "D")
+	tctx.Add("conflict.txt")
+	tctx.TouchAndCommit("d.txt", "Commit_D")
+	tctx.TouchAndCommit("e.txt", "Commit_E")
+	tctx.Exec(git, "checkout", "master")
+	tctx.Exec(git, "merge", "--no-ff", "branch_B")
+
+	tctx.Chdir("..")
+	tctx.Chdir("dest")
+	tctx.SetContents("conflict.txt", "G")
+	tctx.Add("conflict.txt")
+	tctx.TouchAndCommit("g.txt", "Commit_G")
+	tctx.TouchAndCommit("h.txt", "Commit_H")
+	ctx := grs.NewAppContext()
+	rstat := status.NewRStat()
+	rstat.Dir = status.DIR_VALID
+	repo := grs.Repo{"foo"}
+	runner := tctx.GetRunner()
+	script.Fetch(ctx, runner, rstat, repo)
+
+	err := script.AutoRebase(ctx, repo, runner, rstat, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	script.GetRepoStatus(ctx, runner, rstat)
+	if rstat.Branch != status.BRANCH_DIVERGED {
+		t.Fatalf("expected BRANCH_DIVERGED, but was %v\n", rstat.Branch)
+	}
+}
+
 
 func MkTmpDir(t *testing.T, prefix string, errid string) (oldwd string, d string) {
 	var err error

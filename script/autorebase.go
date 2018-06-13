@@ -64,17 +64,16 @@ func AutoRebase(ctx *grs.AppContext, repo grs.Repo, runner grs.CommandRunner, rs
 		return errors.New(fmt.Sprintf("%v %v", err, string(bytes)))
 	}
 	revlist := strings.Split(strings.TrimSpace(string(bytes)),"\n")
-
 	//  5. Rebase current branch against each child in lineage
 	for i := len(revlist)-1; i >=0; i-- {
 		commit := revlist[i]
 		cmd = runner.Command(git, "rebase", commit)
-		bytes, err = cmd.CombinedOutput()
-		if err != nil {
+		_, err1 := cmd.CombinedOutput()
+		if err1 != nil {
 			cmd = runner.Command(git, "rebase", "--abort")
-			bytes, err = cmd.CombinedOutput()
+			bytes2, err2 := cmd.CombinedOutput()
 			if err != nil {
-				return errors.New(fmt.Sprintf("%s %s", err, string(bytes)))
+				return errors.New(fmt.Sprintf("%s %s", err2, string(bytes2)))
 			}
 		}
 	}

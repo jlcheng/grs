@@ -16,6 +16,10 @@
 * TODO Rename grs.Command to something that is not so much like 'Cmd'
 * TODO DEV: Decouple persistence of user config from repo_metadata
 * TODO DEV: Rename DBService to DBRepository
+* TODO DEV: Rewrite TestContext as Exec
+  - Note taken on [2018-06-13 Wed 07:08] \\
+    https://blog.golang.org/errors-are-values
+* TODO DEV: Rename gittest/fstest_context.go to grstest/exec.go
 * DONE DEV: CommandRunner.Command() should return a Command interface
 * DONE DEV: Rewrite InitTest1 to use panic/recover instead of multiple 'return error'
 * TODO DEV: Consider moving foo_test.go files to their respective packages

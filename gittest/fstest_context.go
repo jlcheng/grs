@@ -42,6 +42,11 @@ func (tctx TestContext) Mkdir(subdir string) {
 	}
 }
 
+func (tctx TestContext) Add(path string) {
+	git := tctx.git
+	tctx.Exec(git, "add", path)
+}
+
 func (tctx TestContext) Chdir(dir string) {
 	if err := os.Chdir(dir); err != nil {
 		panic(err)
@@ -50,6 +55,15 @@ func (tctx TestContext) Chdir(dir string) {
 
 func (tctx TestContext) Git() string {
 	return tctx.git
+}
+
+func (tctx TestContext) SetContents(file, contents string) {
+	f, err := os.Create(file)
+	if err != nil {
+		panic(err)
+	}
+	defer func() {f.Close()}()
+	f.WriteString(contents)
 }
 
 func Touch(file string) error {
