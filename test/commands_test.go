@@ -1,21 +1,21 @@
 package test
 
 import (
-	"testing"
 	"errors"
 	"fmt"
 	"jcheng/grs/grs"
+	"testing"
 )
 
 var echoOne = NewCommandHelper([]byte("one"), nil)
 var echoTwo = NewCommandHelper([]byte("two"), nil)
 var dateS = NewCommandHelper([]byte("1515196992"), nil)
-var failed = NewCommandHelper(make([]byte,0), errors.New("failed"))
+var failed = NewCommandHelper(make([]byte, 0), errors.New("failed"))
 
 func TestMockCommand_Fail(t *testing.T) {
 	m := NewMockRunner()
 	m.Add(failed)
-	cmd := m.Command("echo","one")
+	cmd := m.Command("echo", "one")
 	out, err := cmd.CombinedOutput()
 	if err == nil {
 		t.Error("expected error, got nil")
@@ -27,7 +27,7 @@ func TestMockCommand_Fail(t *testing.T) {
 
 func TestMockCommand_Empty(t *testing.T) {
 	m := NewMockRunner()
-	cmd := m.Command("echo","one")
+	cmd := m.Command("echo", "one")
 	out, err := cmd.CombinedOutput()
 	if err == nil {
 		t.Error("expected error, got nil")
@@ -43,7 +43,7 @@ func TestMockCommand_Empty(t *testing.T) {
 func TestMockCommand_Ok(t *testing.T) {
 	m := NewMockRunner()
 	m.Add(echoOne)
-	cmd := m.Command("echo","one")
+	cmd := m.Command("echo", "one")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Errorf("expected ok, got error: %v\n", err)
@@ -58,12 +58,12 @@ func TestMockCommand_Multi_Ok(t *testing.T) {
 	m.Add(echoOne)
 	m.Add(echoTwo)
 	m.Add(failed)
-	cmd := m.Command("echo","one")
+	cmd := m.Command("echo", "one")
 	out, err := cmd.CombinedOutput()
 	if s := string(out); s != "one" {
 		t.Errorf("expected 'one', got %v", s)
 	}
-	cmd = m.Command("echo","two")
+	cmd = m.Command("echo", "two")
 	out, err = cmd.CombinedOutput()
 	if s := string(out); s != "two" {
 		t.Errorf("expected 'two', got %v", s)

@@ -1,13 +1,13 @@
 package test
 
 import (
-	"testing"
+	"io/ioutil"
 	"jcheng/grs/grs"
 	"jcheng/grs/script"
 	"jcheng/grs/status"
 	"os"
-	"io/ioutil"
 	"path/filepath"
+	"testing"
 	"time"
 )
 
@@ -75,7 +75,6 @@ func TestGetActivityTime(t *testing.T) {
 		t.Fatalf("TestGetActivityTime: %v", err)
 	}
 
-
 	os.Mkdir(filepath.Join(d, ".git"), 0777)
 	fname := filepath.Join(d, ".git", "HEAD")
 	fh, err := os.Create(fname)
@@ -95,4 +94,3 @@ func TestGetActivityTime(t *testing.T) {
 		t.Error("unexpected last activity time: ", activity)
 	}
 }
-

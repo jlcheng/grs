@@ -26,7 +26,7 @@ type DBServiceImpl struct {
 	kvstore KVStore
 }
 
-func NewDBService(kvstore KVStore) (DBService) {
+func NewDBService(kvstore KVStore) DBService {
 	return &DBServiceImpl{
 		kvstore: kvstore,
 	}
@@ -61,7 +61,6 @@ func (db *DB) FindRepo(id string) *RepoDTO {
 	}
 	return nil
 }
-
 
 func (db *DB) FindOrCreateRepo(id string) *RepoDTO {
 	for idx, r := range db.Repos {

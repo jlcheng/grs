@@ -1,11 +1,11 @@
 package test
 
 import (
-	"testing"
-	"os"
-	"os/exec"
 	"fmt"
 	"jcheng/grs/compat"
+	"os"
+	"os/exec"
+	"testing"
 )
 
 func TestWindowsFix(t *testing.T) {
@@ -32,7 +32,7 @@ func TestWindowsFixHelper(t *testing.T) {
 	}
 	var arg string = ""
 	for idx, elem := range os.Args {
-		if elem == "--" && idx < len(os.Args) - 1 {
+		if elem == "--" && idx < len(os.Args)-1 {
 			arg = os.Args[idx+1]
 		}
 	}

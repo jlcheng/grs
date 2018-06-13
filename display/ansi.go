@@ -11,7 +11,7 @@ type AnsiDisplay struct {
 	writer *bufio.Writer
 }
 
-func NewAnsiDisplay(writer io.Writer) (*AnsiDisplay) {
+func NewAnsiDisplay(writer io.Writer) *AnsiDisplay {
 	return &AnsiDisplay{bufio.NewWriter(writer)}
 }
 

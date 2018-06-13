@@ -149,7 +149,6 @@ func TestAutoRebase_IT_Test_3(t *testing.T) {
 	}
 }
 
-
 func MkTmpDir(t *testing.T, prefix string, errid string) (oldwd string, d string) {
 	var err error
 	oldwd, err = os.Getwd()
@@ -172,4 +171,3 @@ func CleanTmpDir(t *testing.T, oldwd string, tmpdir string, errid string) {
 		t.Fatal(errid, err)
 	}
 }
-

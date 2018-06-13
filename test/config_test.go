@@ -1,8 +1,8 @@
 package test
 
 import (
-	"testing"
 	"jcheng/grs/config"
+	"testing"
 )
 
 func TestConfigFromEnv(t *testing.T) {

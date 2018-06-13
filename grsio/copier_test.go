@@ -1,10 +1,10 @@
 package grsio
 
 import (
-	"testing"
-	"os"
 	"io/ioutil"
+	"os"
 	"path/filepath"
+	"testing"
 )
 
 func TestNewCopyDir(t *testing.T) {

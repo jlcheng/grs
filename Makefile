@@ -3,6 +3,7 @@ GOCMD=go
 GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
+GOFMT=gofmt
 GOGET=$(GOCMD) get
 GORUN=$(GOCMD) run
 GOMAIN=cmd/grs/grs.go
@@ -24,9 +25,13 @@ build: | $(OUTDIR) prg1 prg2
 .PHONY: test
 test: 
 	$(GOTEST) -v ./test
+	$(GOFMT) -l .
 clean: 
 	$(GOCLEAN)
 	rm -rf $(OUTDIR)
+
+gofmt:
+	$(GOFMT) -s -w .
 
 install: all
 	mv $(OUTDIR)/$(BINARY_NAME) $(HOME)/bin
@@ -43,3 +48,4 @@ prg1:
 
 prg2:
 	$(GOBUILD) -o $(OUTDIR)/$(PRG2_NAME) $(PRG2)
+

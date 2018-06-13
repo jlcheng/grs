@@ -1,10 +1,10 @@
 package test
 
 import (
-	"testing"
-	"jcheng/grs/status"
-	"jcheng/grs/script"
 	"jcheng/grs/grs"
+	"jcheng/grs/script"
+	"jcheng/grs/status"
+	"testing"
 )
 
 func TestGetIndexStatus_Ls_Files_Fail(t *testing.T) {

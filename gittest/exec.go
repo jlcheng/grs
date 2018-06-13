@@ -1,18 +1,18 @@
 package gittest
 
 import (
-	"jcheng/grs/grs"
-	"os"
 	"errors"
 	"fmt"
+	"jcheng/grs/grs"
+	"os"
 )
 
 // An TestExecRunner is a stateful utility that refuses to execute further Commands once an error occurs.
 // It applies the Scanner.Err() technique as mentioned in https://blog.golang.org/errors-are-values
 type ExecRunner struct {
-	err error
-	git string
-	runner *grs.ExecRunner
+	err       error
+	git       string
+	runner    *grs.ExecRunner
 	debugExec bool
 }
 

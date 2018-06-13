@@ -1,17 +1,17 @@
 package main
 
 import (
-	"flag"
-	"jcheng/grs/grs"
-	"jcheng/grs/config"
-	"os"
-	"fmt"
 	"encoding/json"
+	"flag"
+	"fmt"
+	"jcheng/grs/config"
+	"jcheng/grs/grs"
+	"os"
 )
 
 type Args struct {
 	Clear bool
-	Show bool
+	Show  bool
 }
 
 func main() {

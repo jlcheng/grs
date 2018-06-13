@@ -6,17 +6,17 @@ var level int = INFO
 
 const (
 	DEBUG = iota
-	INFO = iota
+	INFO  = iota
 )
 
 func Debug(format string, a ...interface{}) {
-	if (level <= DEBUG) {
+	if level <= DEBUG {
 		fmt.Printf("[DEBUG] %v\n", fmt.Sprintf(format, a...))
 	}
 }
 
 func Info(format string, a ...interface{}) {
-	if (level <= INFO) {
+	if level <= INFO {
 		fmt.Printf("[INFO] %v\n", fmt.Sprintf(format, a...))
 	}
 }

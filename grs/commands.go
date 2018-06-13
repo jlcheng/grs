@@ -1,8 +1,8 @@
 package grs
 
 import (
-	"os/exec"
 	"jcheng/grs/compat"
+	"os/exec"
 )
 
 type Command interface {
@@ -13,7 +13,7 @@ type CommandRunner interface {
 	Command(name string, arg ...string) Command
 }
 
-type ExecRunner struct { }
+type ExecRunner struct{}
 
 func (r *ExecRunner) Command(name string, arg ...string) Command {
 	c := exec.Command(name, arg...)

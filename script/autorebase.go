@@ -1,17 +1,17 @@
 package script
 
 import (
+	"crypto/sha1"
+	"errors"
+	"fmt"
+	"io"
 	"jcheng/grs/config"
 	"jcheng/grs/grs"
-	"jcheng/grs/status"
-	"path/filepath"
 	"jcheng/grs/grsio"
-	"fmt"
-	"crypto/sha1"
-	"io"
+	"jcheng/grs/status"
 	"os"
+	"path/filepath"
 	"strings"
-	"errors"
 )
 
 const (
@@ -22,7 +22,7 @@ func AutoRebase(ctx *grs.AppContext, repo grs.Repo, runner grs.CommandRunner, rs
 	// Set up a working directory and update some sort of metadata object (grsdb)
 	// for any repo that requires rebasing (branch == diverged):
 	//  1. Set up a clone directory
-	if (clone) {
+	if clone {
 		clnpath := ToClonePath(repo.Path)
 		clndir, err := os.Stat(clnpath)
 		if clndir != nil {
@@ -63,9 +63,9 @@ func AutoRebase(ctx *grs.AppContext, repo grs.Repo, runner grs.CommandRunner, rs
 	if err != nil {
 		return errors.New(fmt.Sprintf("%v %v", err, string(bytes)))
 	}
-	revlist := strings.Split(strings.TrimSpace(string(bytes)),"\n")
+	revlist := strings.Split(strings.TrimSpace(string(bytes)), "\n")
 	//  5. Rebase current branch against each child in lineage
-	for i := len(revlist)-1; i >=0; i-- {
+	for i := len(revlist) - 1; i >= 0; i-- {
 		commit := revlist[i]
 		cmd = runner.Command(git, "rebase", commit)
 		_, err1 := cmd.CombinedOutput()

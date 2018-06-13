@@ -1,10 +1,10 @@
 package test
 
 import (
-	"testing"
-	"jcheng/grs/grsdb"
 	"io/ioutil"
+	"jcheng/grs/grsdb"
 	"os"
+	"testing"
 )
 
 func TestMemKVStore(t *testing.T) {

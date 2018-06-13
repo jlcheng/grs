@@ -1,12 +1,12 @@
 package script
 
 import (
+	"errors"
 	"jcheng/grs/grs"
 	"jcheng/grs/status"
 	"os"
-	"errors"
-	"time"
 	"path/filepath"
+	"time"
 )
 
 // AutoFFMerge runs `git merge --ff-only...` when the branch is behind and unmodified
@@ -31,12 +31,13 @@ func AutoFFMerge(ctx *grs.AppContext, runner grs.CommandRunner, rstat *status.RS
 
 // GetActivityTime gets the estimated "last modified time" of a repo
 var lastActivityFiles = []string{"HEAD", "COMMIT_EDITMSG", "ORIG_HEAD", "index", "config"}
+
 func GetActivityTime(repo string) (time.Time, error) {
 	var atime time.Time
 	if f, err := os.Stat(repo); err != nil || !f.IsDir() {
 		return atime, errors.New("%v is not a directory")
 	}
-	for _, f := range(lastActivityFiles) {
+	for _, f := range lastActivityFiles {
 		fn := filepath.Join(repo, ".git", f)
 		if finfo, err := os.Stat(fn); err == nil {
 			if finfo.ModTime().After(atime) {

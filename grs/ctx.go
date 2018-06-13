@@ -39,7 +39,6 @@ func (ctx *AppContext) SetGitExec(defaultGitExec string) {
 	ctx.defaultGitExec = defaultGitExec
 }
 
-
 func (ctx *AppContext) DB() *grsdb.DB {
 	return ctx.db
 }
@@ -53,13 +52,13 @@ func (ctx *AppContext) DBService() grsdb.DBService {
 }
 
 type ScriptContext struct {
-	Ctx *AppContext
+	Ctx   *AppContext
 	Repos []Repo
 }
 
 func NewScriptContext(ctx *AppContext) *ScriptContext {
 	return &ScriptContext{
-		Ctx: ctx,
+		Ctx:   ctx,
 		Repos: make([]Repo, 0),
 	}
 }

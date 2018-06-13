@@ -1,11 +1,11 @@
 package grsdb
 
 import (
-	"fmt"
 	"errors"
-	"path/filepath"
-	"os"
+	"fmt"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 )
 
 // KVStore interface is implemented by objects that can persist key/value pairs

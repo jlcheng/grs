@@ -8,7 +8,7 @@ import (
 )
 
 type clist struct {
-	pattern *regexp.Regexp
+	pattern  *regexp.Regexp
 	commands []grs.Command
 }
 
@@ -29,8 +29,8 @@ func NewCommandHelper(bytes []byte, err error) grs.Command {
 	return &CommandHelper{f}
 }
 
-
 var _EMPTY_BYTES = []byte("")
+
 // Error is a convenience function for mocking common errors
 func Error(msg string) grs.Command {
 	return NewCommandHelper(_EMPTY_BYTES, errors.New(msg))
@@ -40,13 +40,12 @@ func Ok(msg string) grs.Command {
 	return NewCommandHelper([]byte(msg), nil)
 }
 
-
 // MockRunner holds a sequence of Commands, mapped to their command-line text. When the user specifies a command text,
 // it returns the corresponding command and advances to the next command in memory.
 type MockRunner struct {
 	_commands []grs.Command
-	commands map[string]*clist
-	history []string
+	commands  map[string]*clist
+	history   []string
 }
 
 func (m *MockRunner) Add(cmd grs.Command) {
@@ -57,7 +56,7 @@ func (m *MockRunner) AddMap(s string, cmd grs.Command) {
 	v, ok := m.commands[s]
 	if !ok {
 		v = &clist{
-			pattern: regexp.MustCompile(s),
+			pattern:  regexp.MustCompile(s),
 			commands: make([]grs.Command, 0),
 		}
 	}
@@ -70,7 +69,7 @@ func (m *MockRunner) Command(name string, arg ...string) grs.Command {
 	m.history = append(m.history, full)
 
 	if len(m._commands) == 0 && len(m.commands) == 0 {
-		return NewCommandHelper(make([]byte,0), errors.New("no commands configured"))
+		return NewCommandHelper(make([]byte, 0), errors.New("no commands configured"))
 	}
 
 	for k := range m.commands {
@@ -83,7 +82,7 @@ func (m *MockRunner) Command(name string, arg ...string) grs.Command {
 		}
 	}
 	if len(m._commands) == 0 {
-		return NewCommandHelper(make([]byte,0), errors.New("mock has no commands that match: " + name))
+		return NewCommandHelper(make([]byte, 0), errors.New("mock has no commands that match: "+name))
 	}
 
 	r := m._commands[0]
@@ -106,8 +105,8 @@ func (m *MockRunner) HistoryCount(command string) int {
 func NewMockRunner() *MockRunner {
 
 	return &MockRunner{
-		_commands:make([]grs.Command, 0),
-		commands: make(map[string]*clist),
-		history:make([]string, 0),
+		_commands: make([]grs.Command, 0),
+		commands:  make(map[string]*clist),
+		history:   make([]string, 0),
 	}
 }

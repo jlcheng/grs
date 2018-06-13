@@ -1,12 +1,11 @@
-
 package test
 
 import (
-	"testing"
 	"jcheng/grs/grs"
-	"os"
 	"jcheng/grs/script"
 	"jcheng/grs/status"
+	"os"
+	"testing"
 )
 
 func TestBeforeScript_Fail(t *testing.T) {
@@ -16,13 +15,13 @@ func TestBeforeScript_Fail(t *testing.T) {
 	if cwd, e := os.Getwd(); e != nil {
 		t.Error(e)
 	} else {
-		repo = grs.Repo{Path:cwd}
+		repo = grs.Repo{Path: cwd}
 	}
 	rstat := status.NewRStat()
 	runner.Add(Error("failed"))
 	script.BeforeScript(grs.NewAppContext(), repo, runner, rstat)
 	if rstat.Dir == status.DIR_VALID {
-		t.Errorf("expected %s, got: %v\n" +
+		t.Errorf("expected %s, got: %v\n"+
 			"", status.DIR_INVALID, rstat.Dir)
 	}
 }
@@ -34,7 +33,7 @@ func TestBeforeScript_OK(t *testing.T) {
 	if cwd, e := os.Getwd(); e != nil {
 		t.Error(e)
 	} else {
-		repo = grs.Repo{Path:cwd}
+		repo = grs.Repo{Path: cwd}
 	}
 	rstat := status.NewRStat()
 	runner.Add(Ok(""))
@@ -43,4 +42,3 @@ func TestBeforeScript_OK(t *testing.T) {
 		t.Errorf("expected %s, got: %v\n", status.DIR_VALID, rstat.Dir)
 	}
 }
-
