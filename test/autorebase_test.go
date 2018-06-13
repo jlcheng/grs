@@ -25,26 +25,6 @@ func TestToClonePath(t *testing.T) {
 	}
 }
 
-func TestAutoRebase_IT_Test_1(t *testing.T) {
-	tctx := gittest.NewTestContext()
-
-	oldwd, tmpdir := MkTmpDir(t, "AutoRebase_IT_Test_1", "TestAutoRebase_IT_Test_1")
-	defer CleanTmpDir(t, oldwd, tmpdir, "TestAutoRebase_IT_Test_1")
-
-	if err := gittest.InitTest1(tctx, tmpdir); err != nil {
-		t.Fatal(err, "TestAutoRebase_Test1")
-	}
-
-	ctx := grs.NewAppContext()
-	rstat := status.NewRStat()
-	rstat.Dir = status.DIR_VALID
-	repo := grs.Repo{"foo"}
-	runner := tctx.GetRunner()
-
-	script.AutoRebase(ctx, repo, runner, rstat, false)
-
-}
-
 /*
 cloned_repo/master rebases without conflicts on to @{UPSTREAM}
 
@@ -55,52 +35,45 @@ a--b---c---f  @{UPSTREAM} origin/master
     g---h     cloned_repo/master
 */
 func TestAutoRebase_IT_Test_2(t *testing.T) {
-	tctx := gittest.NewTestContext()
+	exec := gittest.NewExecRunner()
 
 	oldwd, tmpdir := MkTmpDir(t, "AutoRebase_IT_Test_2", "TestAutoRebase_IT_Test_2")
 	defer CleanTmpDir(t, oldwd, tmpdir, "TestAutoRebase_IT_Test_2")
-
-	defer func() {
-		if r := recover(); r != nil {
-			var ok bool
-			err, ok := r.(error)
-			if ok {
-				t.Fatal(err)
-			}
-		}
-	}()
-
 	if err := os.Chdir(tmpdir); err != nil {
 		t.Fatal(err)
 	}
 
-	git := tctx.Git()
-	tctx.Mkdir("source")
-	tctx.Chdir("source")
-	tctx.Exec(git, "init")
-	tctx.TouchAndCommit(".gitignore", "Commit_A")
-	tctx.Chdir("..")
-	tctx.Exec(git, "clone", "source", "dest")
+	git := exec.Git()
+	exec.Mkdir("source")
+	exec.Chdir("source")
+	exec.Exec(git, "init")
+	exec.TouchAndCommit(".gitignore", "Commit_A")
+	exec.Chdir("..")
+	exec.Exec(git, "clone", "source", "dest")
 
-	tctx.Chdir("./source")
-	tctx.TouchAndCommit("b.txt", "Commit_B")
-	tctx.TouchAndCommit("c.txt", "Commit_C")
-	tctx.Exec(git, "checkout", "-b", "branch_B")
-	tctx.TouchAndCommit("d.txt", "Commit_D")
-	tctx.TouchAndCommit("e.txt", "Commit_E")
-	tctx.Exec(git, "checkout", "master")
-	tctx.Exec(git, "merge", "--no-ff", "branch_B")
+	exec.Chdir("./source")
+	exec.TouchAndCommit("b.txt", "Commit_B")
+	exec.TouchAndCommit("c.txt", "Commit_C")
+	exec.Exec(git, "checkout", "-b", "branch_B")
+	exec.TouchAndCommit("d.txt", "Commit_D")
+	exec.TouchAndCommit("e.txt", "Commit_E")
+	exec.Exec(git, "checkout", "master")
+	exec.Exec(git, "merge", "--no-ff", "branch_B")
 
-	tctx.Chdir("..")
-	tctx.Chdir("dest")
-	tctx.TouchAndCommit("g.txt", "Commit_G")
-	tctx.TouchAndCommit("h.txt", "Commit_H")
+	exec.Chdir("..")
+	exec.Chdir("dest")
+	exec.TouchAndCommit("g.txt", "Commit_G")
+	exec.TouchAndCommit("h.txt", "Commit_H")
+
+	if exec.Err() != nil {
+		t.Fatal("test setup failed")
+	}
 
 	ctx := grs.NewAppContext()
 	rstat := status.NewRStat()
 	rstat.Dir = status.DIR_VALID
 	repo := grs.Repo{"foo"}
-	runner := tctx.GetRunner()
+	runner := exec.Runner()
 	script.Fetch(ctx, runner, rstat, repo)
 
 	err := script.AutoRebase(ctx, repo, runner, rstat, false)
@@ -120,55 +93,50 @@ a--b---c---f  @{UPSTREAM} origin/master
     g---h     cloned_repo/master (g has a conflict with commit d)
 */
 func TestAutoRebase_IT_Test_3(t *testing.T) {
-	tctx := gittest.NewTestContext()
+	exec := gittest.NewExecRunner()
 
 	oldwd, tmpdir := MkTmpDir(t, "AutoRebase_IT_Test_3", "TestAutoRebase_IT_Test_3")
 	defer CleanTmpDir(t, oldwd, tmpdir, "TestAutoRebase_IT_Test_3")
-
-	defer func() {
-		if r := recover(); r != nil {
-			var ok bool
-			err, ok := r.(error)
-			if ok {
-				t.Fatal(err)
-			}
-		}
-	}()
-
 	if err := os.Chdir(tmpdir); err != nil {
 		t.Fatal(err)
 	}
 
-	git := tctx.Git()
-	tctx.Mkdir("source")
-	tctx.Chdir("source")
-	tctx.Exec(git, "init")
-	tctx.TouchAndCommit(".gitignore", "Commit_A")
-	tctx.Chdir("..")
-	tctx.Exec(git, "clone", "source", "dest")
+	git := exec.Git()
+	exec.Mkdir("source")
+	exec.Chdir("source")
+	exec.Exec(git, "init")
+	exec.TouchAndCommit(".gitignore", "Commit_A")
+	exec.Chdir("..")
+	exec.Exec(git, "clone", "source", "dest")
 
-	tctx.Chdir("./source")
-	tctx.TouchAndCommit("b.txt", "Commit_B")
-	tctx.TouchAndCommit("c.txt", "Commit_C")
-	tctx.Exec(git, "checkout", "-b", "branch_B")
-	tctx.SetContents("conflict.txt", "D")
-	tctx.Add("conflict.txt")
-	tctx.TouchAndCommit("d.txt", "Commit_D")
-	tctx.TouchAndCommit("e.txt", "Commit_E")
-	tctx.Exec(git, "checkout", "master")
-	tctx.Exec(git, "merge", "--no-ff", "branch_B")
+	exec.Chdir("./source")
+	exec.TouchAndCommit("b.txt", "Commit_B")
+	exec.TouchAndCommit("c.txt", "Commit_C")
+	exec.Exec(git, "checkout", "-b", "branch_B")
+	exec.SetContents("conflict.txt", "D")
+	exec.Add("conflict.txt")
+	exec.TouchAndCommit("d.txt", "Commit_D")
+	exec.TouchAndCommit("e.txt", "Commit_E")
+	exec.Exec(git, "checkout", "master")
+	exec.Exec(git, "merge", "--no-ff", "branch_B")
 
-	tctx.Chdir("..")
-	tctx.Chdir("dest")
-	tctx.SetContents("conflict.txt", "G")
-	tctx.Add("conflict.txt")
-	tctx.TouchAndCommit("g.txt", "Commit_G")
-	tctx.TouchAndCommit("h.txt", "Commit_H")
+	exec.Chdir("..")
+	exec.Chdir("dest")
+	exec.SetContents("conflict.txt", "G")
+
+	exec.Add("conflict.txt")
+	exec.TouchAndCommit("g.txt", "Commit_G")
+	exec.TouchAndCommit("h.txt", "Commit_H")
+
+	if exec.Err() != nil {
+		t.Fatal("test setup failed", exec.Err())
+	}
+
 	ctx := grs.NewAppContext()
 	rstat := status.NewRStat()
 	rstat.Dir = status.DIR_VALID
 	repo := grs.Repo{"foo"}
-	runner := tctx.GetRunner()
+	runner := exec.Runner()
 	script.Fetch(ctx, runner, rstat, repo)
 
 	err := script.AutoRebase(ctx, repo, runner, rstat, false)
