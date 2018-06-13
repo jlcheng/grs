@@ -4,6 +4,7 @@ GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
 GOFMT=gofmt
+GOVET=$(GOCMD) vet
 GOGET=$(GOCMD) get
 GORUN=$(GOCMD) run
 GOMAIN=cmd/grs/grs.go
@@ -26,6 +27,10 @@ build: | $(OUTDIR) prg1 prg2
 test: 
 	$(GOTEST) -v ./test
 	$(GOFMT) -l .
+
+vet:
+	$(GOVET) jcheng/grs/compat jcheng/grs/config jcheng/grs/display jcheng/grs/gittest jcheng/grs/grs jcheng/grs/grsdb jcheng/grs/grsio jcheng/grs/script jcheng/grs/status jcheng/grs/test
+
 clean: 
 	$(GOCLEAN)
 	rm -rf $(OUTDIR)

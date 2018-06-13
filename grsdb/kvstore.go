@@ -63,7 +63,6 @@ func (s *DiskKVStore) LoadBytes(key string) ([]byte, error) {
 	f, err := os.Open(full)
 	if err != nil && !os.IsExist(err) {
 		return nil, errors.New(fmt.Sprintf("key does not exist: %v", err))
-		f, err = os.Create(full)
 	}
 	if err != nil {
 		return nil, err

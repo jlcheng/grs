@@ -38,6 +38,6 @@ func assertInvalidRemoteDiff(t *testing.T, str string) {
 	var err error
 	_, err = parseRevList([]byte(str))
 	if err == nil {
-		t.Errorf("expected error parsing %v")
+		t.Error("expected error parsing", err)
 	}
 }

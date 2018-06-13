@@ -72,7 +72,7 @@ func TestAutoRebase_IT_Test_2(t *testing.T) {
 	ctx := grs.NewAppContext()
 	rstat := status.NewRStat()
 	rstat.Dir = status.DIR_VALID
-	repo := grs.Repo{"foo"}
+	repo := grs.Repo{Path:"foo"}
 	runner := exec.Runner()
 	script.Fetch(ctx, runner, rstat, repo)
 
@@ -135,7 +135,7 @@ func TestAutoRebase_IT_Test_3(t *testing.T) {
 	ctx := grs.NewAppContext()
 	rstat := status.NewRStat()
 	rstat.Dir = status.DIR_VALID
-	repo := grs.Repo{"foo"}
+	repo := grs.Repo{Path:"foo"}
 	runner := exec.Runner()
 	script.Fetch(ctx, runner, rstat, repo)
 
