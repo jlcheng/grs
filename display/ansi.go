@@ -23,10 +23,10 @@ func (ansi *AnsiDisplay) SummarizeRepos(repos []RepoVO) {
 	for _, repo := range repos {
 		if repo.MergedSec == 0 {
 			ansi.writer.WriteString(fmt.Sprintf("repo [%v] status is %v, %v.\n",
-				repo.Path, repo.Rstat.Branch, repo.Rstat.Index))
+				repo.Repo.Path, repo.Repo.Branch, repo.Repo.Index))
 		} else {
 			ansi.writer.WriteString(fmt.Sprintf("repo [%v] status is %v, %v. Last merge on %v.\n",
-				repo.Path, repo.Rstat.Branch, repo.Rstat.Index, fmtTime(repo.MergedSec)))
+				repo.Repo.Path, repo.Repo.Branch, repo.Repo.Index, fmtTime(repo.MergedSec)))
 		}
 	}
 

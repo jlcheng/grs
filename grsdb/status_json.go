@@ -10,7 +10,7 @@ type RStat_Json struct {
 	Index  status.Indexstat  `json:"index"`
 }
 
-func (r *RStat_Json) Update(src status.RStat) {
+func (r *RStat_Json) Update(src *status.Repo) {
 	r.Branch = src.Branch
 	r.Dir = src.Dir
 	r.Index = src.Index

@@ -3,6 +3,7 @@ package grs
 import (
 	"jcheng/grs/config"
 	"jcheng/grs/grsdb"
+	"jcheng/grs/status"
 	"time"
 )
 
@@ -53,12 +54,12 @@ func (ctx *AppContext) DBService() grsdb.DBService {
 
 type ScriptContext struct {
 	Ctx   *AppContext
-	Repos []Repo
+	Repos []status.Repo
 }
 
 func NewScriptContext(ctx *AppContext) *ScriptContext {
 	return &ScriptContext{
 		Ctx:   ctx,
-		Repos: make([]Repo, 0),
+		Repos: make([]status.Repo, 0),
 	}
 }

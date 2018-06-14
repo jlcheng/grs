@@ -10,35 +10,32 @@ import (
 
 func TestBeforeScript_Fail(t *testing.T) {
 	runner := NewMockRunner()
-	var repo grs.Repo
-
+	var repo *status.Repo
 	if cwd, e := os.Getwd(); e != nil {
 		t.Error(e)
 	} else {
-		repo = grs.Repo{Path: cwd}
+		repo = status.NewRepo(cwd)
 	}
-	rstat := status.NewRStat()
 	runner.Add(Error("failed"))
-	script.BeforeScript(grs.NewAppContext(), repo, runner, rstat)
-	if rstat.Dir == status.DIR_VALID {
+	script.BeforeScript(grs.NewAppContext(), runner, repo)
+	if repo.Dir == status.DIR_VALID {
 		t.Errorf("expected %s, got: %v\n"+
-			"", status.DIR_INVALID, rstat.Dir)
+			"", status.DIR_INVALID, repo.Dir)
 	}
 }
 
 func TestBeforeScript_OK(t *testing.T) {
 	runner := NewMockRunner()
-	var repo grs.Repo
-
+	var repo *status.Repo
 	if cwd, e := os.Getwd(); e != nil {
 		t.Error(e)
 	} else {
-		repo = grs.Repo{Path: cwd}
+		repo = status.NewRepo(cwd)
 	}
-	rstat := status.NewRStat()
+
 	runner.Add(Ok(""))
-	script.BeforeScript(grs.NewAppContext(), repo, runner, rstat)
-	if rstat.Dir != status.DIR_VALID {
-		t.Errorf("expected %s, got: %v\n", status.DIR_VALID, rstat.Dir)
+	script.BeforeScript(grs.NewAppContext(), runner, repo)
+	if repo.Dir != status.DIR_VALID {
+		t.Errorf("expected %s, got: %v\n", status.DIR_VALID, repo.Dir)
 	}
 }

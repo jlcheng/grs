@@ -10,10 +10,10 @@ import (
 )
 
 // AutoFFMerge runs `git merge --ff-only...` when the branch is behind and unmodified
-func AutoFFMerge(ctx *grs.AppContext, runner grs.CommandRunner, rstat *status.RStat) bool {
-	if rstat.Dir != status.DIR_VALID ||
-		rstat.Branch != status.BRANCH_BEHIND ||
-		rstat.Index != status.INDEX_UNMODIFIED {
+func AutoFFMerge(ctx *grs.AppContext, runner grs.CommandRunner, repo *status.Repo) bool {
+	if repo.Dir != status.DIR_VALID ||
+		repo.Branch != status.BRANCH_BEHIND ||
+		repo.Index != status.INDEX_UNMODIFIED {
 		return false
 	}
 

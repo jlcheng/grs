@@ -12,28 +12,24 @@ import (
 )
 
 // BeforeScript chdir to the repo directory and validates the repo. Sets rstat.Dir to `DIR_VALID` on success.
-func BeforeScript(ctx *grs.AppContext, repo grs.Repo, runner grs.CommandRunner, rstat *status.RStat) {
+func BeforeScript(ctx *grs.AppContext, runner grs.CommandRunner, repo *status.Repo) {
 	git := ctx.GetGitExec()
 
-	if f, err := os.Stat(repo.Path); err != nil || !f.IsDir() {
-		rstat.Dir = status.DIR_INVALID
-		return
-	}
 	if err := os.Chdir(repo.Path); err != nil {
-		rstat.Dir = status.DIR_INVALID
+		repo.Dir = status.DIR_INVALID
 		return
 	}
 	command := runner.Command(git, "show-ref", "-q", "HEAD")
 	if _, err := command.CombinedOutput(); err != nil {
-		rstat.Dir = status.DIR_INVALID
+		repo.Dir = status.DIR_INVALID
 		return
 	}
-	rstat.Dir = status.DIR_VALID
+	repo.Dir = status.DIR_VALID
 }
 
 // Fetch runs `git fetch`.
-func Fetch(ctx *grs.AppContext, runner grs.CommandRunner, rstat *status.RStat, repo grs.Repo) {
-	if rstat.Dir != status.DIR_VALID {
+func Fetch(ctx *grs.AppContext, runner grs.CommandRunner, repo *status.Repo) {
+	if repo.Dir != status.DIR_VALID {
 		return
 	}
 
@@ -56,8 +52,8 @@ func Fetch(ctx *grs.AppContext, runner grs.CommandRunner, rstat *status.RStat, r
 }
 
 // GetRepoStatus gives a summary of the repo's status. Sets a number of `rstat` properties.
-func GetRepoStatus(ctx *grs.AppContext, runner grs.CommandRunner, rstat *status.RStat) {
-	if rstat.Dir != status.DIR_VALID {
+func GetRepoStatus(ctx *grs.AppContext, runner grs.CommandRunner, repo *status.Repo) {
+	if repo.Dir != status.DIR_VALID {
 		return
 	}
 
@@ -69,39 +65,39 @@ func GetRepoStatus(ctx *grs.AppContext, runner grs.CommandRunner, rstat *status.
 	command = runner.Command(git, "rev-parse", "@{upstream}")
 	if out, err = command.CombinedOutput(); err != nil {
 		grs.Debug("GetRepoStatus: no upstream detected", err, string(out))
-		rstat.Branch = status.BRANCH_UNTRACKED
+		repo.Branch = status.BRANCH_UNTRACKED
 		return
 	}
 
 	command = runner.Command(git, "rev-list", "--left-right", "--count", "@{upstream}...HEAD")
 	if out, err = command.CombinedOutput(); err != nil {
 		grs.Debug("rev-list failed: %v\n%v", err, string(out))
-		rstat.Dir = status.DIR_INVALID
+		repo.Dir = status.DIR_INVALID
 		return
 	}
 	diff, err := parseRevList(out)
 	if err != nil {
 		grs.Info("cannot parse `git rev-list...` output: %q", string(out))
-		rstat.Dir = status.DIR_INVALID
+		repo.Dir = status.DIR_INVALID
 		return
 	}
 
 	grs.Debug("CMD: git rev-list --left-right --count @{upstream}...HEAD")
 
 	if diff.remote == 0 && diff.local == 0 {
-		rstat.Branch = status.BRANCH_UPTODATE
+		repo.Branch = status.BRANCH_UPTODATE
 		return
 	}
 	if diff.remote > 0 && diff.local == 0 {
-		rstat.Branch = status.BRANCH_BEHIND
+		repo.Branch = status.BRANCH_BEHIND
 		return
 	}
 	if diff.remote == 0 && diff.local > 0 {
-		rstat.Branch = status.BRANCH_AHEAD
+		repo.Branch = status.BRANCH_AHEAD
 		return
 	}
 	if diff.remote > 0 && diff.local > 0 {
-		rstat.Branch = status.BRANCH_DIVERGED
+		repo.Branch = status.BRANCH_DIVERGED
 		return
 	}
 	return
@@ -131,14 +127,14 @@ func parseRevList(out []byte) (diff RemoteDiff, err error) {
 
 // GetIndexStatus sets the rstat.index property to modified if there are uncommited changes or if the index has been
 // modified
-func GetIndexStatus(ctx *grs.AppContext, runner grs.CommandRunner, rstat *status.RStat) {
-	if rstat.Dir != status.DIR_VALID {
+func GetIndexStatus(ctx *grs.AppContext, runner grs.CommandRunner, repo *status.Repo) {
+	if repo.Dir != status.DIR_VALID {
 		return
 	}
 
 	git := ctx.GetGitExec()
 
-	rstat.Index = status.INDEX_UNKNOWN
+	repo.Index = status.INDEX_UNKNOWN
 	command := runner.Command(git, "ls-files", "--exclude-standard", "-om")
 	var out []byte
 	var err error
@@ -147,7 +143,7 @@ func GetIndexStatus(ctx *grs.AppContext, runner grs.CommandRunner, rstat *status
 		return
 	}
 	if len(out) != 0 {
-		rstat.Index = status.INDEX_MODIFIED
+		repo.Index = status.INDEX_MODIFIED
 		return
 	}
 
@@ -157,9 +153,9 @@ func GetIndexStatus(ctx *grs.AppContext, runner grs.CommandRunner, rstat *status
 		return
 	}
 	if len(out) != 0 {
-		rstat.Index = status.INDEX_MODIFIED
+		repo.Index = status.INDEX_MODIFIED
 		return
 	}
 
-	rstat.Index = status.INDEX_UNMODIFIED
+	repo.Index = status.INDEX_UNMODIFIED
 }

@@ -12,34 +12,34 @@ import (
 func TestFetch_Git_Fail(t *testing.T) {
 	runner := NewMockRunner()
 	runner.Add(Error("failed"))
-	rstat := status.NewRStat()
-	rstat.Dir = status.DIR_VALID
+	repo := status.NewRepo("")
+	repo.Dir = status.DIR_VALID
 	ctx := grs.NewAppContext()
-	script.Fetch(ctx, runner, rstat, grs.Repo{Path: "/repo"})
-	if rstat.Branch != status.BRANCH_UNKNOWN {
-		t.Errorf("expected %s, got: %v\n", status.BRANCH_UNKNOWN, rstat.Branch)
+	script.Fetch(ctx, runner, repo)
+	if repo.Branch != status.BRANCH_UNKNOWN {
+		t.Errorf("expected %s, got: %v\n", status.BRANCH_UNKNOWN, repo.Branch)
 	}
 }
 
 func TestFetch_Git_OK(t *testing.T) {
 	runner := NewMockRunner()
 	runner.AddMap("git", Ok("0"))
-	rstat := status.NewRStat()
-	rstat.Dir = status.DIR_VALID
+	repo := status.NewRepo("")
+	repo.Dir = status.DIR_VALID
 	ctx := grs.NewAppContext()
-	script.Fetch(ctx, runner, rstat, grs.Repo{Path: "/repo"})
-	if rstat.Dir == status.DIR_INVALID {
-		t.Error("Unexpected rstat.Dir, got DIR_INVALID")
+	script.Fetch(ctx, runner, repo)
+	if repo.Dir == status.DIR_INVALID {
+		t.Error("Unexpected repo.Dir, got DIR_INVALID")
 	}
 }
 
 func TestFetch_Modified_Update(t *testing.T) {
 	runner := NewMockRunner()
 	runner.AddMap("git", Ok("0"))
-	rstat := status.NewRStat()
-	rstat.Dir = status.DIR_VALID
+	repo := status.NewRepo("")
+	repo.Dir = status.DIR_VALID
 	ctx := grs.NewAppContext()
-	script.Fetch(ctx, runner, rstat, grs.Repo{Path: "/repo"})
+	script.Fetch(ctx, runner, repo)
 	db := ctx.DB()
 	if l := len(db.Repos); l != 1 {
 		t.Errorf("Expected len(db.Repos) == 1, got %v\n", l)
@@ -53,11 +53,11 @@ func TestFetch_Modified_Update(t *testing.T) {
 func TestFetch_Modified_Update_Existing(t *testing.T) {
 	runner := NewMockRunner()
 	runner.AddMap("git", Ok("0"))
-	rstat := status.NewRStat()
-	rstat.Dir = status.DIR_VALID
+	repo := status.NewRepo("/repo")
+	repo.Dir = status.DIR_VALID
 	ctx := grs.NewAppContext()
-	ctx.DB().Repos = append(ctx.DB().Repos, grsdb.RepoDTO{Id: "/repo", FetchedSec: 1})
-	script.Fetch(ctx, runner, rstat, grs.Repo{Path: "/repo"})
+	ctx.DB().Repos = append(ctx.DB().Repos, grsdb.RepoDTO{Id: repo.Path, FetchedSec: 1})
+	script.Fetch(ctx, runner, repo)
 	db := ctx.DB()
 	if l := len(db.Repos); l != 1 {
 		t.Errorf("Expected len(db.Repos) == 1, got %v\n", l)
@@ -71,13 +71,14 @@ func TestFetch_Modified_Update_Existing(t *testing.T) {
 func TestFetch_Modified_Update_NOP(t *testing.T) {
 	runner := NewMockRunner()
 	runner.AddMap("git", Ok("0"))
-	rstat := status.NewRStat()
-	rstat.Dir = status.DIR_VALID
+	repo := status.NewRepo("foo")
+	repo.Dir = status.DIR_VALID
 	ctx := grs.NewAppContext()
 	fetchTime := time.Now().Unix()
-	ctx.DB().Repos = append(ctx.DB().Repos, grsdb.RepoDTO{Id: "/repo", FetchedSec: fetchTime})
-	script.Fetch(ctx, runner, rstat, grs.Repo{Path: "/repo"})
+	ctx.DB().Repos = append(ctx.DB().Repos, grsdb.RepoDTO{Id: repo.Path, FetchedSec: fetchTime})
+	script.Fetch(ctx, runner, repo)
 	db := ctx.DB()
+
 	if l := len(db.Repos); l != 1 {
 		t.Errorf("Expected len(db.Repos) == 1, got %v\n", l)
 	}

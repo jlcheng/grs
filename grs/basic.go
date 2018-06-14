@@ -4,14 +4,11 @@ import (
 	"bytes"
 	"jcheng/grs/config"
 	"jcheng/grs/grsdb"
+	"jcheng/grs/status"
 	"os"
 	"os/exec"
 	"strings"
 )
-
-type Repo struct {
-	Path string
-}
 
 type Result struct {
 	delegate *exec.Cmd
@@ -22,19 +19,19 @@ func (cmd *Result) String() string {
 	return cmd.delegate.Stdout.(*bytes.Buffer).String()
 }
 
-func ReposFromConf(rc []config.RepoConf) []Repo {
-	var r = make([]Repo, len(rc))
+func ReposFromConf(rc []config.RepoConf) []status.Repo {
+	var r = make([]status.Repo, len(rc))
 	for idx, elem := range rc {
-		r[idx] = Repo{Path: elem.Path}
+		r[idx] = status.Repo{Path: elem.Path}
 	}
 	return r
 }
 
-func ReposFromString(input string) []Repo {
+func ReposFromString(input string) []status.Repo {
 	tokens := strings.Split(input, string(os.PathListSeparator))
-	r := make([]Repo, len(tokens))
+	r := make([]status.Repo, len(tokens))
 	for idx, elem := range tokens {
-		r[idx] = Repo{Path: elem}
+		r[idx] = status.Repo{Path: elem}
 	}
 	return r
 }

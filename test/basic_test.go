@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"jcheng/grs/config"
 	"jcheng/grs/grs"
+	"jcheng/grs/status"
 	"os"
 	"os/exec"
 	"strings"
@@ -75,7 +76,7 @@ func TestReposFromConf(t *testing.T) {
 }
 
 func TestReposFromString(t *testing.T) {
-	var r []grs.Repo
+	var r []status.Repo
 
 	r = grs.ReposFromString("")
 	if r[0].Path != "" {

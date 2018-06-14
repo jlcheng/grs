@@ -7,8 +7,6 @@ import (
 	"io"
 	"jcheng/grs/config"
 	"jcheng/grs/grs"
-	"jcheng/grs/grsio"
-	"jcheng/grs/status"
 	"os"
 	"path/filepath"
 	"strings"
@@ -18,35 +16,7 @@ const (
 	CLONE_BASEDIR = "clones"
 )
 
-func AutoRebase(ctx *grs.AppContext, repo grs.Repo, runner grs.CommandRunner, rstat *status.RStat, clone bool) error {
-	// Set up a working directory and update some sort of metadata object (grsdb)
-	// for any repo that requires rebasing (branch == diverged):
-	//  1. Set up a clone directory
-	if clone {
-		clnpath := ToClonePath(repo.Path)
-		clndir, err := os.Stat(clnpath)
-		if clndir != nil {
-			os.RemoveAll(clndir.Name())
-		}
-
-		_, err = os.Stat(GetCloneBaseDir())
-		if os.IsNotExist(err) {
-			if err := CreateCloneDir(); err != nil {
-				return err
-			}
-		}
-
-		err = grsio.CopyDir(repo.Path, clnpath)
-		if err != nil {
-			return err
-		}
-
-		err = os.Chdir(clnpath)
-		if err != nil {
-			return err
-		}
-	}
-
+func AutoRebase(ctx *grs.AppContext, runner grs.CommandRunner) error {
 	//  2. Identify merge-base
 	git := ctx.GetGitExec()
 	p := "@{upstream}"

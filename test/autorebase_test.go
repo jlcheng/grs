@@ -70,13 +70,12 @@ func TestAutoRebase_IT_Test_2(t *testing.T) {
 	}
 
 	ctx := grs.NewAppContext()
-	rstat := status.NewRStat()
-	rstat.Dir = status.DIR_VALID
-	repo := grs.Repo{Path:"foo"}
+	repo := status.NewRepo("")
+	repo.Dir = status.DIR_VALID
 	runner := exec.Runner()
-	script.Fetch(ctx, runner, rstat, repo)
+	script.Fetch(ctx, runner, repo)
 
-	err := script.AutoRebase(ctx, repo, runner, rstat, false)
+	err := script.AutoRebase(ctx, runner)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -133,19 +132,18 @@ func TestAutoRebase_IT_Test_3(t *testing.T) {
 	}
 
 	ctx := grs.NewAppContext()
-	rstat := status.NewRStat()
-	rstat.Dir = status.DIR_VALID
-	repo := grs.Repo{Path:"foo"}
+	repo := status.NewRepo("")
+	repo.Dir = status.DIR_VALID
 	runner := exec.Runner()
-	script.Fetch(ctx, runner, rstat, repo)
+	script.Fetch(ctx, runner, repo)
 
-	err := script.AutoRebase(ctx, repo, runner, rstat, false)
+	err := script.AutoRebase(ctx, runner)
 	if err != nil {
 		t.Fatal(err)
 	}
-	script.GetRepoStatus(ctx, runner, rstat)
-	if rstat.Branch != status.BRANCH_DIVERGED {
-		t.Fatalf("expected BRANCH_DIVERGED, but was %v\n", rstat.Branch)
+	script.GetRepoStatus(ctx, runner, repo)
+	if repo.Branch != status.BRANCH_DIVERGED {
+		t.Fatalf("expected BRANCH_DIVERGED, but was %v\n", repo.Branch)
 	}
 }
 

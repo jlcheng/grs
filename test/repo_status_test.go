@@ -12,11 +12,11 @@ import (
 func TestGetRepoStatus_Git_Fail(t *testing.T) {
 	runner := NewMockRunner()
 	runner.Add(Error("failed"))
-	rstat := status.NewRStat()
-	rstat.Dir = status.DIR_VALID
-	script.GetRepoStatus(grs.NewAppContext(), runner, rstat)
-	if rstat.Branch != status.BRANCH_UNTRACKED {
-		t.Errorf("expected %s, got: %v\n", status.BRANCH_UNTRACKED, rstat.Branch)
+	repo := status.NewRepo("")
+	repo.Dir = status.DIR_VALID
+	script.GetRepoStatus(grs.NewAppContext(), runner, repo)
+	if repo.Branch != status.BRANCH_UNTRACKED {
+		t.Errorf("expected %s, got: %v\n", status.BRANCH_UNTRACKED, repo.Branch)
 	}
 }
 
@@ -48,15 +48,15 @@ func TestGetRepoStatus_Git_From_Ctx(t *testing.T) {
 		ctx.SetGitExec(conf.Git)
 	}
 
-	rstat := status.NewRStat()
-	rstat.Dir = status.DIR_VALID
-	script.GetRepoStatus(ctx, runner, rstat)
-	if rstat.Dir == status.DIR_INVALID {
-		t.Error("Unexpected rstat.Dir, got DIR_INVALID")
+	repo := status.NewRepo("")
+	repo.Dir = status.DIR_VALID
+	script.GetRepoStatus(ctx, runner, repo)
+	if repo.Dir == status.DIR_INVALID {
+		t.Error("Unexpected repo.Dir, got DIR_INVALID")
 		return
 	}
-	if rstat.Branch != status.BRANCH_UPTODATE {
-		t.Error("Unexpected rstat.Branch, got", rstat.Branch)
+	if repo.Branch != status.BRANCH_UPTODATE {
+		t.Error("Unexpected repo.Branch, got", repo.Branch)
 		return
 	}
 }
@@ -66,10 +66,10 @@ func helpGetRepoStatus(t *testing.T, out string, expected status.Branchstat) {
 	runner.AddMap("git rev-parse", Ok("..."))
 	runner.AddMap("git rev-list", Ok(out))
 
-	rstat := status.NewRStat()
-	rstat.Dir = status.DIR_VALID
-	script.GetRepoStatus(grs.NewAppContext(), runner, rstat)
-	got := rstat.Branch
+	repo := status.NewRepo("")
+	repo.Dir = status.DIR_VALID
+	script.GetRepoStatus(grs.NewAppContext(), runner, repo)
+	got := repo.Branch
 	if got != expected {
 		t.Errorf("expected [%v], got [%v]\n", expected, got)
 	}

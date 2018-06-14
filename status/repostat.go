@@ -51,17 +51,3 @@ var indexstatdir = [INDEX_UNMODIFIED + 1]string{
 }
 
 func (i Indexstat) String() string { return indexstatdir[i] }
-
-type RStat struct {
-	Dir    Dirstat
-	Branch Branchstat
-	Index  Indexstat
-}
-
-func NewRStat() *RStat {
-	return &RStat{
-		Dir:    DIR_INVALID,
-		Branch: BRANCH_UNKNOWN,
-		Index:  INDEX_UNKNOWN,
-	}
-}

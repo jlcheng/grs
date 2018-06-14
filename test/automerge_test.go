@@ -28,11 +28,11 @@ func TestAutoFFMerge_Ok(t *testing.T) {
 
 	ctx := grs.NewAppContext()
 
-	rstat := status.NewRStat()
-	rstat.Dir = status.DIR_VALID
-	rstat.Branch = status.BRANCH_BEHIND
-	rstat.Index = status.INDEX_UNMODIFIED
-	script.AutoFFMerge(ctx, runner, rstat)
+	repo := status.NewRepo("")
+	repo.Dir = status.DIR_VALID
+	repo.Branch = status.BRANCH_BEHIND
+	repo.Index = status.INDEX_UNMODIFIED
+	script.AutoFFMerge(ctx, runner, repo)
 
 	if runner.HistoryCount("git merge --ff-only") != 1 {
 		t.Error("git merge not invoked as expected")
@@ -45,11 +45,11 @@ func verifiedGitNotCalled(t *testing.T, dir status.Dirstat, branch status.Branch
 
 	ctx := grs.NewAppContext()
 
-	rstat := status.NewRStat()
-	rstat.Dir = dir
-	rstat.Branch = branch
-	rstat.Index = index
-	script.AutoFFMerge(ctx, runner, rstat)
+	repo := status.NewRepo("")
+	repo.Dir = dir
+	repo.Branch = branch
+	repo.Index = index
+	script.AutoFFMerge(ctx, runner, repo)
 
 	if runner.HistoryCount("git merge --ff-only") != 0 {
 		t.Errorf("unexpected `git merge` when dirstat=%v, branchstat=%v, indexstat=%v\n", dir, branch, index)

@@ -7,11 +7,10 @@ import (
 )
 
 func TestUpdateRStat(t *testing.T) {
-	src := status.RStat{
-		Branch: status.BRANCH_DIVERGED,
-		Dir:    status.DIR_VALID,
-		Index:  status.INDEX_MODIFIED,
-	}
+	src := status.NewRepo("")
+	src.Branch = status.BRANCH_DIVERGED
+	src.Dir = status.DIR_VALID
+	src.Index = status.INDEX_MODIFIED
 	var dest grsdb.RStat_Json
 	dest.Update(src)
 	if dest.Branch != src.Branch ||

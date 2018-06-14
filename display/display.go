@@ -1,8 +1,6 @@
 package display
 
-import (
-	"jcheng/grs/status"
-)
+import "jcheng/grs/status"
 
 type Display interface {
 	SummarizeRepos(repos []RepoVO)
@@ -10,8 +8,7 @@ type Display interface {
 }
 
 type RepoVO struct {
-	Path      string
-	Rstat     status.RStat
+	Repo      status.Repo
 	Merged    bool
 	MergeCnt  int
 	MergedSec int64

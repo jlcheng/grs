@@ -70,17 +70,16 @@ func main() {
 	var repeat = true
 	for repeat {
 		for idx, repo := range repos {
-			rstat := status.NewRStat()
-			script.BeforeScript(ctx, repo, runner, rstat)
-			if rstat.Dir == status.DIR_VALID {
-				script.Fetch(ctx, runner, rstat, repo)
+			repoTwo := status.NewRepo(repo.Path)
+			script.BeforeScript(ctx, runner, repoTwo)
+			if repoTwo.Dir != status.DIR_VALID {
+				script.Fetch(ctx, runner, repoTwo)
 			}
-			if rstat.Dir == status.DIR_VALID {
-				script.GetRepoStatus(ctx, runner, rstat)
-
+			if repoTwo.Dir == status.DIR_VALID {
+				script.GetRepoStatus(ctx, runner, repoTwo)
 			}
-			if rstat.Dir == status.DIR_VALID {
-				script.GetIndexStatus(ctx, runner, rstat)
+			if repoTwo.Dir == status.DIR_VALID {
+				script.GetIndexStatus(ctx, runner, repoTwo)
 			}
 
 			merged := false
@@ -91,25 +90,23 @@ func main() {
 				do_merge = true
 			}
 			if args.daemon || !args.force_merge {
-				atime, err := script.GetActivityTime(repo.Path)
+				atime, err := script.GetActivityTime(repoTwo.Path)
 				do_merge = (err == nil) && time.Now().After(atime.Add(ctx.ActivityTimeout))
 			}
-			if rstat.Branch != status.BRANCH_UNTRACKED && do_merge {
-				merged = script.AutoFFMerge(ctx, runner, rstat)
+			if repoTwo.Branch != status.BRANCH_UNTRACKED && do_merge {
+				merged = script.AutoFFMerge(ctx, runner, repoTwo)
 			}
 
 			repoPtr := ctx.DB().FindOrCreateRepo(repo.Path)
 			if repoPtr != nil {
-				repoPtr.RStat.Update(*rstat)
+				repoPtr.RStat.Update(repoTwo)
 				if merged {
 					repoPtr.MergedCnt = repoPtr.MergedCnt + 1
 					repoPtr.MergedSec = time.Now().Unix()
 				}
 				repoStatusList[idx] = display.RepoVO{
-					Path:      repo.Path,
-					Rstat:     *rstat,
+					Repo:      *repoTwo,
 					Merged:    merged,
-					MergeCnt:  repoPtr.MergedCnt,
 					MergedSec: repoPtr.MergedSec,
 				}
 			}
