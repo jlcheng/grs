@@ -10,7 +10,7 @@ import (
 )
 
 // AutoFFMerge runs `git merge --ff-only...` when the branch is behind and unmodified
-func AutoFFMerge(ctx *grs.AppContext, runner grs.CommandRunner, repo *status.Repo) bool {
+func AutoFFMerge(ctx *grs.AppContext, repo *status.Repo) bool {
 	if repo.Dir != status.DIR_VALID ||
 		repo.Branch != status.BRANCH_BEHIND ||
 		repo.Index != status.INDEX_UNMODIFIED {
@@ -19,7 +19,7 @@ func AutoFFMerge(ctx *grs.AppContext, runner grs.CommandRunner, repo *status.Rep
 
 	git := ctx.GetGitExec()
 
-	command := runner.Command(git, "merge", "--ff-only", "@{upstream}")
+	command := ctx.CommandRunner.Command(git, "merge", "--ff-only", "@{upstream}")
 	var out []byte
 	var err error
 	if out, err = command.CombinedOutput(); err != nil {

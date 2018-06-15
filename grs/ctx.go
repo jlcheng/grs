@@ -8,6 +8,7 @@ import (
 )
 
 type AppContext struct {
+	CommandRunner
 	confParams      *config.ConfigParams
 	defaultGitExec  string
 	db              *grsdb.DB
@@ -27,6 +28,18 @@ func NewAppContext() *AppContext {
 		DbPath:          config.UserDB,
 	}
 }
+func NewAppContextWithRunner(runner CommandRunner) *AppContext {
+	return &AppContext{
+		CommandRunner:   runner,
+		confParams:      config.NewConfigParams(),
+		defaultGitExec:  "git",
+		db:              &grsdb.DB{Repos: make([]grsdb.RepoDTO, 0)},
+		MinFetchSec:     60 * 60,
+		ActivityTimeout: 2 * time.Hour,
+		DbPath:          config.UserDB,
+	}
+}
+
 
 func (ctx *AppContext) ConfParams(confParams *config.ConfigParams) {
 	ctx.confParams = confParams

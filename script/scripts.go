@@ -12,14 +12,14 @@ import (
 )
 
 // BeforeScript chdir to the repo directory and validates the repo. Sets rstat.Dir to `DIR_VALID` on success.
-func BeforeScript(ctx *grs.AppContext, runner grs.CommandRunner, repo *status.Repo) {
+func BeforeScript(ctx *grs.AppContext, repo *status.Repo) {
 	git := ctx.GetGitExec()
 
 	if err := os.Chdir(repo.Path); err != nil {
 		repo.Dir = status.DIR_INVALID
 		return
 	}
-	command := runner.Command(git, "show-ref", "-q", "HEAD")
+	command := ctx.CommandRunner.Command(git, "show-ref", "-q", "HEAD")
 	if _, err := command.CombinedOutput(); err != nil {
 		repo.Dir = status.DIR_INVALID
 		return
@@ -28,7 +28,7 @@ func BeforeScript(ctx *grs.AppContext, runner grs.CommandRunner, repo *status.Re
 }
 
 // Fetch runs `git fetch`.
-func Fetch(ctx *grs.AppContext, runner grs.CommandRunner, repo *status.Repo) {
+func Fetch(ctx *grs.AppContext, repo *status.Repo) {
 	if repo.Dir != status.DIR_VALID {
 		return
 	}
@@ -41,7 +41,7 @@ func Fetch(ctx *grs.AppContext, runner grs.CommandRunner, repo *status.Repo) {
 
 	git := ctx.GetGitExec()
 
-	command := runner.Command(git, "fetch")
+	command := ctx.CommandRunner.Command(git, "fetch")
 	if out, err := command.CombinedOutput(); err != nil {
 		// fetch may have failed for common reasons, such as not adding yourxk ssh key to the agent
 		grs.Debug("git fetch failed: %v\n%v", err, string(out))
@@ -52,7 +52,7 @@ func Fetch(ctx *grs.AppContext, runner grs.CommandRunner, repo *status.Repo) {
 }
 
 // GetRepoStatus gives a summary of the repo's status. Sets a number of `rstat` properties.
-func GetRepoStatus(ctx *grs.AppContext, runner grs.CommandRunner, repo *status.Repo) {
+func GetRepoStatus(ctx *grs.AppContext, repo *status.Repo) {
 	if repo.Dir != status.DIR_VALID {
 		return
 	}
@@ -62,14 +62,14 @@ func GetRepoStatus(ctx *grs.AppContext, runner grs.CommandRunner, repo *status.R
 	var out []byte
 	var err error
 
-	command = runner.Command(git, "rev-parse", "@{upstream}")
+	command = ctx.CommandRunner.Command(git, "rev-parse", "@{upstream}")
 	if out, err = command.CombinedOutput(); err != nil {
 		grs.Debug("GetRepoStatus: no upstream detected", err, string(out))
 		repo.Branch = status.BRANCH_UNTRACKED
 		return
 	}
 
-	command = runner.Command(git, "rev-list", "--left-right", "--count", "@{upstream}...HEAD")
+	command = ctx.CommandRunner.Command(git, "rev-list", "--left-right", "--count", "@{upstream}...HEAD")
 	if out, err = command.CombinedOutput(); err != nil {
 		grs.Debug("rev-list failed: %v\n%v", err, string(out))
 		repo.Dir = status.DIR_INVALID
@@ -127,7 +127,7 @@ func parseRevList(out []byte) (diff RemoteDiff, err error) {
 
 // GetIndexStatus sets the rstat.index property to modified if there are uncommited changes or if the index has been
 // modified
-func GetIndexStatus(ctx *grs.AppContext, runner grs.CommandRunner, repo *status.Repo) {
+func GetIndexStatus(ctx *grs.AppContext, repo *status.Repo) {
 	if repo.Dir != status.DIR_VALID {
 		return
 	}
@@ -135,7 +135,7 @@ func GetIndexStatus(ctx *grs.AppContext, runner grs.CommandRunner, repo *status.
 	git := ctx.GetGitExec()
 
 	repo.Index = status.INDEX_UNKNOWN
-	command := runner.Command(git, "ls-files", "--exclude-standard", "-om")
+	command := ctx.CommandRunner.Command(git, "ls-files", "--exclude-standard", "-om")
 	var out []byte
 	var err error
 	if out, err = command.CombinedOutput(); err != nil {
@@ -147,7 +147,7 @@ func GetIndexStatus(ctx *grs.AppContext, runner grs.CommandRunner, repo *status.
 		return
 	}
 
-	command = runner.Command(git, "diff-index", "HEAD")
+	command = ctx.CommandRunner.Command(git, "diff-index", "HEAD")
 	if out, err = command.CombinedOutput(); err != nil {
 		grs.Debug("diff-index failed: %v\n%v\n", err, string(out))
 		return

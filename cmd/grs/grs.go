@@ -37,7 +37,7 @@ func main() {
 		grs.SetLogLevel(grs.DEBUG)
 	}
 
-	ctx := grs.NewAppContext()
+	ctx := grs.NewAppContextWithRunner(&grs.ExecRunner{})
 	sctx, err := grs.InitScriptCtx(config.NewConfigParams(), ctx)
 	if err != nil {
 		grs.Info("%v", err)
@@ -66,20 +66,19 @@ func main() {
 		}
 	}()
 
-	runner := &grs.ExecRunner{}
 	var repeat = true
 	for repeat {
 		for idx, repo := range repos {
 			repoTwo := status.NewRepo(repo.Path)
-			script.BeforeScript(ctx, runner, repoTwo)
+			script.BeforeScript(ctx, repoTwo)
 			if repoTwo.Dir != status.DIR_VALID {
-				script.Fetch(ctx, runner, repoTwo)
+				script.Fetch(ctx, repoTwo)
 			}
 			if repoTwo.Dir == status.DIR_VALID {
-				script.GetRepoStatus(ctx, runner, repoTwo)
+				script.GetRepoStatus(ctx, repoTwo)
 			}
 			if repoTwo.Dir == status.DIR_VALID {
-				script.GetIndexStatus(ctx, runner, repoTwo)
+				script.GetIndexStatus(ctx, repoTwo)
 			}
 
 			merged := false
@@ -94,7 +93,14 @@ func main() {
 				do_merge = (err == nil) && time.Now().After(atime.Add(ctx.ActivityTimeout))
 			}
 			if repoTwo.Branch != status.BRANCH_UNTRACKED && do_merge {
-				merged = script.AutoFFMerge(ctx, runner, repoTwo)
+				merged = script.AutoFFMerge(ctx, repoTwo)
+
+				if repoTwo.Dir == status.DIR_VALID {
+					script.GetRepoStatus(ctx, repoTwo)
+				}
+				if repoTwo.Dir == status.DIR_VALID {
+					script.GetIndexStatus(ctx, repoTwo)
+				}
 			}
 
 			repoPtr := ctx.DB().FindOrCreateRepo(repo.Path)
