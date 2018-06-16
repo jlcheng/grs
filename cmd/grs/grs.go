@@ -54,7 +54,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	var screen display.Display = display.NewAnsiDisplay(os.Stdout)
+	screen := display.NewAnsiDisplay(args.daemon, os.Stdout)
 	var repoStatusList = make([]display.RepoVO, len(repos))
 
 	ctrl := make(chan os.Signal, 1)
