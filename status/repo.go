@@ -15,12 +15,3 @@ func NewRepo(path string) *Repo {
 		Index:  INDEX_UNKNOWN,
 	}
 }
-
-//go:generate stringer -type=JCNames
-type JCNames int
-
-const (
-	APPLE = iota
-	Foo
-	Toes
-)
