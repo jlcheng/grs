@@ -66,11 +66,9 @@ func main() {
 		}
 	}()
 
-	var repeat = true
-	for repeat {
+	for true {
 		for idx, repo := range repos {
-			repoTwo := status.NewRepo(repo.Path)
-			s := script.NewScript(ctx, repoTwo)
+			s := script.NewScript(ctx, &repo)
 			s.BeforeScript()
 			s.Fetch()
 			s.GetRepoStatus()
@@ -78,13 +76,13 @@ func main() {
 
 			// allow forced-merge in non-daemon mode. otherwise, use last modified time to decide mergeness
 			merged := false
-			do_merge := args.force_merge && !args.daemon
-			if !do_merge {
-				atime, err := script.GetActivityTime(repoTwo.Path)
-				do_merge = (err == nil) && time.Now().After(atime.Add(ctx.ActivityTimeout))
+			doMerge := args.force_merge && !args.daemon
+			if !doMerge {
+				atime, err := script.GetActivityTime(repo.Path)
+				doMerge = (err == nil) && time.Now().After(atime.Add(ctx.ActivityTimeout))
 			}
-			if do_merge {
-				switch repoTwo.Branch {
+			if doMerge {
+				switch repo.Branch {
 				case status.BRANCH_BEHIND:
 					s.AutoFFMerge()
 				case status.BRANCH_DIVERGED:
@@ -96,13 +94,13 @@ func main() {
 
 			repoPtr := ctx.DB().FindOrCreateRepo(repo.Path)
 			if repoPtr != nil {
-				repoPtr.RStat.Update(repoTwo)
+				repoPtr.RStat.Update(&repo)
 				if merged {
 					repoPtr.MergedCnt = repoPtr.MergedCnt + 1
 					repoPtr.MergedSec = time.Now().Unix()
 				}
 				repoStatusList[idx] = display.RepoVO{
-					Repo:      *repoTwo,
+					Repo:      repo,
 					Merged:    merged,
 					MergedSec: repoPtr.MergedSec,
 				}
@@ -116,8 +114,7 @@ func main() {
 		screen.Update()
 
 		if !args.daemon {
-			repeat = false
-			continue
+			break
 		}
 		time.Sleep(time.Second * time.Duration(args.refresh))
 	}

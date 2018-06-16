@@ -12,7 +12,7 @@
 * TODO UX: Print error messsage when .grs.json is missing a ',' - now it just silently fails (user, "why is it not using the repos in the file?")
 * DONE DEV: Manually gofmt all files
 * DONE BUG: Handle case when the current branch is untracked (took only 40 minutes)
-* TODO DEV: Rename grs.go: repoTwo to repo or something similar
+* DONE DEV: Rename grs.go: repoTwo to repo or something similar
 * TODO UX: logging.Info should output only when running from cli
 * TODO Rename grs.Command to something that is not so much like 'Cmd'
 * TODO DEV: Decouple persistence of user config from repo_metadata
