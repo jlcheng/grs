@@ -70,37 +70,28 @@ func main() {
 	for repeat {
 		for idx, repo := range repos {
 			repoTwo := status.NewRepo(repo.Path)
-			script.BeforeScript(ctx, repoTwo)
-			if repoTwo.Dir != status.DIR_VALID {
-				script.Fetch(ctx, repoTwo)
-			}
-			if repoTwo.Dir == status.DIR_VALID {
-				script.GetRepoStatus(ctx, repoTwo)
-			}
-			if repoTwo.Dir == status.DIR_VALID {
-				script.GetIndexStatus(ctx, repoTwo)
-			}
+			s := script.NewScript(ctx, repoTwo)
+			s.BeforeScript()
+			s.Fetch()
+			s.GetRepoStatus()
+			s.GetIndexStatus()
 
+			// allow forced-merge in non-daemon mode. otherwise, use last modified time to decide mergeness
 			merged := false
-			do_merge := false
-
-			// check for recency when in daemon mode, allow forced merge in non-deamon mode
-			if !args.daemon && args.force_merge {
-				do_merge = true
-			}
-			if args.daemon || !args.force_merge {
+			do_merge := args.force_merge && !args.daemon
+			if !do_merge {
 				atime, err := script.GetActivityTime(repoTwo.Path)
 				do_merge = (err == nil) && time.Now().After(atime.Add(ctx.ActivityTimeout))
 			}
-			if repoTwo.Branch != status.BRANCH_UNTRACKED && do_merge {
-				merged = script.AutoFFMerge(ctx, repoTwo)
-
-				if repoTwo.Dir == status.DIR_VALID {
-					script.GetRepoStatus(ctx, repoTwo)
+			if do_merge {
+				switch repoTwo.Branch {
+				case status.BRANCH_BEHIND:
+					s.AutoFFMerge()
+				case status.BRANCH_DIVERGED:
+					s.AutoRebase()
 				}
-				if repoTwo.Dir == status.DIR_VALID {
-					script.GetIndexStatus(ctx, repoTwo)
-				}
+				s.GetRepoStatus()
+				s.GetIndexStatus()
 			}
 
 			repoPtr := ctx.DB().FindOrCreateRepo(repo.Path)

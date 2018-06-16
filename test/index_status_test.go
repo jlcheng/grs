@@ -13,7 +13,7 @@ func TestGetIndexStatus_Ls_Files_Fail(t *testing.T) {
 	runner.AddMap("git diff-index", Ok(""))
 	repo := status.NewRepo("")
 	repo.Dir = status.DIR_VALID
-	script.GetIndexStatus(grs.NewAppContextWithRunner(runner), repo)
+	script.NewScript(grs.NewAppContextWithRunner(runner), repo).GetIndexStatus()
 	if repo.Index != status.INDEX_UNKNOWN {
 		t.Errorf("expected %s, got: %v\n", status.INDEX_UNKNOWN, repo.Index)
 	}
@@ -25,7 +25,7 @@ func TestGetIndexStatus_Diff_Index_Fail(t *testing.T) {
 	runner.AddMap("git diff-index", Error("failed"))
 	repo := status.NewRepo("")
 	repo.Dir = status.DIR_VALID
-	script.GetIndexStatus(grs.NewAppContextWithRunner(runner), repo)
+	script.NewScript(grs.NewAppContextWithRunner(runner), repo).GetIndexStatus()
 	if repo.Index != status.INDEX_UNKNOWN {
 		t.Errorf("expected %s, got: %v\n", status.INDEX_UNKNOWN, repo.Index)
 	}
@@ -37,7 +37,7 @@ func TestGetIndexStatus_Unmodified_Ok(t *testing.T) {
 	runner.AddMap("git diff-index", Ok(""))
 	repo := status.NewRepo("")
 	repo.Dir = status.DIR_VALID
-	script.GetIndexStatus(grs.NewAppContextWithRunner(runner), repo)
+	script.NewScript(grs.NewAppContextWithRunner(runner), repo).GetIndexStatus()
 	if repo.Index != status.INDEX_UNMODIFIED {
 		t.Errorf("expected %s, got: %v\n", status.INDEX_UNMODIFIED, repo.Index)
 	}
@@ -51,7 +51,7 @@ func TestGetIndexStatus_Modified_Ok(t *testing.T) {
 	runner.AddMap("git diff-index", Ok(""))
 	repo = status.NewRepo("")
 	repo.Dir = status.DIR_VALID
-	script.GetIndexStatus(grs.NewAppContextWithRunner(runner), repo)
+	script.NewScript(grs.NewAppContextWithRunner(runner), repo).GetIndexStatus()
 	if repo.Index != status.INDEX_MODIFIED {
 		t.Errorf("expected %s, got: %v\n", status.INDEX_MODIFIED, repo.Index)
 	}
@@ -61,7 +61,7 @@ func TestGetIndexStatus_Modified_Ok(t *testing.T) {
 	runner.AddMap("git diff-index", Ok("foo\n"))
 	repo = status.NewRepo("")
 	repo.Dir = status.DIR_VALID
-	script.GetIndexStatus(grs.NewAppContextWithRunner(runner), repo)
+	script.NewScript(grs.NewAppContextWithRunner(runner), repo).GetIndexStatus()
 	if repo.Index != status.INDEX_MODIFIED {
 		t.Errorf("expected %s, got: %v\n", status.INDEX_MODIFIED, repo.Index)
 	}

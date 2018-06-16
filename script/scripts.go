@@ -11,49 +11,63 @@ import (
 	"time"
 )
 
-// BeforeScript chdir to the repo directory and validates the repo. Sets rstat.Dir to `DIR_VALID` on success.
-func BeforeScript(ctx *grs.AppContext, repo *status.Repo) {
-	git := ctx.GetGitExec()
+type Script struct {
+	ctx  *grs.AppContext
+	repo *status.Repo
+	err  error
+}
 
-	if err := os.Chdir(repo.Path); err != nil {
-		repo.Dir = status.DIR_INVALID
+func NewScript(ctx *grs.AppContext, repo *status.Repo) *Script {
+	return &Script{ctx: ctx, repo: repo}
+}
+
+// BeforeScript chdir to the repo directory and validates the repo. Sets rstat.Dir to `DIR_VALID` on success.
+func (s *Script) BeforeScript() {
+	if s.err != nil {
 		return
 	}
-	command := ctx.CommandRunner.Command(git, "show-ref", "-q", "HEAD")
+	if err := os.Chdir(s.repo.Path); err != nil {
+		s.repo.Dir = status.DIR_INVALID
+		return
+	}
+	git := s.ctx.GetGitExec()
+	command := s.ctx.CommandRunner.Command(git, "show-ref", "-q", "HEAD")
 	if _, err := command.CombinedOutput(); err != nil {
-		repo.Dir = status.DIR_INVALID
+		s.repo.Dir = status.DIR_INVALID
 		return
 	}
-	repo.Dir = status.DIR_VALID
+	s.repo.Dir = status.DIR_VALID
 }
 
 // Fetch runs `git fetch`.
-func Fetch(ctx *grs.AppContext, repo *status.Repo) {
-	if repo.Dir != status.DIR_VALID {
+func (s *Script) Fetch() {
+	if s.err != nil || s.repo.Dir != status.DIR_VALID {
 		return
 	}
 
-	dbRepo := ctx.DB().FindOrCreateRepo(repo.Path)
+	dbRepo := s.ctx.DB().FindOrCreateRepo(s.repo.Path)
 	now := time.Now().Unix()
-	if dbRepo.FetchedSec > (now - int64(ctx.MinFetchSec)) {
+	if dbRepo.FetchedSec > (now - int64(s.ctx.MinFetchSec)) {
 		return
 	}
 
-	git := ctx.GetGitExec()
+	git := s.ctx.GetGitExec()
 
-	command := ctx.CommandRunner.Command(git, "fetch")
+	command := s.ctx.CommandRunner.Command(git, "fetch")
 	if out, err := command.CombinedOutput(); err != nil {
 		// fetch may have failed for common reasons, such as not adding yourxk ssh key to the agent
 		grs.Debug("git fetch failed: %v\n%v", err, string(out))
 		return
 	}
-	grs.Debug("git fetch ok: %v", repo.Path)
+	grs.Debug("git fetch ok: %v", s.repo.Path)
 	dbRepo.FetchedSec = now
 }
 
-// GetRepoStatus gives a summary of the repo's status. Sets a number of `rstat` properties.
-func GetRepoStatus(ctx *grs.AppContext, repo *status.Repo) {
-	if repo.Dir != status.DIR_VALID {
+// GetRepoStatus() updates the status of a repository
+func (s *Script) GetRepoStatus() {
+	repo := s.repo
+	ctx := s.ctx
+	if s.err != nil || repo.Dir != status.DIR_VALID {
 		return
 	}
 
@@ -83,7 +97,6 @@ func GetRepoStatus(ctx *grs.AppContext, repo *status.Repo) {
 	}
 
 	grs.Debug("CMD: git rev-list --left-right --count @{upstream}...HEAD")
-
 	if diff.remote == 0 && diff.local == 0 {
 		repo.Branch = status.BRANCH_UPTODATE
 		return
@@ -127,8 +140,10 @@ func parseRevList(out []byte) (diff RemoteDiff, err error) {
 
 // GetIndexStatus sets the rstat.index property to modified if there are uncommited changes or if the index has been
 // modified
-func GetIndexStatus(ctx *grs.AppContext, repo *status.Repo) {
-	if repo.Dir != status.DIR_VALID {
+func (s *Script) GetIndexStatus() {
+	repo := s.repo
+	ctx := s.ctx
+	if s.err != nil || repo.Dir != status.DIR_VALID {
 		return
 	}
 

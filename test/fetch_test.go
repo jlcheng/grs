@@ -15,7 +15,7 @@ func TestFetch_Git_Fail(t *testing.T) {
 	repo := status.NewRepo("")
 	repo.Dir = status.DIR_VALID
 	ctx := grs.NewAppContextWithRunner(runner)
-	script.Fetch(ctx, repo)
+	script.NewScript(ctx, repo).Fetch()
 	if repo.Branch != status.BRANCH_UNKNOWN {
 		t.Errorf("expected %s, got: %v\n", status.BRANCH_UNKNOWN, repo.Branch)
 	}
@@ -27,7 +27,7 @@ func TestFetch_Git_OK(t *testing.T) {
 	repo := status.NewRepo("")
 	repo.Dir = status.DIR_VALID
 	ctx := grs.NewAppContextWithRunner(runner)
-	script.Fetch(ctx, repo)
+	script.NewScript(ctx, repo).Fetch()
 	if repo.Dir == status.DIR_INVALID {
 		t.Error("Unexpected repo.Dir, got DIR_INVALID")
 	}
@@ -39,7 +39,7 @@ func TestFetch_Modified_Update(t *testing.T) {
 	repo := status.NewRepo("")
 	repo.Dir = status.DIR_VALID
 	ctx := grs.NewAppContextWithRunner(runner)
-	script.Fetch(ctx, repo)
+	script.NewScript(ctx, repo).Fetch()
 	db := ctx.DB()
 	if l := len(db.Repos); l != 1 {
 		t.Errorf("Expected len(db.Repos) == 1, got %v\n", l)
@@ -57,7 +57,7 @@ func TestFetch_Modified_Update_Existing(t *testing.T) {
 	repo.Dir = status.DIR_VALID
 	ctx := grs.NewAppContextWithRunner(runner)
 	ctx.DB().Repos = append(ctx.DB().Repos, grsdb.RepoDTO{Id: repo.Path, FetchedSec: 1})
-	script.Fetch(ctx, repo)
+	script.NewScript(ctx, repo).Fetch()
 	db := ctx.DB()
 	if l := len(db.Repos); l != 1 {
 		t.Errorf("Expected len(db.Repos) == 1, got %v\n", l)
@@ -76,7 +76,7 @@ func TestFetch_Modified_Update_NOP(t *testing.T) {
 	ctx := grs.NewAppContextWithRunner(runner)
 	fetchTime := time.Now().Unix()
 	ctx.DB().Repos = append(ctx.DB().Repos, grsdb.RepoDTO{Id: repo.Path, FetchedSec: fetchTime})
-	script.Fetch(ctx, repo)
+	script.NewScript(ctx, repo).Fetch()
 	db := ctx.DB()
 
 	if l := len(db.Repos); l != 1 {

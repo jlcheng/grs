@@ -25,7 +25,7 @@
 * DONE DEV: Rewrite InitTest1 to use panic/recover instead of multiple 'return error'
 * TODO DEV: Consider moving foo_test.go files to their respective packages
 * TODO UX: Instead of fs-copying repos for rebasing, consider using git clone
-* TODO DEV: AutoRebase() to return err instead of printing to stdout
+* DONE DEV: AutoRebase() to return err instead of printing to stdout
 * DONE DEV: TestAutoRebase_Test1 must validate AutoRebase() did not yield a git error
 * TODO DEV: Consider moving integration tests (TestAutoRebase_Test1) to IT directory
 * TODO DEV: Functions like AutoRebase should take "upstream" as a parameter. 

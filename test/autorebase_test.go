@@ -72,14 +72,14 @@ func TestAutoRebase_IT_Test_2(t *testing.T) {
 	ctx := grs.NewAppContextWithRunner(exec.Runner())
 	repo := status.NewRepo("")
 	repo.Dir = status.DIR_VALID
-	runner := exec.Runner()
-	script.Fetch(ctx, repo)
+	s := script.NewScript(ctx, repo)
+	s.Fetch()
+	s.AutoRebase()
+	s.GetRepoStatus()
 
-	err := script.AutoRebase(ctx, runner)
-	if err != nil {
-		t.Fatal(err)
+	if repo.Branch != status.BRANCH_AHEAD {
+		t.Fatalf("expected BRANCH_UPTODATE, but was %v\n", repo.Branch)
 	}
-
 }
 
 /*
@@ -134,14 +134,10 @@ func TestAutoRebase_IT_Test_3(t *testing.T) {
 	ctx := grs.NewAppContextWithRunner(exec.Runner())
 	repo := status.NewRepo("")
 	repo.Dir = status.DIR_VALID
-	runner := exec.Runner()
-	script.Fetch(ctx, repo)
-
-	err := script.AutoRebase(ctx, runner)
-	if err != nil {
-		t.Fatal(err)
-	}
-	script.GetRepoStatus(ctx, repo)
+	s := script.NewScript(ctx, repo)
+	s.Fetch()
+	s.AutoRebase()
+	s.GetRepoStatus()
 	if repo.Branch != status.BRANCH_DIVERGED {
 		t.Fatalf("expected BRANCH_DIVERGED, but was %v\n", repo.Branch)
 	}

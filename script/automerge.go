@@ -10,8 +10,11 @@ import (
 )
 
 // AutoFFMerge runs `git merge --ff-only...` when the branch is behind and unmodified
-func AutoFFMerge(ctx *grs.AppContext, repo *status.Repo) bool {
-	if repo.Dir != status.DIR_VALID ||
+func (s *Script) AutoFFMerge() bool {
+	repo := s.repo
+	ctx := s.ctx
+	if s.err != nil ||
+		repo.Dir != status.DIR_VALID ||
 		repo.Branch != status.BRANCH_BEHIND ||
 		repo.Index != status.INDEX_UNMODIFIED {
 		return false
@@ -29,9 +32,9 @@ func AutoFFMerge(ctx *grs.AppContext, repo *status.Repo) bool {
 	return true
 }
 
-// GetActivityTime gets the estimated "last modified time" of a repo
 var lastActivityFiles = []string{"HEAD", "COMMIT_EDITMSG", "ORIG_HEAD", "index", "config"}
 
+// GetActivityTime gets the estimated "last modified time" of a repo
 func GetActivityTime(repo string) (time.Time, error) {
 	var atime time.Time
 	if f, err := os.Stat(repo); err != nil || !f.IsDir() {

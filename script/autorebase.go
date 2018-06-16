@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"jcheng/grs/config"
-	"jcheng/grs/grs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -16,7 +15,10 @@ const (
 	CLONE_BASEDIR = "clones"
 )
 
-func AutoRebase(ctx *grs.AppContext, runner grs.CommandRunner) error {
+func (s *Script) AutoRebase() error {
+	ctx := s.ctx
+	runner := s.ctx.CommandRunner
+
 	//  2. Identify merge-base
 	git := ctx.GetGitExec()
 	p := "@{upstream}"

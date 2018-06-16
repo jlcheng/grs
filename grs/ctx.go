@@ -40,7 +40,6 @@ func NewAppContextWithRunner(runner CommandRunner) *AppContext {
 	}
 }
 
-
 func (ctx *AppContext) ConfParams(confParams *config.ConfigParams) {
 	ctx.confParams = confParams
 }

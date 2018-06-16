@@ -14,7 +14,7 @@ func TestGetRepoStatus_Git_Fail(t *testing.T) {
 	runner.Add(Error("failed"))
 	repo := status.NewRepo("")
 	repo.Dir = status.DIR_VALID
-	script.GetRepoStatus(grs.NewAppContextWithRunner(runner), repo)
+	script.NewScript(grs.NewAppContextWithRunner(runner), repo).GetRepoStatus()
 	if repo.Branch != status.BRANCH_UNTRACKED {
 		t.Errorf("expected %s, got: %v\n", status.BRANCH_UNTRACKED, repo.Branch)
 	}
@@ -50,7 +50,7 @@ func TestGetRepoStatus_Git_From_Ctx(t *testing.T) {
 
 	repo := status.NewRepo("")
 	repo.Dir = status.DIR_VALID
-	script.GetRepoStatus(ctx, repo)
+	script.NewScript(ctx, repo).GetRepoStatus()
 	if repo.Dir == status.DIR_INVALID {
 		t.Error("Unexpected repo.Dir, got DIR_INVALID")
 		return
@@ -68,7 +68,7 @@ func helpGetRepoStatus(t *testing.T, out string, expected status.Branchstat) {
 
 	repo := status.NewRepo("")
 	repo.Dir = status.DIR_VALID
-	script.GetRepoStatus(grs.NewAppContextWithRunner(runner), repo)
+	script.NewScript(grs.NewAppContextWithRunner(runner), repo).GetRepoStatus()
 	got := repo.Branch
 	if got != expected {
 		t.Errorf("expected [%v], got [%v]\n", expected, got)
