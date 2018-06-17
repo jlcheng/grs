@@ -1,7 +1,11 @@
 package script
 
 import (
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"testing"
+	"time"
 )
 
 func TestParseRevList(t *testing.T) {
@@ -20,7 +24,7 @@ func TestParseRevList(t *testing.T) {
 }
 
 func assertValidRemoteDiff(t *testing.T, str string, eRemote int, eLocal int) {
-	var d RemoteDiff
+	var d remoteDiff
 	var err error
 	d, err = parseRevList([]byte(str))
 	if err != nil {
@@ -39,5 +43,44 @@ func assertInvalidRemoteDiff(t *testing.T, str string) {
 	_, err = parseRevList([]byte(str))
 	if err == nil {
 		t.Error("expected error parsing", err)
+	}
+}
+
+func TestGetActivityTime(t *testing.T) {
+	oldwd, err := os.Getwd()
+	d, err := ioutil.TempDir("", "grstest")
+	if err != nil {
+		t.Fatalf("TestGetActivityTime: %v", err)
+	}
+	defer func() {
+		if err := os.Chdir(oldwd); err != nil {
+			t.Fatal("TestGetActivityTime.defer: ", err)
+		}
+		if err := os.RemoveAll(d); err != nil {
+			t.Fatal("TestGetActivityTime.defer: ", err)
+		}
+	}()
+
+	if err := os.Chdir(d); err != nil {
+		t.Fatalf("TestGetActivityTime: %v", err)
+	}
+
+	os.Mkdir(filepath.Join(d, ".git"), 0777)
+	fname := filepath.Join(d, ".git", "HEAD")
+	fh, err := os.Create(fname)
+	fh.Close()
+
+	atime := time.Date(1900, time.January, 1, 1, 0, 0, 0, time.UTC)
+	mtime := time.Date(2000, time.January, 1, 1, 0, 0, 0, time.UTC)
+	if err := os.Chtimes(fname, atime, mtime); err != nil {
+		t.Fatalf("TestGetActivityTime: %v", err)
+	}
+
+	activity, err := GetActivityTime(d)
+	if err != nil {
+		t.Fatal("unexpected error", err)
+	}
+	if !activity.Equal(mtime) {
+		t.Error("unexpected last activity time: ", activity)
 	}
 }

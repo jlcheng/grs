@@ -2,28 +2,13 @@ package test
 
 import (
 	"io/ioutil"
-	"jcheng/grs/config"
 	"jcheng/grs/gittest"
 	"jcheng/grs/grs"
 	"jcheng/grs/script"
 	"jcheng/grs/status"
 	"os"
-	"strings"
 	"testing"
 )
-
-func TestToClonePath(t *testing.T) {
-	a := string(os.PathSeparator) + "foo"
-	b := "foo"
-	aclone := script.ToClonePath(a)
-	bclone := script.ToClonePath(b)
-	if aclone == bclone {
-		t.Fatal("a and b must not yield same 'clone path'", aclone, bclone)
-	}
-	if !strings.HasPrefix(aclone, config.UserPrefDir) {
-		t.Fatal("The 'clone path' must start with user pref directory")
-	}
-}
 
 /*
 cloned_repo/master rebases without conflicts on to @{UPSTREAM}

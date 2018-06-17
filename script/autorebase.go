@@ -1,18 +1,9 @@
 package script
 
 import (
-	"crypto/sha1"
 	"errors"
 	"fmt"
-	"io"
-	"jcheng/grs/config"
-	"os"
-	"path/filepath"
 	"strings"
-)
-
-const (
-	CLONE_BASEDIR = "clones"
 )
 
 func (s *Script) AutoRebase() error {
@@ -52,19 +43,4 @@ func (s *Script) AutoRebase() error {
 
 	//  6. Stop when conflict is detected
 	return nil
-}
-
-func ToClonePath(repoPath string) string {
-	h := sha1.New()
-	io.WriteString(h, repoPath)
-	d := fmt.Sprintf("%x", h.Sum(nil))
-	return filepath.Join(GetCloneBaseDir(), d)
-}
-
-func CreateCloneDir() error {
-	return os.Mkdir(GetCloneBaseDir(), 0755)
-}
-
-func GetCloneBaseDir() string {
-	return filepath.Join(config.UserPrefDir, CLONE_BASEDIR)
 }
