@@ -1,7 +1,7 @@
 package test
 
 import (
-	"jcheng/grs/grs"
+	"jcheng/grs/core"
 	"jcheng/grs/grsdb"
 	"jcheng/grs/script"
 	"jcheng/grs/status"

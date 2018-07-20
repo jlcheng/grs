@@ -10,22 +10,19 @@ GORUN=$(GOCMD) run
 GOMAIN=cmd/grs/grs.go
 BINARY_NAME=grs
 OUTDIR=out
+# Sets GOPATH to the current project directory
+export GOPATH=$(shell pwd)
+
 
 PRG2=cmd/grsnote/grsnote.go
 PRG2_NAME=grsnote
-
-ifeq ($(OS),Windows_NT)
-	BINARY_NAME=grs.exe
-	PRG2_NAME=grsnote.exe
-endif
-
 
 all: test build
 build: | $(OUTDIR) prg1 prg2
 
 .PHONY: test
 test: 
-	$(GOTEST) -v ./test
+	$(GOTEST) -v jcheng/grs/test
 	$(GOFMT) -l .
 
 vet:

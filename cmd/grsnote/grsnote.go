@@ -5,7 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"jcheng/grs/config"
-	"jcheng/grs/grs"
+	"jcheng/grs/core"
 	"os"
 )
 

@@ -1,17 +1,21 @@
-# Dev
+# Dev (gopath refactoring)
+
+Assume the root of the project is in your $GOPATH
 
 ```
-$GOPATH
-  \
-   +-- src/jcheng/grs/.git
-         \
-          +-- cmd/grsp/prototype.go
-          +-- grs/basic.go
+grs
+ +-- cmd/grs/grs.go
+ +-- docs
+ +-- src
+      +- src/jcheng/grs
+      +- src/jcheng/grs/test
+ +-- out (build artifacts)
+
 ```
 
 ```
-$ go build ./...
-$ go test ./...
+$ make test # test only
+$ make all  # test and produce artifcats in out
 ```
 
  

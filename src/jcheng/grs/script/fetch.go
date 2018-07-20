@@ -1,7 +1,7 @@
 package script
 
 import (
-	"jcheng/grs/grs"
+	"jcheng/grs/core"
 	"jcheng/grs/status"
 	"time"
 )

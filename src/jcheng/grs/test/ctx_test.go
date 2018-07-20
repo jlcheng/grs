@@ -2,7 +2,7 @@ package test
 
 import (
 	"jcheng/grs/config"
-	"jcheng/grs/grs"
+	"jcheng/grs/core"
 	"reflect"
 	"testing"
 )

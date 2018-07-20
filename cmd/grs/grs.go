@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"jcheng/grs/config"
 	"jcheng/grs/display"
-	"jcheng/grs/grs"
+	"jcheng/grs/core"
 	"jcheng/grs/script"
 	"jcheng/grs/status"
 	"os"

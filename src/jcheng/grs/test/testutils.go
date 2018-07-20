@@ -2,7 +2,7 @@ package test
 
 import (
 	"errors"
-	"jcheng/grs/grs"
+	"jcheng/grs/core"
 	"regexp"
 	"strings"
 )
