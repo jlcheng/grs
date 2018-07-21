@@ -14,16 +14,13 @@ OUTDIR=out
 export GOPATH=$(shell pwd)
 
 
-PRG2=cmd/grsnote/grsnote.go
-PRG2_NAME=grsnote
+WHAT := grs grsdbh
 
 all: test build
-build: | $(OUTDIR) prg1 prg2
 
 .PHONY: test
 test: 
 	$(GOTEST) -v jcheng/grs/test
-	$(GOFMT) -l .
 
 vet:
 	$(GOVET) jcheng/grs/compat jcheng/grs/config jcheng/grs/display jcheng/grs/gittest jcheng/grs/grs jcheng/grs/grsdb jcheng/grs/grsio jcheng/grs/script jcheng/grs/status jcheng/grs/test
@@ -32,12 +29,13 @@ clean:
 	$(GOCLEAN)
 	rm -rf $(OUTDIR)
 
-gofmt:
-	$(GOFMT) -s -w .
+fmt:
+	$(GOFMT) -s -w `find src/jcheng/grs -maxdepth 1 -and -type d -and -not -name vendor`
 
 install: all
-	mv $(OUTDIR)/$(BINARY_NAME) $(HOME)/bin
-	mv $(OUTDIR)/$(PRG2_NAME) $(HOME)/bin
+	for target in $(WHAT); do \
+		mv $(OUTDIR)/$$target $(HOME)/bin; \
+	done
 
 run:
 	$(GORUN) $(GOMAIN)
@@ -45,9 +43,8 @@ run:
 $(OUTDIR):
 	mkdir -p $(OUTDIR)
 
-prg1:
-	$(GOBUILD) -o $(OUTDIR)/$(BINARY_NAME) $(GOMAIN)
-
-prg2:
-	$(GOBUILD) -o $(OUTDIR)/$(PRG2_NAME) $(PRG2)
+build:
+	for target in $(WHAT); do \
+		$(GOBUILD) -o $(OUTDIR)/$$target ./cmd/$$target; \
+	done
 

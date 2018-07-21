@@ -7,12 +7,12 @@ import (
 type BadgerKVStore struct {
 	dir string
 }
+
 func NewBadgerKVStore(dir string) *BadgerKVStore {
 	return &BadgerKVStore{
 		dir: dir,
 	}
 }
-
 
 func (s *BadgerKVStore) SaveBytes(key string, val []byte) error {
 	opts := badger.DefaultOptions

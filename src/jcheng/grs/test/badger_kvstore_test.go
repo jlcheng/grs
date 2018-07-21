@@ -1,10 +1,10 @@
 package test
 
 import (
-	"testing"
+	"io/ioutil"
 	"jcheng/grs/grsdb"
 	"os"
-	"io/ioutil"
+	"testing"
 )
 
 func TestBadgerKVStore(t *testing.T) {
