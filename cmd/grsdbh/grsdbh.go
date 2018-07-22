@@ -7,31 +7,22 @@ import (
 	"os"
 )
 
-type Args struct {
-	dir       string
-	asString  bool
-}
-
 func main() {
-
-	args := Args{}
-	flag.StringVar(&args.dir, "dir", "", "badgerdb to view")
-	flag.BoolVar(&args.asString, "asString", false, "treat values as strings")
+	args := grsdb.DefaultViewerOptions
+	flag.BoolVar(&args.TextMode, "text", false, "treat items values as strings")
+	flag.StringVar(&args.Add, "add", "", "add the specified key:value pair to the db")
 	flag.Parse()
 
-	if args.dir == "" {
+	if args.Dir = flag.Arg(0); args.Dir == "" {
 		fmt.Println("dir is required\n")
+		flag.Usage()
 		os.Exit(1)
 	}
 
-	if args.asString {
-		err := grsdb.BadgerDbAsString(args.dir)
-		if err != nil {
-			fmt.Println(err)
-		}
-	} else {
-		fmt.Println("db format not specified")
-		os.Exit(1)
+	vopts := grsdb.DefaultViewerOptions
+	vopts.Dir = args.Dir
+	err := grsdb.BadgerDbAsString(args)
+	if err != nil {
+		fmt.Println(err)
 	}
-
 }
