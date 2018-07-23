@@ -28,6 +28,20 @@
 * DONE DEV: AutoRebase() to return err instead of printing to stdout
 * DONE DEV: TestAutoRebase_Test1 must validate AutoRebase() did not yield a git error
 * TODO DEV: Consider moving integration tests (TestAutoRebase_Test1) to IT directory
+* TODO DEV: Before switching to using Badger for grs.db, understand the consequences:
+  - Note taken on [2018-07-22 Sun 17:26] \\
+    1.  What is stored in grs.db? Write them out. Is each field essential?
+    2.  What does Badger provide? 
+        Directory lock - https://github.com/dgraph-io/badger/blob/da813b47af74e45d6b2e0e1686768169c25eb518/db.go#L207
+    2a. How does Badger release stale locks? 
+        You have to manually delete the lock file. Badger does not handle this at all!
+        https://github.com/dgraph-io/badger/issues/424
+    2b. Does Badger provide benefits other than file locking?
+	Updating multiple keys in a transaction, e.g., one key to model the 'last grs time', and one key to remember other stats (total number of syncs automated)
+        Supporting multiple keys is not important as of 2018-07-22
+    2c. Are there simpler APIs for handling file locking?
+        https://github.com/theckman/go-flock
+	The API allows us to create read locks as well as exclusive locks for writes.
 * TODO DEV: Functions like AutoRebase should take "upstream" as a parameter. 
   - Note taken on [2018-05-14 Mon 10:52] \\
     This allows for doing things like 

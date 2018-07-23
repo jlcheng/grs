@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"github.com/theckman/go-flock"
 )
 
 // KVStore interface is implemented by objects that can persist key/value pairs
@@ -55,6 +56,21 @@ func InitDiskKVStore(path string) (KVStore, error) {
 
 func (s *DiskKVStore) SaveBytes(key string, val []byte) error {
 	full := filepath.Join(s.path, filepath.FromSlash(filepath.Clean(key)))
+
+	// advisory lock
+	lpath := fmt.Sprintf("%v.lock", full)
+	f := flock.NewFlock(lpath)
+	_, err := f.TryLock()
+	if err != nil {
+		fmt.Printf("cannot obtained lock on %v: %v\n", lpath, err)
+		return err
+	}
+	// TODO: Consider handling failure to unlock. What can be done other than logging?
+	defer func() {
+		f.Unlock()
+		fmt.Printf("released lock on %v\n", lpath)
+	}()
+	fmt.Printf("obtained lock on %v\n", lpath)
 	return ioutil.WriteFile(full, val, 0644)
 }
 
