@@ -14,6 +14,8 @@ grs
 ```
 
 ```
+$ export GOPATH=$PWD
+$ cd src/jcheng/grs && dep ensure # install dependencies
 $ make test # test only
 $ make all  # test and produce artifcats in out
 ```

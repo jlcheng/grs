@@ -1,4 +1,4 @@
-package grs
+package logging
 
 import "fmt"
 

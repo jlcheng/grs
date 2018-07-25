@@ -1,8 +1,8 @@
 package script
 
 import (
-	"jcheng/grs/core"
 	"jcheng/grs/status"
+	"jcheng/grs/logging"
 )
 
 // AutoFFMerge runs `git merge --ff-only...` when the branch is behind and unmodified
@@ -22,7 +22,7 @@ func (s *Script) AutoFFMerge() bool {
 	var out []byte
 	var err error
 	if out, err = command.CombinedOutput(); err != nil {
-		grs.Debug("git merge failed: %v\n%v\n", err, string(out))
+		logging.Debug("git merge failed: %v\n%v\n", err, string(out))
 		return false
 	}
 	return true

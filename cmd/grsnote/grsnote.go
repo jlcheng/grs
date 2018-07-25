@@ -7,6 +7,8 @@ import (
 	"jcheng/grs/config"
 	"jcheng/grs/core"
 	"os"
+	"jcheng/grs/script"
+	"jcheng/grs/logging"
 )
 
 type Args struct {
@@ -22,9 +24,9 @@ func main() {
 
 	// TODO: Sets the 'ack_time' of each known repo to the current time
 	ctx := grs.NewAppContext()
-	sctx, err := grs.InitScriptCtx(config.NewConfigParams(), ctx)
+	sctx, err := script.InitScriptCtx(config.NewConfigParams(), ctx)
 	if err != nil {
-		grs.Info("%v", err)
+		logging.Info("%v", err)
 		os.Exit(1)
 	}
 

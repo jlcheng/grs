@@ -1,9 +1,9 @@
 package script
 
 import (
-	"jcheng/grs/core"
 	"jcheng/grs/status"
 	"time"
+	"jcheng/grs/logging"
 )
 
 // Fetch runs `git fetch`.
@@ -23,9 +23,9 @@ func (s *Script) Fetch() {
 	command := s.ctx.CommandRunner.Command(git, "fetch")
 	if out, err := command.CombinedOutput(); err != nil {
 		// fetch may have failed for common reasons, such as not adding yourxk ssh key to the agent
-		grs.Debug("git fetch failed: %v\n%v", err, string(out))
+		logging.Debug("git fetch failed: %v\n%v", err, string(out))
 		return
 	}
-	grs.Debug("git fetch ok: %v", s.repo.Path)
+	logging.Debug("git fetch ok: %v", s.repo.Path)
 	dbRepo.FetchedSec = now
 }

@@ -15,7 +15,7 @@ type AppContext struct {
 	MinFetchSec     int
 	ActivityTimeout time.Duration
 	DbPath          string
-	dbService       grsdb.DBService
+	DbService       grsdb.DBService
 }
 
 func NewAppContext() *AppContext {
@@ -61,7 +61,7 @@ func (ctx *AppContext) SetDB(db *grsdb.DB) {
 }
 
 func (ctx *AppContext) DBService() grsdb.DBService {
-	return ctx.dbService
+	return ctx.DbService
 }
 
 type ScriptContext struct {

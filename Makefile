@@ -13,6 +13,7 @@ OUTDIR=out
 # Sets GOPATH to the current project directory
 export GOPATH=$(shell pwd)
 
+PKGS=$(shell find src/jcheng/grs -maxdepth 1 -type d)
 
 PRG2=cmd/grsnote/grsnote.go
 PRG2_NAME=grsnote
@@ -23,17 +24,16 @@ build: | $(OUTDIR) prg1 prg2
 .PHONY: test
 test: 
 	$(GOTEST) -v jcheng/grs/test
-	$(GOFMT) -l .
 
 vet:
-	$(GOVET) jcheng/grs/compat jcheng/grs/config jcheng/grs/display jcheng/grs/gittest jcheng/grs/grs jcheng/grs/grsdb jcheng/grs/grsio jcheng/grs/script jcheng/grs/status jcheng/grs/test
+	$(GOVET) $(PKGS)
 
 clean: 
 	$(GOCLEAN)
 	rm -rf $(OUTDIR)
 
 gofmt:
-	$(GOFMT) -s -w .
+	$(GOFMT) -s -w $(PKGS)
 
 install: all
 	mv $(OUTDIR)/$(BINARY_NAME) $(HOME)/bin

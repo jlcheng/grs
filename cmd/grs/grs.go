@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/signal"
 	"time"
+	"jcheng/grs/logging"
 )
 
 type Args struct {
@@ -34,13 +35,13 @@ func main() {
 	flag.Parse()
 
 	if args.verbose {
-		grs.SetLogLevel(grs.DEBUG)
+		logging.SetLogLevel(logging.DEBUG)
 	}
 
 	ctx := grs.NewAppContextWithRunner(&grs.ExecRunner{})
-	sctx, err := grs.InitScriptCtx(config.NewConfigParams(), ctx)
+	sctx, err := script.InitScriptCtx(config.NewConfigParams(), ctx)
 	if err != nil {
-		grs.Info("%v", err)
+		logging.Info("%v", err)
 		os.Exit(1)
 	}
 
@@ -61,7 +62,7 @@ func main() {
 	signal.Notify(ctrl, os.Interrupt)
 	go func() {
 		for sig := range ctrl {
-			grs.Debug("got %v, quitting", sig)
+			logging.Debug("got %v, quitting", sig)
 			os.Exit(0)
 		}
 	}()
@@ -108,7 +109,7 @@ func main() {
 		}
 		err := ctx.DBService().SaveDB(config.UserDBName, ctx.DB())
 		if err != nil {
-			grs.Info("cannot save db %v", err)
+			logging.Info("cannot save db %v", err)
 		}
 		screen.SummarizeRepos(repoStatusList)
 		screen.Update()

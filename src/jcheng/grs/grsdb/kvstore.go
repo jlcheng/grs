@@ -3,10 +3,11 @@ package grsdb
 import (
 	"errors"
 	"fmt"
+	"github.com/theckman/go-flock"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"github.com/theckman/go-flock"
+	"jcheng/grs/logging"
 )
 
 // KVStore interface is implemented by objects that can persist key/value pairs
@@ -60,17 +61,19 @@ func (s *DiskKVStore) SaveBytes(key string, val []byte) error {
 	// advisory lock
 	lpath := fmt.Sprintf("%v.lock", full)
 	f := flock.NewFlock(lpath)
+	fmt.Println(f.Locked())
 	_, err := f.TryLock()
+	fmt.Println(f)
 	if err != nil {
-		fmt.Printf("cannot obtained lock on %v: %v\n", lpath, err)
+		logging.Debug("cannot obtain lock on %v: %v\n", lpath, err)
 		return err
 	}
 	// TODO: Consider handling failure to unlock. What can be done other than logging?
 	defer func() {
 		f.Unlock()
-		fmt.Printf("released lock on %v\n", lpath)
+		logging.Debug("released lock on %v\n", lpath)
 	}()
-	fmt.Printf("obtained lock on %v\n", lpath)
+	logging.Debug("obtained lock on %v\n", lpath)
 	return ioutil.WriteFile(full, val, 0644)
 }
 

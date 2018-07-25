@@ -1,8 +1,8 @@
 package script
 
 import (
-	"jcheng/grs/core"
 	"jcheng/grs/status"
+	"jcheng/grs/logging"
 )
 
 // GetIndexStatus sets the rstat.index property to modified if there are uncommited changes or if the index has been
@@ -21,7 +21,7 @@ func (s *Script) GetIndexStatus() {
 	var out []byte
 	var err error
 	if out, err = command.CombinedOutput(); err != nil {
-		grs.Debug("ls-files failed: %v\n%v\n", err, string(out))
+		logging.Debug("ls-files failed: %v\n%v\n", err, string(out))
 		return
 	}
 	if len(out) != 0 {
@@ -31,7 +31,7 @@ func (s *Script) GetIndexStatus() {
 
 	command = ctx.CommandRunner.Command(git, "diff-index", "HEAD")
 	if out, err = command.CombinedOutput(); err != nil {
-		grs.Debug("diff-index failed: %v\n%v\n", err, string(out))
+		logging.Debug("diff-index failed: %v\n%v\n", err, string(out))
 		return
 	}
 	if len(out) != 0 {

@@ -7,6 +7,7 @@ import (
 	"jcheng/grs/status"
 	"strconv"
 	"strings"
+	"jcheng/grs/logging"
 )
 
 // GetRepoStatus() updates the status of a repository
@@ -24,25 +25,25 @@ func (s *Script) GetRepoStatus() {
 
 	command = ctx.CommandRunner.Command(git, "rev-parse", "@{upstream}")
 	if out, err = command.CombinedOutput(); err != nil {
-		grs.Debug("GetRepoStatus: no upstream detected", err, string(out))
+		logging.Debug("GetRepoStatus: no upstream detected", err, string(out))
 		repo.Branch = status.BRANCH_UNTRACKED
 		return
 	}
 
 	command = ctx.CommandRunner.Command(git, "rev-list", "--left-right", "--count", "@{upstream}...HEAD")
 	if out, err = command.CombinedOutput(); err != nil {
-		grs.Debug("rev-list failed: %v\n%v", err, string(out))
+		logging.Debug("rev-list failed: %v\n%v", err, string(out))
 		repo.Dir = status.DIR_INVALID
 		return
 	}
 	diff, err := parseRevList(out)
 	if err != nil {
-		grs.Info("cannot parse `git rev-list...` output: %q", string(out))
+		logging.Info("cannot parse `git rev-list...` output: %q", string(out))
 		repo.Dir = status.DIR_INVALID
 		return
 	}
 
-	grs.Debug("CMD: git rev-list --left-right --count @{upstream}...HEAD")
+	logging.Debug("CMD: git rev-list --left-right --count @{upstream}...HEAD")
 	if diff.remote == 0 && diff.local == 0 {
 		repo.Branch = status.BRANCH_UPTODATE
 		return
