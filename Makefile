@@ -11,7 +11,7 @@ OUTDIR=out
 # Sets GOPATH to the current project directory
 export GOPATH=$(shell pwd)
 
-WHAT := grs grsnote
+WHAT := grs
 
 all: test build
 build: | $(OUTDIR)
@@ -21,7 +21,7 @@ build: | $(OUTDIR)
 
 .PHONY: test
 test: 
-	$(GOTEST) -v jcheng/grs/test
+	$(GOTEST) -v jcheng/grs/...
 
 clean: 
 	$(GOCLEAN)

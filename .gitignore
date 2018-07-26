@@ -25,3 +25,5 @@
 
 # go
 /out
+/pkg
+/src/jcheng/grs/vendor
