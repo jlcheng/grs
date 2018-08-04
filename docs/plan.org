@@ -40,3 +40,4 @@
     
     1. grs -d will rebase 'currently checked-out branch' against 'master on on local file system'
     2. followed by rebasing 'currently checked-out branch' against 'master on <integration branch> on <team repo>'
+* TODO DEV: Run as web server, which takes 'get' as command to show stats in console

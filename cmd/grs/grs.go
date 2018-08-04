@@ -8,8 +8,9 @@ import (
 	"jcheng/grs/core"
 	"jcheng/grs/script"
 	"jcheng/grs/status"
+	"io"
+	"net/http"
 	"os"
-	"os/signal"
 	"time"
 )
 
@@ -37,6 +38,7 @@ func main() {
 		grs.SetLogLevel(grs.DEBUG)
 	}
 
+
 	ctx := grs.NewAppContextWithRunner(&grs.ExecRunner{})
 	sctx, err := grs.InitScriptCtx(config.NewConfigParams(), ctx)
 	if err != nil {
@@ -54,68 +56,74 @@ func main() {
 		os.Exit(1)
 	}
 
-	screen := display.NewAnsiDisplay(args.daemon, os.Stdout)
-	var repoStatusList = make([]display.RepoVO, len(repos))
+	go UpdateRepos(args, ctx, repos)
+	Tmp()
+}
 
-	ctrl := make(chan os.Signal, 1)
-	signal.Notify(ctrl, os.Interrupt)
-	go func() {
-		for sig := range ctrl {
-			grs.Debug("got %v, quitting", sig)
-			os.Exit(0)
-		}
-	}()
-
+func UpdateReposRepeat(args Args, ctx *grs.AppContext, repos []status.Repo) {
 	for true {
-		for idx, repo := range repos {
-			s := script.NewScript(ctx, &repo)
-			s.BeforeScript()
-			s.Fetch()
-			s.GetRepoStatus()
-			s.GetIndexStatus()
-
-			// allow forced-merge in non-daemon mode. otherwise, use last modified time to decide mergeness
-			merged := false
-			doMerge := args.force_merge && !args.daemon
-			if !doMerge {
-				atime, err := script.GetActivityTime(repo.Path)
-				doMerge = (err == nil) && time.Now().After(atime.Add(ctx.ActivityTimeout))
-			}
-			if doMerge {
-				switch repo.Branch {
-				case status.BRANCH_BEHIND:
-					s.AutoFFMerge()
-				case status.BRANCH_DIVERGED:
-					s.AutoRebase()
-				}
-				s.GetRepoStatus()
-				s.GetIndexStatus()
-			}
-
-			repoPtr := ctx.DB().FindOrCreateRepo(repo.Path)
-			if repoPtr != nil {
-				repoPtr.RStat.Update(&repo)
-				if merged {
-					repoPtr.MergedCnt = repoPtr.MergedCnt + 1
-					repoPtr.MergedSec = time.Now().Unix()
-				}
-				repoStatusList[idx] = display.RepoVO{
-					Repo:      repo,
-					Merged:    merged,
-					MergedSec: repoPtr.MergedSec,
-				}
-			}
-		}
-		err := ctx.DBService().SaveDB(config.UserDBName, ctx.DB())
-		if err != nil {
-			grs.Info("cannot save db %v", err)
-		}
-		screen.SummarizeRepos(repoStatusList)
-		screen.Update()
-
+		UpdateRepos(args, ctx, repos)
 		if !args.daemon {
 			break
 		}
 		time.Sleep(time.Second * time.Duration(args.refresh))
 	}
+}
+
+func UpdateRepos(args Args, ctx *grs.AppContext, repos []status.Repo) {
+	screen := display.NewAnsiDisplay(args.daemon, os.Stdout)
+	repoStatusList := make([]display.RepoVO, len(repos))
+	for idx, repo := range repos {
+		s := script.NewScript(ctx, &repo)
+		s.BeforeScript()
+		s.Fetch()
+		s.GetRepoStatus()
+		s.GetIndexStatus()
+
+		// allow forced-merge in non-daemon mode. otherwise, use last modified time to decide mergeness
+		merged := false
+		doMerge := args.force_merge && !args.daemon
+		if !doMerge {
+			atime, err := script.GetActivityTime(repo.Path)
+			doMerge = (err == nil) && time.Now().After(atime.Add(ctx.ActivityTimeout))
+		}
+		if doMerge {
+			switch repo.Branch {
+			case status.BRANCH_BEHIND:
+				s.AutoFFMerge()
+			case status.BRANCH_DIVERGED:
+				s.AutoRebase()
+			}
+			s.GetRepoStatus()
+			s.GetIndexStatus()
+		}
+
+		repoPtr := ctx.DB().FindOrCreateRepo(repo.Path)
+		if repoPtr != nil {
+			repoPtr.RStat.Update(&repo)
+			if merged {
+				repoPtr.MergedCnt = repoPtr.MergedCnt + 1
+				repoPtr.MergedSec = time.Now().Unix()
+			}
+			repoStatusList[idx] = display.RepoVO{
+				Repo:      repo,
+				Merged:    merged,
+				MergedSec: repoPtr.MergedSec,
+			}
+		}
+	}
+	err := ctx.DBService().SaveDB(config.UserDBName, ctx.DB())
+	if err != nil {
+		grs.Info("cannot save db %v", err)
+	}
+	screen.SummarizeRepos(repoStatusList)
+	screen.Update()
+}
+
+func Tmp() {
+	http.HandleFunc("/st", func(w http.ResponseWriter, req *http.Request){
+		io.WriteString(w, "status\n")
+	})
+	http.ListenAndServe(":8080", nil)
+
 }
