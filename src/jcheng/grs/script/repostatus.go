@@ -24,7 +24,7 @@ func (s *Script) GetRepoStatus() {
 
 	command = ctx.CommandRunner.Command(git, "rev-parse", "@{upstream}")
 	if out, err = command.CombinedOutput(); err != nil {
-		grs.Debug("GetRepoStatus: no upstream detected", err, string(out))
+		grs.Debug("GetRepoStatus: no upstream detected. %s, %s", err, string(out))
 		repo.Branch = status.BRANCH_UNTRACKED
 		return
 	}
