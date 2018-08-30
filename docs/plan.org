@@ -28,6 +28,7 @@
 * DONE DEV: AutoRebase() to return err instead of printing to stdout
 * DONE DEV: TestAutoRebase_Test1 must validate AutoRebase() did not yield a git error
 * TODO DEV: Consider moving integration tests (TestAutoRebase_Test1) to IT directory
+* TODO UX: When config.json refers to an invalid directory, indicates it in the console outpu instead of just 'unknown'.
 * TODO DEV: Functions like AutoRebase should take "upstream" as a parameter. 
   - Note taken on [2018-05-14 Mon 10:52] \\
     This allows for doing things like 
