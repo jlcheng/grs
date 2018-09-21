@@ -10,23 +10,12 @@
 * TODO UX: Repos that are "behind" with only untracked changes should be eligible for auto-forward
 * TODO DEV: Move code that sets MergeCnt into AutoFFerge and add test case
 * TODO UX: Print error messsage when .grs.json is missing a ',' - now it just silently fails (user, "why is it not using the repos in the file?")
-* DONE DEV: Manually gofmt all files
-* DONE BUG: Handle case when the current branch is untracked (took only 40 minutes)
-* DONE DEV: Rename grs.go: repoTwo to repo or something similar
 * TODO UX: logging.Info should output only when running from cli
 * TODO Rename grs.Command to something that is not so much like 'Cmd'
 * TODO DEV: Decouple persistence of user config from repo_metadata
 * TODO DEV: Rename DBService to DBRepository
-* DONE DEV: Rewrite TestContext as Exec
-  - Note taken on [2018-06-13 Wed 07:08] \\
-    https://blog.golang.org/errors-are-values
-* DONE DEV: Rename gittest/fstest_context.go to grstest/exec.go
-* DONE DEV: CommandRunner.Command() should return a Command interface
-* DONE DEV: Rewrite InitTest1 to use panic/recover instead of multiple 'return error'
 * TODO DEV: Consider moving foo_test.go files to their respective packages
 * TODO UX: Instead of fs-copying repos for rebasing, consider using git clone
-* DONE DEV: AutoRebase() to return err instead of printing to stdout
-* DONE DEV: TestAutoRebase_Test1 must validate AutoRebase() did not yield a git error
 * TODO DEV: Consider moving integration tests (TestAutoRebase_Test1) to IT directory
 * TODO UX: When config.json refers to an invalid directory, indicates it in the console outpu instead of just 'unknown'.
 * TODO DEV: Functions like AutoRebase should take "upstream" as a parameter. 

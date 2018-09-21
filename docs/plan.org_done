@@ -443,3 +443,77 @@ Archived entries from file /home/johnl/privprjs/grs/docs/plan.org
     "\033[r;cH"	Move the cursor to row r, column c. Note that both the rows and columns are indexed starting at 1.
     "\033[?25l"	Hide the cursor.
     "\033[K"	Delete everything from the cursor to the end of the line.
+
+* DONE DEV: Manually gofmt all files
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2018-08-31 Fri 13:32
+  :ARCHIVE_FILE: ~/privprjs/grs/docs/plan.org
+  :ARCHIVE_CATEGORY: plan
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* DONE BUG: Handle case when the current branch is untracked (took only 40 minutes)
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2018-08-31 Fri 13:32
+  :ARCHIVE_FILE: ~/privprjs/grs/docs/plan.org
+  :ARCHIVE_CATEGORY: plan
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* DONE DEV: Rename grs.go: repoTwo to repo or something similar
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2018-08-31 Fri 13:32
+  :ARCHIVE_FILE: ~/privprjs/grs/docs/plan.org
+  :ARCHIVE_CATEGORY: plan
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* DONE DEV: Rewrite TestContext as Exec
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2018-08-31 Fri 13:32
+  :ARCHIVE_FILE: ~/privprjs/grs/docs/plan.org
+  :ARCHIVE_CATEGORY: plan
+  :ARCHIVE_TODO: DONE
+  :END:
+  - Note taken on [2018-06-13 Wed 07:08] \\
+    https://blog.golang.org/errors-are-values
+
+* DONE DEV: Rename gittest/fstest_context.go to grstest/exec.go
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2018-08-31 Fri 13:32
+  :ARCHIVE_FILE: ~/privprjs/grs/docs/plan.org
+  :ARCHIVE_CATEGORY: plan
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* DONE DEV: CommandRunner.Command() should return a Command interface
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2018-08-31 Fri 13:32
+  :ARCHIVE_FILE: ~/privprjs/grs/docs/plan.org
+  :ARCHIVE_CATEGORY: plan
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* DONE DEV: Rewrite InitTest1 to use panic/recover instead of multiple 'return error'
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2018-08-31 Fri 13:32
+  :ARCHIVE_FILE: ~/privprjs/grs/docs/plan.org
+  :ARCHIVE_CATEGORY: plan
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* DONE DEV: AutoRebase() to return err instead of printing to stdout
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2018-08-31 Fri 13:32
+  :ARCHIVE_FILE: ~/privprjs/grs/docs/plan.org
+  :ARCHIVE_CATEGORY: plan
+  :ARCHIVE_TODO: DONE
+  :END:
+
+* DONE DEV: TestAutoRebase_Test1 must validate AutoRebase() did not yield a git error
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2018-08-31 Fri 13:32
+  :ARCHIVE_FILE: ~/privprjs/grs/docs/plan.org
+  :ARCHIVE_CATEGORY: plan
+  :ARCHIVE_TODO: DONE
+  :END:
