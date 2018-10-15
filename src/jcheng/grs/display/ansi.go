@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"jcheng/grs/status"
 	"time"
 )
 
@@ -25,11 +26,11 @@ func (ansi *AnsiDisplay) SummarizeRepos(repos []RepoVO) {
 	// write out the status of each repository
 	for _, repo := range repos {
 		if repo.MergedSec == 0 {
-			ansi.writer.WriteString(fmt.Sprintf("repo [%v] status is %v, %v.\n",
-				repo.Repo.Path, repo.Repo.Branch, repo.Repo.Index))
+			ansi.writer.WriteString(fmt.Sprintf("repo [%v] status IS %v, %v.\n",
+				repo.Repo.Path, colorB(repo.Repo.Branch), colorI(repo.Repo.Index)))
 		} else {
-			ansi.writer.WriteString(fmt.Sprintf("repo [%v] status is %v, %v. Last merge on %v.\n",
-				repo.Repo.Path, repo.Repo.Branch, repo.Repo.Index, fmtTime(repo.MergedSec)))
+			ansi.writer.WriteString(fmt.Sprintf("repo [%v] status IS %v, %v. Last merge on %v.\n",
+				repo.Repo.Path, colorB(repo.Repo.Branch), colorI(repo.Repo.Index), fmtTime(repo.MergedSec)))
 		}
 	}
 
@@ -44,4 +45,18 @@ func fmtTime(sec int64) string {
 
 func (ansi *AnsiDisplay) Update() {
 	ansi.writer.Flush()
+}
+
+func colorI(s status.Indexstat) string {
+	if s == status.INDEX_UNMODIFIED {
+		return fmt.Sprintf("%v", s)
+	}
+	return fmt.Sprintf("\033[31m%v\033[0m", s)
+}
+
+func colorB(s status.Branchstat) string {
+	if s == status.BRANCH_UPTODATE {
+		return fmt.Sprintf("%v", s)
+	}
+	return fmt.Sprintf("\033[31m%v\033[0m", s)
 }
