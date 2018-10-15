@@ -29,3 +29,4 @@
     
     1. grs -d will rebase 'currently checked-out branch' against 'master on on local file system'
     2. followed by rebasing 'currently checked-out branch' against 'master on <integration branch> on <team repo>'
+* TODO DEV: Add test case for checking status of a newly created git repo (the need to call git show ref --head)
