@@ -29,4 +29,7 @@
     
     1. grs -d will rebase 'currently checked-out branch' against 'master on on local file system'
     2. followed by rebasing 'currently checked-out branch' against 'master on <integration branch> on <team repo>'
+* TODO UX: Add indication when attempt to autorebase fails
+  - Note taken on [2018-10-18 Thu 07:39] \\
+    Useful when treating grs like Dropbox, as it tells you whether grs can autorebase divergent changes.
 * TODO DEV: Add test case for checking status of a newly created git repo (the need to call git show ref --head)
