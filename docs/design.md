@@ -1,6 +1,18 @@
 # Overview
-Based on https://medium.com/golang-learn/go-project-layout-e5213cdcfaa2 with the intent of
-separating commands, library, and test code.
++ cmd                                 // current location for 'cli' code.
++ .../<foo>                           // each cmd/<foo> subdirectory holds a main package
++ docs                                // you are here
++ src/jcheng/grs                      // code stored here so project basedir can be GOPATH
+             .../cmd                  // future location for 'main' packages
+	     .../cmd/grs/cmd/<foo>    // location of 'grs <foo>' subcommand, as laid out by the cobra framework
+	     .../config               // config framework, to be replaced with viper
+	     .../core                 // fundamental package
+	     .../display              // displays messages to users
+	     .../gittest              // test for git-related code
+	     .../grsdb                // k/v store API, possibly replaced by boltdb
+	     .../grsio                // code related to I/O
+	     .../script               // scripts, core of business logic
+	     .../status               // model state of a repository
 
 # grs
 Foundation for the "interesting" parts of the code. 

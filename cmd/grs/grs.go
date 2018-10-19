@@ -1,5 +1,5 @@
 package main
-
+// deprecated, see src/jcheng/grs/cmd/grs/cmd/root.go instead
 import (
 	"flag"
 	"fmt"

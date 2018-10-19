@@ -27,3 +27,9 @@
 /out
 /pkg
 /src/jcheng/grs/vendor
+
+# cobra and its ilk
+/bin
+
+# scatch documentation
+docs/scratch.txt
