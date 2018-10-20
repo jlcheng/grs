@@ -3,40 +3,34 @@ GOCMD=go
 GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
-GOFMT=gofmt
 GOGET=$(GOCMD) get
 GORUN=$(GOCMD) run
-GOMAIN=cmd/grs/grs.go
 OUTDIR=out
+MAIN_PRIME=src/jcheng/grs/cmd/grs/main.go
+OUT_PRIME=out/grs
 # Sets GOPATH to the current project directory
 export GOPATH=$(shell pwd)
 
-WHAT := grs
-
+.PHONY: all
 all: test build
-build: | $(OUTDIR)
-	for target in $(WHAT); do \
-		$(GOBUILD) -o $(OUTDIR)/$$target ./cmd/$$target; \
-	done
+
+.PHONY: build
+build: $(OUT_PRIME)
 
 .PHONY: test
 test: 
 	$(GOTEST) -v jcheng/grs/...
 
+.PHONY: clean
 clean: 
 	$(GOCLEAN)
 	rm -rf $(OUTDIR)
 
-gofmt:
-	$(GOFMT) -s -w $(shell find src/jcheng/grs -maxdepth 1 -type d -not -name vendor)
-
 install: all
-	for target in $(WHAT); do \
-		mv $(OUTDIR)/$$target $(HOME)/bin; \
-	done
+	mv $(OUT_PRIME) $(HOME)/bin
 
 run:
-	$(GORUN) $(GOMAIN)
+	$(GORUN) $(MAIN_PRIME)
 
-$(OUTDIR):
-	mkdir -p $(OUTDIR)
+out/grs:
+	$(GOBUILD) -o $(OUT_PRIME) $(MAIN_PRIME)
