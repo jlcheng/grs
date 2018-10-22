@@ -42,7 +42,7 @@ var rootCmd = &cobra.Command{
 		var args = Args {
 			verbose: verbose,
 			daemon: daemon,
-			refresh: refresh,
+			refresh: viper.GetInt("refresh"),
 			forceMerge: forceMerge,
 			repos: viper.GetStringSlice("repos"),
 		}
@@ -69,6 +69,7 @@ func init() {
 	rootCmd.PersistentFlags().StringArrayVarP(&repos, "repos", "r", make([]string,0), "colon separated list of repositories")
 
 	viper.BindPFlag("repos", rootCmd.PersistentFlags().Lookup("repos"))
+	viper.BindPFlag("refresh", rootCmd.PersistentFlags().Lookup("refresh"))
 }
 
 // initConfig reads in config file and ENV variables if set.

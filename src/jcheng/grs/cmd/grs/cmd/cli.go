@@ -35,7 +35,7 @@ func RunCli(args Args) {
 		ctx: ctx,
 		repos: repos,
 	}
-	gui := script.NewGUI(ctx, displayCh, reporter.Report)
+	gui := script.NewGUI(ctx, displayCh, reporter.Report, args.daemon)
 	gui.Start()
 
 	syncDaemon := script.NewSyncDaemon(repos, ctx, displayCh)

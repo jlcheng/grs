@@ -15,15 +15,17 @@ type AnsiGUI struct {
 	run      <-chan bool     // signals GUI to render state
 	stopped  chan struct{}   // allow other goroutines to wait for GUI to gracefully shutdown
 	reporter Reporter        // provides status on repos
+	clr      bool            // if true, clears screen before each iteration
 }
 
-func NewGUI(ctx *grs.AppContext, run <-chan bool, reporter Reporter) AnsiGUI {
+func NewGUI(ctx *grs.AppContext, run <-chan bool, reporter Reporter, clr bool) AnsiGUI {
 	return AnsiGUI{
 		ctx:      ctx,
 		done:     make(chan struct{}),
 		run:      run,
 		stopped:  make(chan struct{}),
 		reporter: reporter,
+		clr:      clr,
 	}
 }
 
@@ -47,6 +49,11 @@ func (gui *AnsiGUI) Start() {
 }
 
 func (gui *AnsiGUI) runIteration() {
+	// setup/clear screen
+	if gui.clr {
+		fmt.Print("\033[2J\033[H")
+	}
+
 	for _, repo := range gui.reporter() {
 		fmt.Printf("repo [%v] status IS %v, %v.\n",
 				repo.Path, colorB(repo.Branch), colorI(repo.Index))
