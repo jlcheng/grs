@@ -2,7 +2,6 @@ package test
 
 import (
 	"fmt"
-	"jcheng/grs/config"
 	"jcheng/grs/core"
 	"jcheng/grs/status"
 	"os"
@@ -58,20 +57,6 @@ func TestFail(t *testing.T) {
 		}
 	} else {
 		t.Errorf("false: want exit status 1, got exit status 0 with: %v", string(out))
-	}
-}
-
-func TestReposFromConf(t *testing.T) {
-	rc := []config.RepoConf{{Path: "rel/repo1"}, {Path: "abs/repo2"}}
-	r := grs.ReposFromConf(rc)
-	if len(r) != 2 {
-		t.Error("Unexpected length:", 2)
-	}
-	if r[0].Path != "rel/repo1" {
-		t.Error("Unexpected path:", r[0].Path)
-	}
-	if r[1].Path != "abs/repo2" {
-		t.Error("Unexpected path:", r[1].Path)
 	}
 }
 

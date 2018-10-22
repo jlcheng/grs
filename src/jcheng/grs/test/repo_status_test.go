@@ -2,7 +2,6 @@
 package test
 
 import (
-	"jcheng/grs/config"
 	"jcheng/grs/core"
 	"jcheng/grs/script"
 	"jcheng/grs/status"
@@ -44,10 +43,7 @@ func TestGetRepoStatus_Git_From_Ctx(t *testing.T) {
 	runner.AddMap("^/path/to/git rev-list", Ok("0\t0\n"))
 
 	ctx := grs.NewAppContextWithRunner(runner)
-	cp := &config.ConfigParams{User: "data/config.json"}
-	if conf, _ := config.ReadConfig(cp); conf != nil {
-		ctx.SetGitExec(conf.Git)
-	}
+	ctx.SetGitExec("/path/to/git")
 
 	repo := status.NewRepo("")
 	repo.Dir = status.DIR_VALID

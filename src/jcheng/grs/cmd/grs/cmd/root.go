@@ -16,11 +16,10 @@ package cmd
 
 import (
 	"fmt"
-	"os"
-
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"os"
 )
 
 var (
@@ -29,7 +28,7 @@ var (
 	daemon  bool    // runs in daemon mode
 	refresh int     // how often to check for changes, in seconds
 	forceMerge bool // ignore access time check when auto-merging
-	repos string    // colon separated list of repositories
+	repos []string    // colon separated list of repositories
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -45,11 +44,9 @@ var rootCmd = &cobra.Command{
 			daemon: daemon,
 			refresh: refresh,
 			forceMerge: forceMerge,
-			repos: viper.GetString("repos"),
+			repos: viper.GetStringSlice("repos"),
 		}
 		RunCli(args)
-
-
 	},
 }
 
@@ -69,7 +66,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&daemon, "daemon", "d", false, "daemon mode")
 	rootCmd.PersistentFlags().IntVarP(&refresh, "refresh", "t", 600, "how often to check for changes, in seconds")
 	rootCmd.PersistentFlags().BoolVarP(&forceMerge, "force", "m", false, "ignore access time check when auto-merging")
-	rootCmd.PersistentFlags().StringVarP(&repos, "repos", "r", "", "colon separated list of repositories")
+	rootCmd.PersistentFlags().StringArrayVarP(&repos, "repos", "r", make([]string,0), "colon separated list of repositories")
 
 	viper.BindPFlag("repos", rootCmd.PersistentFlags().Lookup("repos"))
 }
