@@ -13,9 +13,7 @@ func TestGui(t *testing.T) {
 	reporter := func() []status.Repo {
 		return make([]status.Repo, 0)
 	}
-	gui := script.NewGUI(grs.NewAppContext(), runCh, reporter)
-	gui.Start()
+	gui := script.NewGUI(grs.NewAppContext(), runCh, reporter, true)
+	go gui.Start()
 	runCh <- true
-	gui.Shutdown()
-	gui.WaitShutdown()
 }

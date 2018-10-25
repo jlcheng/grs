@@ -36,30 +36,33 @@ func RunCli(args Args) {
 		repos: repos,
 	}
 	gui := script.NewGUI(ctx, displayCh, reporter.Report, args.daemon)
-	gui.Start()
 
-	syncDaemon := script.NewSyncDaemon(repos, ctx, displayCh)
-	syncDaemon.StartDaemon()
+	// with for the gui goroutine to be ready
+	started := make(chan int)
+	go func() {
+		close(started)
+		gui.Start()
+	}()
+	<-started
+
+	syncController := script.NewSyncController(repos, ctx, displayCh)
 
 	// always run at least once
-	syncDaemon.Run()
+	syncController.Run()
 	if args.daemon {
 		ticker := time.NewTicker(time.Duration(args.refresh) * time.Second)
 		defer ticker.Stop() // remove? not strictly necessary as we don't offer a way to gracefully shutdown
 
-		// use CTRL-C to stop this loop
-		for true {
+		// use Ctrl-C to stop this program
+		for {
 			select {
 			case <-ticker.C:
-				syncDaemon.Run()
+				syncController.Run()
 			}
 		}
 	}
 
-	syncDaemon.Shutdown()
-	syncDaemon.WaitForShutdown()
-
-	gui.Shutdown()
+	close(displayCh)
 	gui.WaitShutdown()
 }
 
