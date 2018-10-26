@@ -3,7 +3,7 @@ package test
 import (
 	"io/ioutil"
 	"jcheng/grs/gittest"
-	"jcheng/grs/core"
+	"jcheng/grs"
 	"jcheng/grs/script"
 	"jcheng/grs/status"
 	"os"

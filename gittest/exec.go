@@ -3,7 +3,7 @@ package gittest
 import (
 	"errors"
 	"fmt"
-	"jcheng/grs/core"
+	"jcheng/grs"
 	"os"
 )
 

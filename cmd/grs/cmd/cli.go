@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"jcheng/grs/core"
+	"jcheng/grs"
 	"jcheng/grs/script"
 	"os"
 	"time"

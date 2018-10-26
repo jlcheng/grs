@@ -6,10 +6,8 @@ GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
 GORUN=$(GOCMD) run
 OUTDIR=out
-MAIN_PRIME=src/jcheng/grs/cmd/grs/main.go
+MAIN_PRIME=cmd/grs/main.go
 OUT_PRIME=out/grs
-# Sets GOPATH to the current project directory
-export GOPATH=$(shell pwd)
 
 .PHONY: all
 all: test build

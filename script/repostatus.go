@@ -3,7 +3,7 @@ package script
 import (
 	"errors"
 	"fmt"
-	"jcheng/grs/core"
+	"jcheng/grs"
 	"jcheng/grs/status"
 	"strconv"
 	"strings"

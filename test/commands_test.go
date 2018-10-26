@@ -3,7 +3,7 @@ package test
 import (
 	"errors"
 	"fmt"
-	"jcheng/grs/core"
+	"jcheng/grs"
 	"testing"
 )
 
