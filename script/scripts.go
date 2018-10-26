@@ -1,18 +1,17 @@
 package script
 
 import (
-	"jcheng/grs"
-	"jcheng/grs/status"
+	"jcheng/grs/shexec"
 	"os"
 )
 
 type Script struct {
-	ctx  *grs.AppContext
-	repo *status.Repo
+	ctx  *shexec.AppContext
+	repo *Repo
 	err  error
 }
 
-func NewScript(ctx *grs.AppContext, repo *status.Repo) *Script {
+func NewScript(ctx *shexec.AppContext, repo *Repo) *Script {
 	return &Script{ctx: ctx, repo: repo}
 }
 
@@ -24,14 +23,14 @@ func (s *Script) BeforeScript() {
 		return
 	}
 	if err := os.Chdir(s.repo.Path); err != nil {
-		s.repo.Dir = status.DIR_INVALID
+		s.repo.Dir = DIR_INVALID
 		return
 	}
 	git := s.ctx.GetGitExec()
 	command := s.ctx.CommandRunner.Command(git, "show-ref", "-q", "--head", "HEAD")
 	if _, err := command.CombinedOutput(); err != nil {
-		s.repo.Dir = status.DIR_INVALID
+		s.repo.Dir = DIR_INVALID
 		return
 	}
-	s.repo.Dir = status.DIR_VALID
+	s.repo.Dir = DIR_VALID
 }

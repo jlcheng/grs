@@ -1,4 +1,4 @@
-package status
+package script
 
 type Repo struct {
 	Path   string

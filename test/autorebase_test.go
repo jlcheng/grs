@@ -2,10 +2,8 @@ package test
 
 import (
 	"io/ioutil"
-	"jcheng/grs/gittest"
-	"jcheng/grs"
 	"jcheng/grs/script"
-	"jcheng/grs/status"
+	"jcheng/grs/shexec"
 	"os"
 	"testing"
 )
@@ -20,7 +18,7 @@ a--b---c---f  @{UPSTREAM} origin/master
     g---h     cloned_repo/master
 */
 func TestAutoRebase_IT_Test_2(t *testing.T) {
-	exec := gittest.NewExecRunner()
+	exec := script.NewExecRunner()
 
 	oldwd, tmpdir := MkTmpDir(t, "AutoRebase_IT_Test_2", "TestAutoRebase_IT_Test_2")
 	defer CleanTmpDir(t, oldwd, tmpdir, "TestAutoRebase_IT_Test_2")
@@ -54,15 +52,15 @@ func TestAutoRebase_IT_Test_2(t *testing.T) {
 		t.Fatal("test setup failed")
 	}
 
-	ctx := grs.NewAppContextWithRunner(exec.Runner())
-	repo := status.NewRepo("")
-	repo.Dir = status.DIR_VALID
+	ctx := shexec.NewAppContextWithRunner(exec.Runner())
+	repo := script.NewRepo("")
+	repo.Dir = script.DIR_VALID
 	s := script.NewScript(ctx, repo)
 	s.Fetch()
 	s.AutoRebase()
 	s.GetRepoStatus()
 
-	if repo.Branch != status.BRANCH_AHEAD {
+	if repo.Branch != script.BRANCH_AHEAD {
 		t.Fatalf("expected BRANCH_UPTODATE, but was %v\n", repo.Branch)
 	}
 }
@@ -77,7 +75,7 @@ a--b---c---f  @{UPSTREAM} origin/master
     g---h     cloned_repo/master (g has a conflict with commit d)
 */
 func TestAutoRebase_IT_Test_3(t *testing.T) {
-	exec := gittest.NewExecRunner()
+	exec := script.NewExecRunner()
 
 	oldwd, tmpdir := MkTmpDir(t, "AutoRebase_IT_Test_3", "TestAutoRebase_IT_Test_3")
 	defer CleanTmpDir(t, oldwd, tmpdir, "TestAutoRebase_IT_Test_3")
@@ -116,14 +114,14 @@ func TestAutoRebase_IT_Test_3(t *testing.T) {
 		t.Fatal("test setup failed", exec.Err())
 	}
 
-	ctx := grs.NewAppContextWithRunner(exec.Runner())
-	repo := status.NewRepo("")
-	repo.Dir = status.DIR_VALID
+	ctx := shexec.NewAppContextWithRunner(exec.Runner())
+	repo := script.NewRepo("")
+	repo.Dir = script.DIR_VALID
 	s := script.NewScript(ctx, repo)
 	s.Fetch()
 	s.AutoRebase()
 	s.GetRepoStatus()
-	if repo.Branch != status.BRANCH_DIVERGED {
+	if repo.Branch != script.BRANCH_DIVERGED {
 		t.Fatalf("expected BRANCH_DIVERGED, but was %v\n", repo.Branch)
 	}
 }

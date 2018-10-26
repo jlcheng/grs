@@ -1,18 +1,15 @@
 package script
 
-import (
-	"jcheng/grs"
-	"jcheng/grs/status"
-)
+import "jcheng/grs/shexec"
 
 // AutoFFMerge runs `git merge --ff-only...` when the branch is behind and unmodified
 func (s *Script) AutoFFMerge() bool {
 	repo := s.repo
 	ctx := s.ctx
 	if s.err != nil ||
-		repo.Dir != status.DIR_VALID ||
-		repo.Branch != status.BRANCH_BEHIND ||
-		repo.Index != status.INDEX_UNMODIFIED {
+		repo.Dir != DIR_VALID ||
+		repo.Branch != BRANCH_BEHIND ||
+		repo.Index != INDEX_UNMODIFIED {
 		return false
 	}
 
@@ -22,7 +19,7 @@ func (s *Script) AutoFFMerge() bool {
 	var out []byte
 	var err error
 	if out, err = command.CombinedOutput(); err != nil {
-		grs.Debug("git merge failed: %v\n%v\n", err, string(out))
+		shexec.Debug("git merge failed: %v\n%v\n", err, string(out))
 		return false
 	}
 	return true

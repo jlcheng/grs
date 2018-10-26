@@ -1,18 +1,17 @@
 package script
 
 import (
-	"jcheng/grs"
-	"jcheng/grs/status"
+	"jcheng/grs/shexec"
 )
 
 // SyncController provides a struct that can check and report on status of a collection of repositories
 type SyncController struct {
-	repos []status.Repo   // a set of repositories to check and report on
-	ctx   *grs.AppContext // the application context, e.g., dependencies
-	gui   AnsiGUI         // notifies the display subsystem to re-render the UI
+	repos []Repo             // a set of repositories to check and report on
+	ctx   *shexec.AppContext // the application context, e.g., dependencies
+	gui   AnsiGUI            // notifies the display subsystem to re-render the UI
 }
 
-func NewSyncController(repos []status.Repo, ctx *grs.AppContext, gui AnsiGUI) SyncController {
+func NewSyncController(repos []Repo, ctx *shexec.AppContext, gui AnsiGUI) SyncController {
 	return SyncController{
 		repos: repos,
 		ctx:   ctx,
@@ -30,9 +29,9 @@ func (d *SyncController) runIteration() {
 		s.GetIndexStatus()
 
 		switch repo.Branch {
-		case status.BRANCH_BEHIND:
+		case BRANCH_BEHIND:
 			s.AutoFFMerge()
-		case status.BRANCH_DIVERGED:
+		case BRANCH_DIVERGED:
 			s.AutoRebase()
 		}
 

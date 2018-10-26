@@ -1,13 +1,10 @@
 package script
 
-import (
-	"jcheng/grs"
-	"jcheng/grs/status"
-)
+import "jcheng/grs/shexec"
 
 // Fetch runs `git fetch`.
 func (s *Script) Fetch() {
-	if s.err != nil || s.repo.Dir != status.DIR_VALID {
+	if s.err != nil || s.repo.Dir != DIR_VALID {
 		return
 	}
 
@@ -16,8 +13,8 @@ func (s *Script) Fetch() {
 	command := s.ctx.CommandRunner.Command(git, "fetch")
 	if out, err := command.CombinedOutput(); err != nil {
 		// fetch may have failed for common reasons, such as not adding yourxk ssh key to the agent
-		grs.Debug("git fetch failed: %v\n%v", err, string(out))
+		shexec.Debug("git fetch failed: %v\n%v", err, string(out))
 		return
 	}
-	grs.Debug("git fetch ok: %v", s.repo.Path)
+	shexec.Debug("git fetch ok: %v", s.repo.Path)
 }

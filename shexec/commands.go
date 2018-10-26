@@ -1,4 +1,4 @@
-package grs
+package shexec
 
 import (
 	"os/exec"

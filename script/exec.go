@@ -1,9 +1,9 @@
-package gittest
+package script
 
 import (
 	"errors"
 	"fmt"
-	"jcheng/grs"
+	"jcheng/grs/shexec"
 	"os"
 )
 
@@ -12,7 +12,7 @@ import (
 type ExecRunner struct {
 	err       error
 	git       string
-	runner    *grs.ExecRunner
+	runner    *shexec.ExecRunner
 	debugExec bool
 }
 
@@ -22,7 +22,7 @@ func NewExecRunner() *ExecRunner {
 	return &ExecRunner{
 		err:       nil,
 		git:       ResolveGit(),
-		runner:    &grs.ExecRunner{},
+		runner:    &shexec.ExecRunner{},
 		debugExec: debugExec,
 	}
 }
@@ -35,7 +35,7 @@ func (s *ExecRunner) Err() error {
 	return s.err
 }
 
-func (s *ExecRunner) Runner() *grs.ExecRunner {
+func (s *ExecRunner) Runner() *shexec.ExecRunner {
 	return s.runner
 }
 

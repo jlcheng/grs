@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"jcheng/grs"
+	"jcheng/grs/shexec"
 	"jcheng/grs/script"
 	"os"
 	"time"
@@ -19,11 +19,11 @@ type Args struct {
 
 func RunCli(args Args) {
 	if args.verbose {
-		grs.SetLogLevel(grs.DEBUG)
+		shexec.SetLogLevel(shexec.DEBUG)
 	}
 
-	ctx := grs.NewAppContextWithRunner(&grs.ExecRunner{})
-	repos := grs.ReposFromStringSlice(args.repos)
+	ctx := shexec.NewAppContextWithRunner(&shexec.ExecRunner{})
+	repos := script.ReposFromStringSlice(args.repos)
 	if len(repos) == 0 {
 		fmt.Println("repos not specified")
 		os.Exit(1)

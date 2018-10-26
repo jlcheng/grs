@@ -3,8 +3,7 @@ package script
 import (
 	"errors"
 	"fmt"
-	"jcheng/grs"
-	"jcheng/grs/status"
+	"jcheng/grs/shexec"
 	"strconv"
 	"strings"
 )
@@ -13,50 +12,50 @@ import (
 func (s *Script) GetRepoStatus() {
 	repo := s.repo
 	ctx := s.ctx
-	if s.err != nil || repo.Dir != status.DIR_VALID {
+	if s.err != nil || repo.Dir != DIR_VALID {
 		return
 	}
 
 	git := ctx.GetGitExec()
-	var command grs.Command
+	var command shexec.Command
 	var out []byte
 	var err error
 
 	command = ctx.CommandRunner.Command(git, "rev-parse", "@{upstream}")
 	if out, err = command.CombinedOutput(); err != nil {
-		grs.Debug("GetRepoStatus: no upstream detected. %s, %s", err, string(out))
-		repo.Branch = status.BRANCH_UNTRACKED
+		shexec.Debug("GetRepoStatus: no upstream detected. %s, %s", err, string(out))
+		repo.Branch = BRANCH_UNTRACKED
 		return
 	}
 
 	command = ctx.CommandRunner.Command(git, "rev-list", "--left-right", "--count", "@{upstream}...HEAD")
 	if out, err = command.CombinedOutput(); err != nil {
-		grs.Debug("rev-list failed: %v\n%v", err, string(out))
-		repo.Dir = status.DIR_INVALID
+		shexec.Debug("rev-list failed: %v\n%v", err, string(out))
+		repo.Dir = DIR_INVALID
 		return
 	}
 	diff, err := parseRevList(out)
 	if err != nil {
-		grs.Info("cannot parse `git rev-list...` output: %q", string(out))
-		repo.Dir = status.DIR_INVALID
+		shexec.Debug("cannot parse `git rev-list...` output: %q", string(out))
+		repo.Dir = DIR_INVALID
 		return
 	}
 
-	grs.Debug("CMD: git rev-list --left-right --count @{upstream}...HEAD")
+	shexec.Debug("CMD: git rev-list --left-right --count @{upstream}...HEAD")
 	if diff.remote == 0 && diff.local == 0 {
-		repo.Branch = status.BRANCH_UPTODATE
+		repo.Branch = BRANCH_UPTODATE
 		return
 	}
 	if diff.remote > 0 && diff.local == 0 {
-		repo.Branch = status.BRANCH_BEHIND
+		repo.Branch = BRANCH_BEHIND
 		return
 	}
 	if diff.remote == 0 && diff.local > 0 {
-		repo.Branch = status.BRANCH_AHEAD
+		repo.Branch = BRANCH_AHEAD
 		return
 	}
 	if diff.remote > 0 && diff.local > 0 {
-		repo.Branch = status.BRANCH_DIVERGED
+		repo.Branch = BRANCH_DIVERGED
 		return
 	}
 	return

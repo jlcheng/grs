@@ -2,14 +2,14 @@ package test
 
 import (
 	"errors"
-	"jcheng/grs"
+	"jcheng/grs/shexec"
 	"regexp"
 	"strings"
 )
 
 type clist struct {
 	pattern  *regexp.Regexp
-	commands []grs.Command
+	commands []shexec.Command
 }
 
 // CommandHelper allows one to easily mock a CommandRunner interface. Useful when you wan to return the same output
@@ -22,7 +22,7 @@ func (m *CommandHelper) CombinedOutput() ([]byte, error) {
 	return m.f()
 }
 
-func NewCommandHelper(bytes []byte, err error) grs.Command {
+func NewCommandHelper(bytes []byte, err error) shexec.Command {
 	f := func() ([]byte, error) {
 		return bytes, err
 	}
@@ -32,39 +32,39 @@ func NewCommandHelper(bytes []byte, err error) grs.Command {
 var _EMPTY_BYTES = []byte("")
 
 // Error is a convenience function for mocking common errors
-func Error(msg string) grs.Command {
+func Error(msg string) shexec.Command {
 	return NewCommandHelper(_EMPTY_BYTES, errors.New(msg))
 }
 
-func Ok(msg string) grs.Command {
+func Ok(msg string) shexec.Command {
 	return NewCommandHelper([]byte(msg), nil)
 }
 
 // MockRunner holds a sequence of Commands, mapped to their command-line text. When the user specifies a command text,
 // it returns the corresponding command and advances to the next command in memory.
 type MockRunner struct {
-	_commands []grs.Command
+	_commands []shexec.Command
 	commands  map[string]*clist
 	history   []string
 }
 
-func (m *MockRunner) Add(cmd grs.Command) {
+func (m *MockRunner) Add(cmd shexec.Command) {
 	m._commands = append(m._commands, cmd)
 }
 
-func (m *MockRunner) AddMap(s string, cmd grs.Command) {
+func (m *MockRunner) AddMap(s string, cmd shexec.Command) {
 	v, ok := m.commands[s]
 	if !ok {
 		v = &clist{
 			pattern:  regexp.MustCompile(s),
-			commands: make([]grs.Command, 0),
+			commands: make([]shexec.Command, 0),
 		}
 	}
 	v.commands = append(v.commands, cmd)
 	m.commands[s] = v
 }
 
-func (m *MockRunner) Command(name string, arg ...string) grs.Command {
+func (m *MockRunner) Command(name string, arg ...string) shexec.Command {
 	full := strings.Join(append([]string{name}, arg...), " ")
 	m.history = append(m.history, full)
 
@@ -105,7 +105,7 @@ func (m *MockRunner) HistoryCount(command string) int {
 func NewMockRunner() *MockRunner {
 
 	return &MockRunner{
-		_commands: make([]grs.Command, 0),
+		_commands: make([]shexec.Command, 0),
 		commands:  make(map[string]*clist),
 		history:   make([]string, 0),
 	}

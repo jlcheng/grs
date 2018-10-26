@@ -3,7 +3,7 @@ package test
 import (
 	"errors"
 	"fmt"
-	"jcheng/grs"
+	"jcheng/grs/shexec"
 	"testing"
 )
 
@@ -123,7 +123,7 @@ func TestMockCommand_HistoryCount(t *testing.T) {
 
 // Fails if ExecRunner does not implement CommandRunner
 func TestExecRunner(t *testing.T) {
-	var runner grs.CommandRunner
-	runner = &grs.ExecRunner{}
+	var runner shexec.CommandRunner
+	runner = &shexec.ExecRunner{}
 	_ = runner
 }
