@@ -7,22 +7,23 @@ import (
 
 // SyncController provides a struct that can check and report on status of a collection of repositories
 type SyncController struct {
-	repos   []status.Repo   // a set of repositories to check and report on
-	ctx     *grs.AppContext // the application context, e.g., dependencies
-	display chan<- bool     // notifies the display subsystem to re-render the UI
+	repos []status.Repo   // a set of repositories to check and report on
+	ctx   *grs.AppContext // the application context, e.g., dependencies
+	gui   AnsiGUI         // notifies the display subsystem to re-render the UI
 }
 
-func NewSyncController(repos []status.Repo, ctx *grs.AppContext, display chan<- bool) SyncController {
+func NewSyncController(repos []status.Repo, ctx *grs.AppContext, gui AnsiGUI) SyncController {
 	return SyncController{
-		repos:   repos,
-		ctx:     ctx,
-		display: display,
+		repos: repos,
+		ctx:   ctx,
+		gui:   gui,
 	}
 }
 
 func (d *SyncController) runIteration() {
-	for _, repo := range d.repos {
-		s := NewScript(d.ctx, &repo)
+	for i, _ := range d.repos {
+		repo := &d.repos[i]
+		s := NewScript(d.ctx, repo)
 		s.BeforeScript()
 		s.Fetch()
 		s.GetRepoStatus()
@@ -34,14 +35,11 @@ func (d *SyncController) runIteration() {
 		case status.BRANCH_DIVERGED:
 			s.AutoRebase()
 		}
+
 	}
 }
 
 func (d *SyncController) Run() {
 	d.runIteration()
-	// non-blocking scheduling of a display event
-	select {
-	case d.display <- true:
-	default:
-	}
+	d.gui.Run(d.repos)
 }
