@@ -1,25 +1,27 @@
 package script
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"jcheng/grs/shexec"
 	"os"
+	"os/exec"
 )
 
-// An TestExecRunner is a stateful utility that refuses to execute further Commands once an error occurs.
+// An ErrorExecRunner is a stateful utility that refuses to execute further Commands once an error occurs.
 // It applies the Scanner.Err() technique as mentioned in https://blog.golang.org/errors-are-values
-type ExecRunner struct {
+type ErrorExecRunner struct {
 	err       error
 	git       string
 	runner    *shexec.ExecRunner
 	debugExec bool
 }
 
-func NewExecRunner() *ExecRunner {
+func NewExecRunner() *ErrorExecRunner {
 	_, debugExec := os.LookupEnv("GRS_TEST_EXEC_DEBUG")
 
-	return &ExecRunner{
+	return &ErrorExecRunner{
 		err:       nil,
 		git:       ResolveGit(),
 		runner:    &shexec.ExecRunner{},
@@ -27,19 +29,19 @@ func NewExecRunner() *ExecRunner {
 	}
 }
 
-func (s *ExecRunner) Git() string {
+func (s *ErrorExecRunner) Git() string {
 	return s.git
 }
 
-func (s *ExecRunner) Err() error {
+func (s *ErrorExecRunner) Err() error {
 	return s.err
 }
 
-func (s *ExecRunner) Runner() *shexec.ExecRunner {
+func (s *ErrorExecRunner) ExecRunner() *shexec.ExecRunner {
 	return s.runner
 }
 
-func (s *ExecRunner) Mkdir(subdir string) bool {
+func (s *ErrorExecRunner) Mkdir(subdir string) bool {
 	if s.err != nil {
 		return false
 	}
@@ -50,7 +52,7 @@ func (s *ExecRunner) Mkdir(subdir string) bool {
 	return true
 }
 
-func (s *ExecRunner) Chdir(dir string) bool {
+func (s *ErrorExecRunner) Chdir(dir string) bool {
 	if s.err != nil {
 		return false
 	}
@@ -61,7 +63,7 @@ func (s *ExecRunner) Chdir(dir string) bool {
 	return true
 }
 
-func (s *ExecRunner) Touch(file string) bool {
+func (s *ErrorExecRunner) Touch(file string) bool {
 	if s.err != nil {
 		return false
 	}
@@ -78,7 +80,7 @@ func (s *ExecRunner) Touch(file string) bool {
 	return true
 }
 
-func (s *ExecRunner) SetContents(file, contents string) (ok bool) {
+func (s *ErrorExecRunner) SetContents(file, contents string) (ok bool) {
 	if s.err != nil {
 		return false
 	}
@@ -103,7 +105,7 @@ func (s *ExecRunner) SetContents(file, contents string) (ok bool) {
 	return ok
 }
 
-func (s *ExecRunner) Exec(first string, arg ...string) bool {
+func (s *ErrorExecRunner) Exec(first string, arg ...string) bool {
 	if s.err != nil {
 		return false
 	}
@@ -118,11 +120,11 @@ func (s *ExecRunner) Exec(first string, arg ...string) bool {
 	return true
 }
 
-func (s *ExecRunner) Add(path string) bool {
+func (s *ErrorExecRunner) Add(path string) bool {
 	return s.Exec(s.git, "add", path)
 }
 
-func (s *ExecRunner) Commit(msg string) bool {
+func (s *ErrorExecRunner) Commit(msg string) bool {
 	if s.err != nil {
 		return false
 	}
@@ -130,7 +132,7 @@ func (s *ExecRunner) Commit(msg string) bool {
 	return s.Exec(git, "commit", "-m", msg)
 }
 
-func (s *ExecRunner) TouchAndCommit(file, msg string) bool {
+func (s *ErrorExecRunner) TouchAndCommit(file, msg string) bool {
 	return s.Touch(file) &&
 		s.Add(file) &&
 		s.Commit(msg)
@@ -143,3 +145,13 @@ func ResolveGit() string {
 	}
 	return git
 }
+
+type Result struct {
+	delegate *exec.Cmd
+	Stdout   string
+}
+
+func (cmd *Result) String() string {
+	return cmd.delegate.Stdout.(*bytes.Buffer).String()
+}
+

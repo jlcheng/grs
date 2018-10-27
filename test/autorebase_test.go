@@ -52,7 +52,7 @@ func TestAutoRebase_IT_Test_2(t *testing.T) {
 		t.Fatal("test setup failed")
 	}
 
-	ctx := shexec.NewAppContextWithRunner(exec.Runner())
+	ctx := shexec.NewAppContextWithRunner(exec.ExecRunner())
 	repo := script.NewRepo("")
 	repo.Dir = script.DIR_VALID
 	s := script.NewScript(ctx, repo)
@@ -114,7 +114,7 @@ func TestAutoRebase_IT_Test_3(t *testing.T) {
 		t.Fatal("test setup failed", exec.Err())
 	}
 
-	ctx := shexec.NewAppContextWithRunner(exec.Runner())
+	ctx := shexec.NewAppContextWithRunner(exec.ExecRunner())
 	repo := script.NewRepo("")
 	repo.Dir = script.DIR_VALID
 	s := script.NewScript(ctx, repo)

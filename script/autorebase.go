@@ -6,11 +6,13 @@ import (
 	"strings"
 )
 
+// AutoRebase rebases the current branch one change at a time and stops at the first error it encounters. The intent
+// is that the current branch will now be as similar to @{upstream} as possible.
 func (s *Script) AutoRebase() error {
 	ctx := s.ctx
 	runner := s.ctx.CommandRunner
 
-	//  2. Identify merge-base
+	//  1. Identify merge-base
 	git := ctx.GetGitExec()
 	p := "@{upstream}"
 	cmd := runner.Command(git, "merge-base", "HEAD", p)
@@ -20,19 +22,22 @@ func (s *Script) AutoRebase() error {
 	}
 	mergeBase := strings.TrimSpace(string(bytes))
 
-	//  3. Identify the graph of child commits from merge-base to HEAD
+	//  2. Identify the graph of child commits from merge-base to HEAD
 	cmd = runner.Command(git, "rev-list", p, "^"+mergeBase)
 	bytes, err = cmd.CombinedOutput()
 	if err != nil {
 		return errors.New(fmt.Sprintf("%v %v", err, string(bytes)))
 	}
 	revlist := strings.Split(strings.TrimSpace(string(bytes)), "\n")
-	//  5. Rebase current branch against each child in lineage
-	for i := len(revlist) - 1; i >= 0; i-- {
+	//  3. Rebase current branch against each child in lineage
+	var rebaseErr error
+	for i := len(revlist) - 1; i >= 0 && rebaseErr == nil; i-- {
 		commit := revlist[i]
 		cmd = runner.Command(git, "rebase", commit)
 		_, err1 := cmd.CombinedOutput()
 		if err1 != nil {
+			//  4. Stop when conflict is detected
+			rebaseErr = err1
 			cmd = runner.Command(git, "rebase", "--abort")
 			bytes2, err2 := cmd.CombinedOutput()
 			if err != nil {
@@ -41,6 +46,5 @@ func (s *Script) AutoRebase() error {
 		}
 	}
 
-	//  6. Stop when conflict is detected
-	return nil
+	return rebaseErr
 }
