@@ -28,7 +28,7 @@ var (
 	daemon  bool    // runs in daemon mode
 	refresh int     // how often to check for changes, in seconds
 	forceMerge bool // ignore access time check when auto-merging
-	repos []string    // colon separated list of repositories
+	repo string     // a single repo to process
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -45,6 +45,9 @@ var rootCmd = &cobra.Command{
 			refresh: viper.GetInt("refresh"),
 			forceMerge: forceMerge,
 			repos: viper.GetStringSlice("repos"),
+		}
+		if repo != "" {
+			args.repos = []string{repo}
 		}
 		RunCli(args)
 	},
@@ -66,9 +69,8 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&daemon, "daemon", "d", false, "daemon mode")
 	rootCmd.PersistentFlags().IntVarP(&refresh, "refresh", "t", 600, "how often to check for changes, in seconds")
 	rootCmd.PersistentFlags().BoolVarP(&forceMerge, "force", "m", false, "ignore access time check when auto-merging")
-	rootCmd.PersistentFlags().StringArrayVarP(&repos, "repos", "r", make([]string,0), "colon separated list of repositories")
+	rootCmd.PersistentFlags().StringVarP(&repo, "repo", "r", "", "the repository to process")
 
-	viper.BindPFlag("repos", rootCmd.PersistentFlags().Lookup("repos"))
 	viper.BindPFlag("refresh", rootCmd.PersistentFlags().Lookup("refresh"))
 }
 
