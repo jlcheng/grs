@@ -39,16 +39,7 @@ var rootCmd = &cobra.Command{
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, _ []string) {
-		var args = Args {
-			verbose: verbose,
-			daemon: daemon,
-			refresh: viper.GetInt("refresh"),
-			forceMerge: forceMerge,
-			repos: viper.GetStringSlice("repos"),
-		}
-		if repo != "" {
-			args.repos = []string{repo}
-		}
+		args := CliParse(verbose, daemon, refresh, forceMerge, repo)
 		RunCli(args)
 	},
 }

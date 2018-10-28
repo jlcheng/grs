@@ -2,7 +2,6 @@ package test
 
 import (
 	"fmt"
-	"jcheng/grs/script"
 	"os"
 	"os/exec"
 	"strings"
@@ -56,26 +55,5 @@ func TestFail(t *testing.T) {
 		}
 	} else {
 		t.Errorf("false: want exit status 1, got exit status 0 with: %v", string(out))
-	}
-}
-
-func TestReposFromString(t *testing.T) {
-	var r []script.Repo
-
-	r = script.ReposFromString("")
-	if r[0].Path != "" {
-		t.Error("TestReposFromgString")
-	}
-
-	r = script.ReposFromString("foo")
-	if r[0].Path != "foo" {
-		t.Error("TestReposFromString")
-	}
-
-	path0 := "/foo bar/fib"
-	path1 := "file://fizz/fuzz"
-	r = script.ReposFromString(path0 + string(os.PathListSeparator) + path1)
-	if r[0].Path != path0 && r[1].Path != path1 {
-		t.Error("TestReposFromString")
 	}
 }

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/spf13/viper"
 	"jcheng/grs/shexec"
 	"jcheng/grs/script"
 	"os"
@@ -15,6 +16,25 @@ type Args struct {
 	daemon     bool
 	refresh    int
 	forceMerge bool
+	repoConf   map[string]interface{}
+}
+
+func CliParse(verbose bool, daemon bool, refresh int, forceMerge bool, repo string) Args {
+	// command line arg takes precedence over repos
+	repos := viper.GetStringSlice("repos")
+	if repo != "" {
+		repos = []string{repo}
+	}
+
+	var args = Args{
+		verbose:    verbose,
+		daemon:     daemon,
+		refresh:    viper.GetInt("refresh"),
+		forceMerge: forceMerge,
+		repos:      repos,
+		repoConf:   viper.GetStringMap("repo_config"),
+	}
+	return args
 }
 
 func RunCli(args Args) {
@@ -24,6 +44,7 @@ func RunCli(args Args) {
 
 	ctx := shexec.NewAppContextWithRunner(&shexec.ExecRunner{})
 	repos := script.ReposFromStringSlice(args.repos)
+
 	if len(repos) == 0 {
 		fmt.Println("repos not specified")
 		os.Exit(1)

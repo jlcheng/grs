@@ -4,7 +4,6 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 )
 
@@ -22,16 +21,6 @@ func NewRepo(path string) *Repo {
 		Branch: BRANCH_UNKNOWN,
 		Index:  INDEX_UNKNOWN,
 	}
-}
-
-
-func ReposFromString(input string) []Repo {
-	tokens := strings.Split(input, string(os.PathListSeparator))
-	r := make([]Repo, len(tokens))
-	for idx, elem := range tokens {
-		r[idx] = Repo{Path: elem}
-	}
-	return r
 }
 
 func ReposFromStringSlice(input []string) []Repo {
