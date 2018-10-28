@@ -7,13 +7,13 @@ import (
 
 // TestAutoFFMerge_Fail verifies that merge --ff-only is not invoked
 func TestAutoFFMerge_Noop(t *testing.T) {
-	verifiedGitNotCalled(t, DIR_INVALID, BRANCH_BEHIND, INDEX_UNMODIFIED)
+	verify_AutoFFMerge_NoGitExec(t, DIR_INVALID, BRANCH_BEHIND, INDEX_UNMODIFIED)
 
-	verifiedGitNotCalled(t, DIR_VALID, BRANCH_AHEAD, INDEX_UNMODIFIED)
-	verifiedGitNotCalled(t, DIR_VALID, BRANCH_UNKNOWN, INDEX_UNMODIFIED)
+	verify_AutoFFMerge_NoGitExec(t, DIR_VALID, BRANCH_AHEAD, INDEX_UNMODIFIED)
+	verify_AutoFFMerge_NoGitExec(t, DIR_VALID, BRANCH_UNKNOWN, INDEX_UNMODIFIED)
 
-	verifiedGitNotCalled(t, DIR_VALID, BRANCH_BEHIND, INDEX_UNKNOWN)
-	verifiedGitNotCalled(t, DIR_VALID, BRANCH_BEHIND, INDEX_MODIFIED)
+	verify_AutoFFMerge_NoGitExec(t, DIR_VALID, BRANCH_BEHIND, INDEX_UNKNOWN)
+	verify_AutoFFMerge_NoGitExec(t, DIR_VALID, BRANCH_BEHIND, INDEX_MODIFIED)
 }
 
 func TestAutoFFMerge_Ok(t *testing.T) {
@@ -33,7 +33,7 @@ func TestAutoFFMerge_Ok(t *testing.T) {
 	}
 }
 
-func verifiedGitNotCalled(t *testing.T, dir Dirstat, branch Branchstat, index Indexstat) {
+func verify_AutoFFMerge_NoGitExec(t *testing.T, dir Dirstat, branch Branchstat, index Indexstat) {
 	runner := shexec.NewMockRunner()
 	runner.AddMap("git", shexec.Ok(""))
 
