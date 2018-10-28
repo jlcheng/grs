@@ -1,10 +1,9 @@
-package cmd
+package script
 
 import (
 	"fmt"
 	"github.com/spf13/viper"
 	"jcheng/grs/shexec"
-	"jcheng/grs/script"
 	"os"
 	"time"
 )
@@ -16,7 +15,7 @@ type Args struct {
 	daemon     bool
 	refresh    int
 	forceMerge bool
-	repoConf   map[string]interface{}
+	repoCfg    map[string]interface{}
 }
 
 func CliParse(verbose bool, daemon bool, refresh int, forceMerge bool, repo string) Args {
@@ -32,7 +31,7 @@ func CliParse(verbose bool, daemon bool, refresh int, forceMerge bool, repo stri
 		refresh:    viper.GetInt("refresh"),
 		forceMerge: forceMerge,
 		repos:      repos,
-		repoConf:   viper.GetStringMap("repo_config"),
+		repoCfg:    viper.GetStringMap("repo_config"),
 	}
 	return args
 }
@@ -43,15 +42,15 @@ func RunCli(args Args) {
 	}
 
 	ctx := shexec.NewAppContextWithRunner(&shexec.ExecRunner{})
-	repos := script.ReposFromStringSlice(args.repos)
+	repos := ReposFromStringSlice(args.repos, args.repoCfg)
 
 	if len(repos) == 0 {
 		fmt.Println("repos not specified")
 		os.Exit(1)
 	}
 
-	gui := script.NewGUI(args.daemon)
-	syncController := script.NewSyncController(repos, ctx, gui)
+	gui := NewGUI(args.daemon)
+	syncController := NewSyncController(repos, ctx, gui)
 
 	// run at least once
 	syncController.Run()
@@ -67,4 +66,46 @@ func RunCli(args Args) {
 			}
 		}
 	}
+}
+
+
+// TODO: JCHENG unit test improvements
+func ReposFromStringSlice(repos []string, repoCfg map[string]interface{}) []Repo {
+	r := make([]Repo, len(repos))
+	for idx, repoPath := range repos {
+		r[idx] = Repo{Path: repoPath}
+		repo := &r[idx]
+		cfg, ok := GetStringMap(repoCfg, repoPath)
+		if !ok {
+			continue
+		}
+		if value, ok := GetBool(cfg, "push_allowed"); ok {
+			repo.PushAllowed = value
+		}
+	}
+	return r
+}
+
+func GetBool(stringMap map[string]interface{}, key string) (bool, bool) {
+	value, ok := stringMap[key]
+	if !ok {
+		return false, false
+	}
+	boolv, ok := value.(bool)
+	if !ok {
+		return false, false
+	}
+	return boolv, true
+}
+
+func GetStringMap(stringMap map[string]interface{}, key string) (map[string]interface{}, bool) {
+	value, ok := stringMap[key]
+	if !ok {
+		return nil, false
+	}
+	mapv, ok := value.(map[string]interface{})
+	if !ok {
+		return nil, false
+	}
+	return mapv, true
 }

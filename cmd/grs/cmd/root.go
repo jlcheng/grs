@@ -19,6 +19,7 @@ import (
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"jcheng/grs/script"
 	"os"
 )
 
@@ -39,8 +40,8 @@ var rootCmd = &cobra.Command{
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, _ []string) {
-		args := CliParse(verbose, daemon, refresh, forceMerge, repo)
-		RunCli(args)
+		args := script.CliParse(verbose, daemon, refresh, forceMerge, repo)
+		script.RunCli(args)
 	},
 }
 

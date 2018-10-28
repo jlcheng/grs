@@ -8,10 +8,11 @@ import (
 )
 
 type Repo struct {
-	Path   string
-	Dir    Dirstat
-	Branch Branchstat
-	Index  Indexstat
+	Path        string
+	Dir         Dirstat
+	Branch      Branchstat
+	Index       Indexstat
+	PushAllowed bool
 }
 
 func NewRepo(path string) *Repo {
@@ -21,14 +22,6 @@ func NewRepo(path string) *Repo {
 		Branch: BRANCH_UNKNOWN,
 		Index:  INDEX_UNKNOWN,
 	}
-}
-
-func ReposFromStringSlice(input []string) []Repo {
-	r := make([]Repo, len(input))
-	for idx, elem := range input {
-		r[idx] = Repo{Path: elem}
-	}
-	return r
 }
 
 var lastActivityFiles = []string{"HEAD", "COMMIT_EDITMSG", "ORIG_HEAD", "index", "config"}
