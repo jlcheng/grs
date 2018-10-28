@@ -33,6 +33,8 @@ func (d *SyncController) runIteration() {
 			s.AutoFFMerge()
 		case BRANCH_DIVERGED:
 			s.AutoRebase()
+		case BRANCH_AHEAD:
+			s.AutoPush()
 		}
 
 	}
