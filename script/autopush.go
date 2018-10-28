@@ -9,14 +9,18 @@ import (
 // AutoPush runs `git push...` when the branch is ahead. It also autocommits changes.
 func (s *Script) AutoPush() bool {
 	repo := s.repo
+	shexec.Debug("git auto-push ok: %v", repo)
 	if s.err != nil ||
 		repo.Dir != DIR_VALID ||
-		repo.Branch != BRANCH_AHEAD ||
 		repo.Index == INDEX_UNKNOWN ||
 		!repo.PushAllowed {
 		return false
 	}
+	if !(repo.Branch == BRANCH_AHEAD || repo.Branch == BRANCH_UPTODATE) {
+		return false
+	}
 
+	shexec.Debug("git auto-push ok: %v", repo)
 	ctx := s.ctx
 	git := ctx.GetGitExec()
 	commitMsg := AutoPushGenCommitMsg(NewStdClock())
