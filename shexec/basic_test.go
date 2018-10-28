@@ -1,4 +1,4 @@
-package test
+package shexec
 
 import (
 	"fmt"

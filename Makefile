@@ -17,7 +17,7 @@ build: $(OUT_PRIME)
 
 .PHONY: test
 test: 
-	$(GOTEST) -v jcheng/grs/script jcheng/grs/test
+	$(GOTEST) -v jcheng/grs/script jcheng/grs/shexec
 
 .PHONY: clean
 clean: 

@@ -1,8 +1,7 @@
-package test
+package script
 
 import (
 	"io/ioutil"
-	"jcheng/grs/script"
 	"jcheng/grs/shexec"
 	"os"
 	"testing"
@@ -18,7 +17,7 @@ a--b---c---f  @{UPSTREAM} origin/master
     g---h     cloned_repo/master
 */
 func TestAutoRebase_IT_Test_2(t *testing.T) {
-	exec := script.NewExecRunner()
+	exec := NewExecRunner()
 
 	oldwd, tmpdir := MkTmpDir(t, "AutoRebase_IT_Test_2", "TestAutoRebase_IT_Test_2")
 	defer CleanTmpDir(t, oldwd, tmpdir, "TestAutoRebase_IT_Test_2")
@@ -53,14 +52,14 @@ func TestAutoRebase_IT_Test_2(t *testing.T) {
 	}
 
 	ctx := shexec.NewAppContextWithRunner(exec.ExecRunner())
-	repo := script.NewRepo("")
-	repo.Dir = script.DIR_VALID
-	s := script.NewScript(ctx, repo)
+	repo := NewRepo("")
+	repo.Dir = DIR_VALID
+	s := NewScript(ctx, repo)
 	s.Fetch()
 	s.AutoRebase()
 	s.GetRepoStatus()
 
-	if repo.Branch != script.BRANCH_AHEAD {
+	if repo.Branch != BRANCH_AHEAD {
 		t.Fatalf("expected BRANCH_UPTODATE, but was %v\n", repo.Branch)
 	}
 }
@@ -75,7 +74,7 @@ a--b---c---f  @{UPSTREAM} origin/master
     g---h     cloned_repo/master (g has a conflict with commit d)
 */
 func TestAutoRebase_IT_Test_3(t *testing.T) {
-	exec := script.NewExecRunner()
+	exec := NewExecRunner()
 
 	oldwd, tmpdir := MkTmpDir(t, "AutoRebase_IT_Test_3", "TestAutoRebase_IT_Test_3")
 	defer CleanTmpDir(t, oldwd, tmpdir, "TestAutoRebase_IT_Test_3")
@@ -115,13 +114,13 @@ func TestAutoRebase_IT_Test_3(t *testing.T) {
 	}
 
 	ctx := shexec.NewAppContextWithRunner(exec.ExecRunner())
-	repo := script.NewRepo("")
-	repo.Dir = script.DIR_VALID
-	s := script.NewScript(ctx, repo)
+	repo := NewRepo("")
+	repo.Dir = DIR_VALID
+	s := NewScript(ctx, repo)
 	s.Fetch()
 	s.AutoRebase()
 	s.GetRepoStatus()
-	if repo.Branch != script.BRANCH_DIVERGED {
+	if repo.Branch != BRANCH_DIVERGED {
 		t.Fatalf("expected BRANCH_DIVERGED, but was %v\n", repo.Branch)
 	}
 }
