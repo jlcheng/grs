@@ -9,7 +9,6 @@ import (
 // AutoPush runs `git push...` when the branch is ahead. It also autocommits changes.
 func (s *Script) AutoPush() bool {
 	repo := s.repo
-	shexec.Debug("git auto-push ok: %v", repo)
 	if s.err != nil ||
 		repo.Dir != DIR_VALID ||
 		repo.Index == INDEX_UNKNOWN ||
@@ -24,16 +23,24 @@ func (s *Script) AutoPush() bool {
 	ctx := s.ctx
 	git := ctx.GetGitExec()
 	commitMsg := AutoPushGenCommitMsg(NewStdClock())
-	command := ctx.CommandRunner.Command(git, "commit", "-m", commitMsg)
-	var out []byte
+		var out []byte
 	var err error
+	var command shexec.Command
 	if repo.Index == INDEX_MODIFIED {
+		command := ctx.CommandRunner.Command(git, "add", "-A")
+		if out, err = command.CombinedOutput(); err != nil {
+			shexec.Debug("git add failed. %v, %v", err, string(out))
+			return false
+		}
+
+		command = ctx.CommandRunner.Command(git, "commit", "-m", commitMsg)
 		if out, err = command.CombinedOutput(); err != nil {
 			shexec.Debug("git commit failed. commit-msg=%v\nerr-msg:%v\nout:%v", commitMsg, err, string(out))
 			return false
 		}
 		repo.Index = INDEX_UNMODIFIED
 	}
+
 
 	command = ctx.CommandRunner.Command(git, "push")
 	if out, err = command.CombinedOutput(); err != nil {

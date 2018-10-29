@@ -2,6 +2,7 @@ package script
 
 import (
 	"jcheng/grs/shexec"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -73,14 +74,60 @@ func verify_AutoPush_NoGitExec(t *testing.T, dir Dirstat, branch Branchstat, ind
 
 // == Integration tests that runs the git executable on a local disk == //
 /*
-commits *h and rebases g and h on top of f.
+commits *c and pushes it upstrea
 
-a--b---c---f  @{UPSTREAM} origin/master
- \  \     /
-  \  d---e    origin/branch_B
-   \
-    g---*h     cloned_repo/master
+After setup, before run
+A--B            source, @{UPSTREAM}, or origin/master
+    \
+     *modified  dest, or master
+
+After run, *modified turned into commit c and is pushed to @{UPSTREAM}
+
+A--B--C        source
+       \
+        C      dest
 */
-func TestAutoPush_IT_Test_2(t *testing.T) {
+func TestAutoPush_IT_Test_1(t *testing.T) {
+	const TEST_LABEL = "TestAutoPush_IT_Test_1"
 	// TODO JCHENG tedious work of writing out this test case :)
+	exec := NewExecRunner()
+
+	oldwd, tmpdir := MkTmpDir(t, TEST_LABEL, TEST_LABEL)
+	defer CleanTmpDir(t, oldwd, tmpdir, TEST_LABEL)
+	if err := os.Chdir(tmpdir); err != nil {
+		t.Fatal(err)
+	}
+
+	git := exec.Git()
+	exec.Mkdir("source")
+	exec.Chdir("source")
+	exec.Exec(git, "init", "--bare")
+	exec.Chdir("..")
+	exec.Exec(git, "clone", "source", "dest")
+
+	exec.Chdir("dest")
+	exec.TouchAndCommit(".gitignore", "Commit_A")
+	exec.TouchAndCommit("b.txt", "Commit_B")
+	exec.TouchAndCommit("git", "push")
+
+	if exec.Err() != nil {
+		t.Fatal("test setup failed", exec.Err())
+	}
+
+	exec.Touch("c.txt")
+
+	ctx := shexec.NewAppContextWithRunner(exec.ExecRunner())
+	repo := NewRepo("")
+	repo.Dir = DIR_VALID
+	repo.Branch = BRANCH_UPTODATE
+	repo.Index = INDEX_MODIFIED
+	repo.PushAllowed = true
+	s := NewScript(ctx, repo)
+	s.Fetch()
+	s.AutoPush()
+	s.GetRepoStatus()
+
+	if exec.Err() != nil {
+		t.Fatal("test failed", exec.Err())
+	}
 }
