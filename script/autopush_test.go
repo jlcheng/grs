@@ -33,7 +33,8 @@ func TestAutoPush_Noop(t *testing.T) {
 
 func TestAutoPush_Ok(t *testing.T) {
 	runner := shexec.NewMockRunner()
-	runner.AddMap("git commit", shexec.Ok(""))
+	runner.AddMap("git add -A", shexec.Ok(""))
+	runner.AddMap("git commit -m ", shexec.Ok(""))
 	runner.AddMap("git push", shexec.Ok(""))
 
 	ctx := shexec.NewAppContextWithRunner(runner)
