@@ -15,7 +15,7 @@ type Args struct {
 	daemon     bool
 	refresh    int
 	forceMerge bool
-	repoCfg    map[string]interface{}
+	repoCfgMap map[string]RepoConfig
 }
 
 func CliParse(verbose bool, daemon bool, refresh int, forceMerge bool, repo string) Args {
@@ -31,9 +31,39 @@ func CliParse(verbose bool, daemon bool, refresh int, forceMerge bool, repo stri
 		refresh:    viper.GetInt("refresh"),
 		forceMerge: forceMerge,
 		repos:      repos,
-		repoCfg:    viper.GetStringMap("repo_config"),
+		repoCfgMap: parseRepoConfigMap(viper.Get("repo_config")),
 	}
 	return args
+}
+
+func parseRepoConfigMap(obj interface{}) map[string]RepoConfig {
+	var ok bool
+	var sliceIfc []interface{}
+	retval := make(map[string]RepoConfig)
+	if sliceIfc, ok = obj.([]interface{}); !ok {
+		return retval
+	}
+
+	for _, ifc := range sliceIfc {
+		var ifcmap map[string]interface{}
+		if ifcmap, ok = ifc.(map[string]interface{}); !ok {
+			return retval
+		}
+		var repoPath string
+		var pushAllowed bool
+		if repoPath, ok = GetString(ifcmap, "id"); !ok {
+			continue
+		}
+		if pushAllowed, ok = GetBool(ifcmap, "push_allowed"); !ok {
+			continue
+		}
+		retval[repoPath] = RepoConfig{pushAllowed: pushAllowed}
+	}
+	return retval
+}
+
+type RepoConfig struct {
+	pushAllowed bool
 }
 
 func RunCli(args Args) {
@@ -42,7 +72,7 @@ func RunCli(args Args) {
 	}
 
 	ctx := shexec.NewAppContextWithRunner(&shexec.ExecRunner{})
-	repos := ReposFromStringSlice(args.repos, args.repoCfg)
+	repos := ReposFromStringSlice(args.repos, args.repoCfgMap)
 
 	if len(repos) == 0 {
 		fmt.Println("repos not specified")
@@ -70,18 +100,17 @@ func RunCli(args Args) {
 
 
 // TODO: JCHENG unit test improvements
-func ReposFromStringSlice(repos []string, repoCfg map[string]interface{}) []Repo {
+func ReposFromStringSlice(repos []string, repoCfg map[string]RepoConfig) []Repo {
 	r := make([]Repo, len(repos))
 	for idx, repoPath := range repos {
 		r[idx] = Repo{Path: repoPath}
 		repo := &r[idx]
-		cfg, ok := GetStringMap(repoCfg, repoPath)
+
+		config, ok := repoCfg[repoPath]
 		if !ok {
 			continue
 		}
-		if value, ok := GetBool(cfg, "push_allowed"); ok {
-			repo.PushAllowed = value
-		}
+		repo.PushAllowed = config.pushAllowed
 	}
 	return r
 }
@@ -98,14 +127,14 @@ func GetBool(stringMap map[string]interface{}, key string) (bool, bool) {
 	return boolv, true
 }
 
-func GetStringMap(stringMap map[string]interface{}, key string) (map[string]interface{}, bool) {
+func GetString(stringMap map[string]interface{}, key string) (string, bool) {
 	value, ok := stringMap[key]
 	if !ok {
-		return nil, false
+		return "", false
 	}
-	mapv, ok := value.(map[string]interface{})
+	stringv, ok := value.(string)
 	if !ok {
-		return nil, false
+		return "", false
 	}
-	return mapv, true
+	return stringv, true
 }

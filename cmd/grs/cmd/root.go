@@ -56,7 +56,7 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.grs.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.grs.toml)")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbosity")
 	rootCmd.PersistentFlags().BoolVarP(&daemon, "daemon", "d", false, "daemon mode")
 	rootCmd.PersistentFlags().IntVarP(&refresh, "refresh", "t", 600, "how often to check for changes, in seconds")
