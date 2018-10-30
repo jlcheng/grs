@@ -1,7 +1,6 @@
 package script
 
 import (
-	"errors"
 	"fmt"
 	"github.com/spf13/viper"
 	"jcheng/grs/shexec"
@@ -48,11 +47,10 @@ func parseRepoConfigMap(obj interface{}) map[string]RepoConfig {
 	if !ok {
 		return retval
 	}
-	repoConfigMap, err := ToRepoConfigMap(sliceStringMap)
+	retval, err := ToRepoConfigMap(sliceStringMap)
 	if err != nil {
-		retval = repoConfigMap
+		return make(map[string]RepoConfig)
 	}
-
 	return retval
 }
 
@@ -149,23 +147,18 @@ func ToSliceStringMap(input []interface{}) ([]map[string]interface{}, bool) {
 func ToRepoConfigMap(input []map[string]interface{}) (map[string]RepoConfig, error) {
 	var output = make(map[string]RepoConfig)
 	for i := 0; i < len(input); i++ {
+		var repoConfig = RepoConfig{}
+		var repoID string
 		elem := input[i]
-		mapVal, ok := elem["id"]
-		if !ok {
+		if tmp, ok := GetString(elem, "id"); !ok  {
 			continue
+		} else {
+			repoID = tmp
 		}
-		repoID, ok := mapVal.(string)
-		if !ok {
-			return nil, errors.New(fmt.Sprintf("unexpected repoID type %T", mapVal))
+		if tmp, ok := GetBool(elem, "push_allowed"); ok {
+			repoConfig.pushAllowed = tmp
 		}
-		mapVal, ok = elem["push_allowed"]
-		if !ok  {
-			continue
-		}
-		pushAllowed := mapVal.(bool)
-		output[repoID] = RepoConfig{
-			pushAllowed: pushAllowed,
-		}
+		output[repoID] = repoConfig
 	}
 	return output, nil
 }
