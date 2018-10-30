@@ -50,8 +50,9 @@ func parseRepoConfigMap(obj interface{}) map[string]RepoConfig {
 	}
 	repoConfigMap, err := ToRepoConfigMap(sliceStringMap)
 	if err != nil {
-		 retval = repoConfigMap
+		retval = repoConfigMap
 	}
+
 	return retval
 }
 
@@ -147,7 +148,7 @@ func ToSliceStringMap(input []interface{}) ([]map[string]interface{}, bool) {
 
 func ToRepoConfigMap(input []map[string]interface{}) (map[string]RepoConfig, error) {
 	var output = make(map[string]RepoConfig)
-	for i := 0; i < len(output); i++ {
+	for i := 0; i < len(input); i++ {
 		elem := input[i]
 		mapVal, ok := elem["id"]
 		if !ok {
