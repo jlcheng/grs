@@ -1,6 +1,7 @@
 package script
 
 import (
+	"errors"
 	"fmt"
 	"github.com/spf13/viper"
 	"jcheng/grs/shexec"
@@ -43,21 +44,13 @@ func parseRepoConfigMap(obj interface{}) map[string]RepoConfig {
 	if sliceIfc, ok = obj.([]interface{}); !ok {
 		return retval
 	}
-
-	for _, ifc := range sliceIfc {
-		var ifcmap map[string]interface{}
-		if ifcmap, ok = ifc.(map[string]interface{}); !ok {
-			return retval
-		}
-		var repoPath string
-		var pushAllowed bool
-		if repoPath, ok = GetString(ifcmap, "id"); !ok {
-			continue
-		}
-		if pushAllowed, ok = GetBool(ifcmap, "push_allowed"); !ok {
-			continue
-		}
-		retval[repoPath] = RepoConfig{pushAllowed: pushAllowed}
+	sliceStringMap, ok := ToSliceStringMap(sliceIfc)
+	if !ok {
+		return retval
+	}
+	repoConfigMap, err := ToRepoConfigMap(sliceStringMap)
+	if err != nil {
+		 retval = repoConfigMap
 	}
 	return retval
 }
@@ -137,4 +130,41 @@ func GetString(stringMap map[string]interface{}, key string) (string, bool) {
 		return "", false
 	}
 	return stringv, true
+}
+
+// Asserts that the given value is a slice of []map[string]interface{}, raising an error if not
+func ToSliceStringMap(input []interface{}) ([]map[string]interface{}, bool) {
+	var output = make([]map[string]interface{}, len(input))
+	for i := 0; i < len(output); i++ {
+		elem, ok := input[i].(map[string]interface{})
+		if !ok {
+			return nil, false
+		}
+		output[i] = elem
+	}
+	return output, true
+}
+
+func ToRepoConfigMap(input []map[string]interface{}) (map[string]RepoConfig, error) {
+	var output = make(map[string]RepoConfig)
+	for i := 0; i < len(output); i++ {
+		elem := input[i]
+		mapVal, ok := elem["id"]
+		if !ok {
+			continue
+		}
+		repoID, ok := mapVal.(string)
+		if !ok {
+			return nil, errors.New(fmt.Sprintf("unexpected repoID type %T", mapVal))
+		}
+		mapVal, ok = elem["push_allowed"]
+		if !ok  {
+			continue
+		}
+		pushAllowed := mapVal.(bool)
+		output[repoID] = RepoConfig{
+			pushAllowed: pushAllowed,
+		}
+	}
+	return output, nil
 }
