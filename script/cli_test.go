@@ -7,17 +7,14 @@ func TestToSliceStringMap(t *testing.T) {
 	slice[0] = make(map[string]interface{}, 0)
 	slice[1] = "foo"
 
-	_, ok := ToSliceStringMap(slice)
-	if ok {
+	sliceMap := ToSliceStringMap(slice)
+	if len(sliceMap) == 2 {
 		t.Fatal("got ok for slice with string")
 	}
 
 	slice[1] = make(map[string]interface{}, 0)
-	sliceMap, ok := ToSliceStringMap(slice)
-	if !ok {
-		t.Fatal("did not get ok for slice of map[string]interface{}")
-	}
+	sliceMap = ToSliceStringMap(slice)
 	if len(sliceMap) != 2 {
-		t.Fatal("unexpected length", len(sliceMap))
+		t.Fatal("did not get ok for slice of map[string]interface{}")
 	}
 }

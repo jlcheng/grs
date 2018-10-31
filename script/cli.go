@@ -37,21 +37,11 @@ func CliParse(verbose bool, daemon bool, refresh int, forceMerge bool, repo stri
 }
 
 func parseRepoConfigMap(obj interface{}) map[string]RepoConfig {
-	var ok bool
-	var sliceIfc []interface{}
-	retval := make(map[string]RepoConfig)
-	if sliceIfc, ok = obj.([]interface{}); !ok {
-		return retval
+	if sliceIfc, ok := obj.([]interface{}); ok {
+		sliceStringMap := ToSliceStringMap(sliceIfc)
+		return ToRepoConfigMap(sliceStringMap)
 	}
-	sliceStringMap, ok := ToSliceStringMap(sliceIfc)
-	if !ok {
-		return retval
-	}
-	retval, err := ToRepoConfigMap(sliceStringMap)
-	if err != nil {
-		return make(map[string]RepoConfig)
-	}
-	return retval
+	return make(map[string]RepoConfig)
 }
 
 type RepoConfig struct {
@@ -107,58 +97,53 @@ func ReposFromStringSlice(repos []string, repoCfg map[string]RepoConfig) []Repo 
 	return r
 }
 
-func GetBool(stringMap map[string]interface{}, key string) (bool, bool) {
+func GetBool(stringMap map[string]interface{}, key string, fallback bool) bool {
 	value, ok := stringMap[key]
 	if !ok {
-		return false, false
+		return fallback
 	}
 	boolv, ok := value.(bool)
 	if !ok {
-		return false, false
+		return fallback
 	}
-	return boolv, true
+	return boolv
 }
 
-func GetString(stringMap map[string]interface{}, key string) (string, bool) {
+func GetString(stringMap map[string]interface{}, key string, fallback string) string {
 	value, ok := stringMap[key]
 	if !ok {
-		return "", false
+		return fallback
 	}
 	stringv, ok := value.(string)
 	if !ok {
-		return "", false
+		return fallback
 	}
-	return stringv, true
+	return stringv
 }
 
 // Asserts that the given value is a slice of []map[string]interface{}, raising an error if not
-func ToSliceStringMap(input []interface{}) ([]map[string]interface{}, bool) {
+func ToSliceStringMap(input []interface{}) []map[string]interface{} {
+	emptySlice := make([]map[string]interface{}, 0)
 	var output = make([]map[string]interface{}, len(input))
 	for i := 0; i < len(output); i++ {
 		elem, ok := input[i].(map[string]interface{})
 		if !ok {
-			return nil, false
+			return emptySlice
 		}
 		output[i] = elem
 	}
-	return output, true
+	return output
 }
 
-func ToRepoConfigMap(input []map[string]interface{}) (map[string]RepoConfig, error) {
+func ToRepoConfigMap(input []map[string]interface{}) map[string]RepoConfig {
 	var output = make(map[string]RepoConfig)
 	for i := 0; i < len(input); i++ {
-		var repoConfig = RepoConfig{}
-		var repoID string
-		elem := input[i]
-		if tmp, ok := GetString(elem, "id"); !ok  {
-			continue
-		} else {
-			repoID = tmp
+		rawMap := input[i]
+		if repoID := GetString(rawMap, "id", ""); repoID != "" {
+			var repoConfig = RepoConfig{}
+			repoConfig.pushAllowed = GetBool(rawMap, "push_allowed", false)
+			output[repoID] = repoConfig
 		}
-		if tmp, ok := GetBool(elem, "push_allowed"); ok {
-			repoConfig.pushAllowed = tmp
-		}
-		output[repoID] = repoConfig
 	}
-	return output, nil
+	return output
 }
