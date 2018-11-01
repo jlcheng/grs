@@ -112,7 +112,7 @@ func TestAutoPush_IT_Test_1(t *testing.T) {
 	exec.TouchAndCommit("git", "push")
 
 	if exec.Err() != nil {
-		t.Fatal("test setup failed", exec.Err())
+		t.Fatal("test setup failed\n" + exec.ErrString())
 	}
 
 	exec.Touch("c.txt")
