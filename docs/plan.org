@@ -34,3 +34,4 @@
     Useful when treating grs like Dropbox, as it tells you whether grs can autorebase divergent changes.
 * TODO DEV: Add test case for checking status of a newly created git repo (the need to call git show ref --head)
 * TODO DEV: Remove support for ~/.grs.d/grs.db (storing update times) and use viper to store '--repos' as config
+* TODO UX: Show correct status after updating a BEHIND, MODIFIED, or DIVERGED repo
