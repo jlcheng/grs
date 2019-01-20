@@ -56,6 +56,20 @@ func TestGetRepoStatus_Git_From_Ctx(t *testing.T) {
 	}
 }
 
+func TestGetCommitTime(t *testing.T) {
+	runner := shexec.NewMockRunner()
+	runner.AddMap("^git log -1 --format=%cr", shexec.Ok("5 minutes ago\n"))
+	ctx := shexec.NewAppContextWithRunner(runner)
+
+	repo := NewRepo("")
+	repo.Dir = DIR_VALID
+	NewScript(ctx, repo).GetCommitTime()
+	expected := "5 minutes ago"
+	if repo.CommitTime != expected {
+		t.Error("Unexpected commit time, got [" + repo.CommitTime + "]")
+	}
+}
+
 func helpGetRepoStatus(t *testing.T, out string, expected Branchstat) {
 	runner := shexec.NewMockRunner()
 	runner.AddMap("git rev-parse", shexec.Ok("..."))

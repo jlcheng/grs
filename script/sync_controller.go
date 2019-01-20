@@ -35,7 +35,7 @@ func (d *SyncController) runIteration() {
 			s.AutoRebase()
 		}
 		s.AutoPush()
-
+		s.GetCommitTime()
 	}
 }
 

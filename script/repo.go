@@ -12,6 +12,7 @@ type Repo struct {
 	Dir         Dirstat
 	Branch      Branchstat
 	Index       Indexstat
+	CommitTime  string
 	PushAllowed bool
 }
 
@@ -21,6 +22,7 @@ func NewRepo(path string) *Repo {
 		Dir:    DIR_INVALID,
 		Branch: BRANCH_UNKNOWN,
 		Index:  INDEX_UNKNOWN,
+		CommitTime: "",
 	}
 }
 

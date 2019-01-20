@@ -21,8 +21,8 @@ func (gui *AnsiGUI) Run(repos []Repo) {
 	}
 
 	for _, repo := range repos {
-		fmt.Printf("repo [%v] status IS %v, %v.\n",
-			repo.Path, colorB(repo.Branch), colorI(repo.Index))
+		fmt.Printf("repo [%v] status IS %v, %v, %v.\n",
+			repo.Path, colorB(repo.Branch), colorI(repo.Index), repo.CommitTime)
 	}
 }
 
