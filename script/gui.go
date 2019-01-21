@@ -2,6 +2,7 @@ package script
 
 import (
 	"fmt"
+	"time"
 )
 
 type AnsiGUI struct {
@@ -19,6 +20,7 @@ func (gui *AnsiGUI) Run(repos []Repo) {
 	if gui.clr {
 		fmt.Print("\033[2J\033[H")
 	}
+	fmt.Println(time.Now().Format("=== Jan _2 3:04PM MST ==="))
 
 	for _, repo := range repos {
 		fmt.Printf("repo [%v] status IS %v, %v, %v.\n",
