@@ -43,23 +43,19 @@ func (s *Script) GetRepoStatus() {
 		return
 	}
 
-	if diff.remote == 0 && diff.local == 0 {
-		repo.Branch = BRANCH_UPTODATE
-		return
+	if diff.remote == 0 {
+		if diff.local == 0 {
+			repo.Branch = BRANCH_UPTODATE
+		} else {
+			repo.Branch = BRANCH_AHEAD
+		}
+	} else {
+		if diff.local == 0 {
+			repo.Branch = BRANCH_BEHIND
+		} else {
+			repo.Branch = BRANCH_DIVERGED
+		}
 	}
-	if diff.remote > 0 && diff.local == 0 {
-		repo.Branch = BRANCH_BEHIND
-		return
-	}
-	if diff.remote == 0 && diff.local > 0 {
-		repo.Branch = BRANCH_AHEAD
-		return
-	}
-	if diff.remote > 0 && diff.local > 0 {
-		repo.Branch = BRANCH_DIVERGED
-		return
-	}
-	return
 }
 
 func (s *Script) GetCommitTime() {
