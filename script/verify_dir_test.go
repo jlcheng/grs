@@ -15,7 +15,7 @@ func TestBeforeScript_Fail(t *testing.T) {
 		repo = NewRepo(cwd)
 	}
 	runner.Add(shexec.Error("failed"))
-	s := NewScript(shexec.NewAppContextWithRunner(runner), repo)
+	s := NewScript(shexec.NewAppContext(shexec.WithCommandRunner(runner)), repo)
 	s.BeforeScript()
 	if repo.Dir == DIR_VALID {
 		t.Errorf("expected %s, got: %v\n"+
@@ -33,7 +33,7 @@ func TestBeforeScript_OK(t *testing.T) {
 	}
 
 	runner.Add(shexec.Ok(""))
-	s := NewScript(shexec.NewAppContextWithRunner(runner), repo)
+	s := NewScript(shexec.NewAppContext(shexec.WithCommandRunner(runner)), repo)
 	s.BeforeScript()
 	if repo.Dir != DIR_VALID {
 		t.Errorf("expected %s, got: %v\n", DIR_VALID, repo.Dir)

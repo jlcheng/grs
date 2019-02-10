@@ -13,7 +13,7 @@ func (s *Script) AutoRebase() error {
 	runner := s.ctx.CommandRunner
 
 	//  1. Identify merge-base
-	git := ctx.GetGitExec()
+	git := ctx.GitExec
 	p := "@{upstream}"
 	cmd := runner.Command(git, "merge-base", "HEAD", p)
 	bytes, err := cmd.CombinedOutput()

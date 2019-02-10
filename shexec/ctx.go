@@ -2,25 +2,36 @@ package shexec
 
 type AppContext struct {
 	CommandRunner
-	defaultGitExec  string
+	GitExec string
 }
 
-func NewAppContext() *AppContext {
+func newAppCtxWithDefaults() *AppContext {
 	return &AppContext{
-		defaultGitExec:  "git",
-	}
-}
-func NewAppContextWithRunner(runner CommandRunner) *AppContext {
-	return &AppContext{
-		CommandRunner:   runner,
-		defaultGitExec:  "git",
+		CommandRunner: &ExecRunner{},
+		GitExec:       "git",
 	}
 }
 
-func (ctx *AppContext) GetGitExec() string {
-	return ctx.defaultGitExec
+func NewAppContext(options ...AppContextOption) *AppContext {
+	ctx := newAppCtxWithDefaults()
+	for _, option := range options {
+		option(ctx)
+	}
+	return ctx
 }
 
-func (ctx *AppContext) SetGitExec(defaultGitExec string) {
-	ctx.defaultGitExec = defaultGitExec
+// === START: options ===
+type AppContextOption func(*AppContext)
+
+func WithDefaultGitExec(gitExec string) AppContextOption {
+	return func(ctx *AppContext){
+		ctx.GitExec = gitExec
+	}
 }
+
+func WithCommandRunner(runner CommandRunner) AppContextOption {
+	return func(ctx *AppContext) {
+		ctx.CommandRunner = runner
+	}
+}
+// === END: options ===

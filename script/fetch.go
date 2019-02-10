@@ -8,7 +8,7 @@ func (s *Script) Fetch() {
 		return
 	}
 
-	git := s.ctx.GetGitExec()
+	git := s.ctx.GitExec
 
 	command := s.ctx.CommandRunner.Command(git, "fetch")
 	if out, err := command.CombinedOutput(); err != nil {

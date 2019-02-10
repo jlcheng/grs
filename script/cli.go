@@ -53,7 +53,7 @@ func RunCli(args Args) {
 		shexec.SetLogLevel(shexec.DEBUG)
 	}
 
-	ctx := shexec.NewAppContextWithRunner(&shexec.ExecRunner{})
+	ctx := shexec.NewAppContext()
 	repos := ReposFromStringSlice(args.repos, args.repoCfgMap)
 
 	if len(repos) == 0 {

@@ -9,7 +9,7 @@ import (
 func TestGetGitExecDefault(t *testing.T) {
 	ctx := NewAppContext()
 
-	if r := ctx.GetGitExec(); r != "git" {
+	if r := ctx.GitExec; r != "git" {
 		t.Error("Unexpected git executable. Got:", r)
 	}
 }

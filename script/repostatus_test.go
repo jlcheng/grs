@@ -12,7 +12,7 @@ func TestGetRepoStatus_Git_Fail(t *testing.T) {
 	runner.Add(shexec.Error("failed"))
 	repo := NewRepo("")
 	repo.Dir = DIR_VALID
-	NewScript(shexec.NewAppContextWithRunner(runner), repo).GetRepoStatus()
+	NewScript(shexec.NewAppContext(shexec.WithCommandRunner(runner)), repo).GetRepoStatus()
 	if repo.Branch != BRANCH_UNTRACKED {
 		t.Errorf("expected %s, got: %v\n", BRANCH_UNTRACKED, repo.Branch)
 	}
@@ -40,8 +40,10 @@ func TestGetRepoStatus_Git_From_Ctx(t *testing.T) {
 	runner.AddMap("^/path/to/git rev-parse", shexec.Ok(""))
 	runner.AddMap("^/path/to/git rev-list", shexec.Ok("0\t0\n"))
 
-	ctx := shexec.NewAppContextWithRunner(runner)
-	ctx.SetGitExec("/path/to/git")
+	ctx := shexec.NewAppContext(
+		shexec.WithCommandRunner(runner),
+		shexec.WithDefaultGitExec("/path/to/git"),
+	)
 
 	repo := NewRepo("")
 	repo.Dir = DIR_VALID
@@ -59,7 +61,7 @@ func TestGetRepoStatus_Git_From_Ctx(t *testing.T) {
 func TestGetCommitTime(t *testing.T) {
 	runner := shexec.NewMockRunner()
 	runner.AddMap("^git log -1 --format=%cr", shexec.Ok("5 minutes ago\n"))
-	ctx := shexec.NewAppContextWithRunner(runner)
+	ctx := shexec.NewAppContext(shexec.WithCommandRunner(runner))
 
 	repo := NewRepo("")
 	repo.Dir = DIR_VALID
@@ -77,7 +79,7 @@ func helpGetRepoStatus(t *testing.T, out string, expected Branchstat) {
 
 	repo := NewRepo("")
 	repo.Dir = DIR_VALID
-	NewScript(shexec.NewAppContextWithRunner(runner), repo).GetRepoStatus()
+	NewScript(shexec.NewAppContext(shexec.WithCommandRunner(runner)), repo).GetRepoStatus()
 	got := repo.Branch
 	if got != expected {
 		t.Errorf("expected [%v], got [%v]\n", expected, got)

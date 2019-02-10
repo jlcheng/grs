@@ -26,7 +26,7 @@ func (s *Script) BeforeScript() {
 		s.repo.Dir = DIR_INVALID
 		return
 	}
-	git := s.ctx.GetGitExec()
+	git := s.ctx.GitExec
 	command := s.ctx.CommandRunner.Command(git, "show-ref", "-q", "--head", "HEAD")
 	if _, err := command.CombinedOutput(); err != nil {
 		s.repo.Dir = DIR_INVALID

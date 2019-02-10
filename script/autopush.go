@@ -21,7 +21,7 @@ func (s *Script) AutoPush() bool {
 
 	shexec.Debug("git auto-push ok: %v", repo)
 	ctx := s.ctx
-	git := ctx.GetGitExec()
+	git := ctx.GitExec
 	commitMsg := AutoPushGenCommitMsg(NewStdClock())
 		var out []byte
 	var err error

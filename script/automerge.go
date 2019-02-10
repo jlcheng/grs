@@ -13,7 +13,7 @@ func (s *Script) AutoFFMerge() bool {
 		return false
 	}
 
-	git := ctx.GetGitExec()
+	git := ctx.GitExec
 
 	command := ctx.CommandRunner.Command(git, "merge", "--ff-only", "@{upstream}")
 	var out []byte

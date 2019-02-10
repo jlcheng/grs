@@ -16,7 +16,7 @@ func (s *Script) GetRepoStatus() {
 		return
 	}
 
-	git := ctx.GetGitExec()
+	git := ctx.GitExec
 	var command shexec.Command
 	var out []byte
 	var err error
@@ -65,7 +65,7 @@ func (s *Script) GetCommitTime() {
 		return
 	}
 
-	git := ctx.GetGitExec()
+	git := ctx.GitExec
 	var command shexec.Command
 	var out []byte
 	var err error

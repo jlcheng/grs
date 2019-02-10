@@ -11,7 +11,7 @@ func (s *Script) GetIndexStatus() {
 		return
 	}
 
-	git := ctx.GetGitExec()
+	git := ctx.GitExec
 
 	repo.Index = INDEX_UNKNOWN
 	command := ctx.CommandRunner.Command(git, "ls-files", "--exclude-standard", "-om")
