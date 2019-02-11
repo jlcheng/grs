@@ -18,10 +18,10 @@ type Repo struct {
 
 func NewRepo(path string) *Repo {
 	return &Repo{
-		Path:       path,
-		Dir:        DIR_INVALID,
-		Branch:     BRANCH_UNKNOWN,
-		Index:      INDEX_UNKNOWN,
+		Path:   path,
+		Dir:    DIR_INVALID,
+		Branch: BRANCH_UNKNOWN,
+		Index:  INDEX_UNKNOWN,
 		CommitTime: "",
 	}
 }

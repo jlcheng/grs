@@ -173,3 +173,4 @@ type Result struct {
 func (cmd *Result) String() string {
 	return cmd.delegate.Stdout.(*bytes.Buffer).String()
 }
+

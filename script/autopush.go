@@ -23,7 +23,7 @@ func (s *Script) AutoPush() bool {
 	ctx := s.ctx
 	git := ctx.GitExec
 	commitMsg := AutoPushGenCommitMsg(NewStdClock())
-	var out []byte
+		var out []byte
 	var err error
 	var command shexec.Command
 	if repo.Index == INDEX_MODIFIED {
@@ -40,6 +40,7 @@ func (s *Script) AutoPush() bool {
 		}
 		repo.Index = INDEX_UNMODIFIED
 	}
+
 
 	command = ctx.CommandRunner.Command(git, "push")
 	if out, err = command.CombinedOutput(); err != nil {
@@ -58,8 +59,7 @@ func AutoPushGenCommitMsg(clock Clock) string {
 type Clock interface {
 	Now() time.Time
 }
-type StdClock struct{}
-
+type StdClock struct {}
 func (s *StdClock) Now() time.Time {
 	return time.Now()
 }
@@ -70,7 +70,6 @@ func NewStdClock() *StdClock {
 type MockClock struct {
 	NowRetval time.Time
 }
-
 func (s *MockClock) Now() time.Time {
 	return s.NowRetval
 }
