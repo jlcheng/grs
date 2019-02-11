@@ -16,10 +16,9 @@ type Args struct {
 	refresh    int
 	forceMerge bool
 	repoCfgMap map[string]RepoConfig
-	concurrent bool
 }
 
-func CliParse(verbose bool, daemon bool, refresh int, forceMerge bool, repo string, concurrent bool) Args {
+func CliParse(verbose bool, daemon bool, refresh int, forceMerge bool, repo string) Args {
 	// command line arg takes precedence over repos
 	repos := viper.GetStringSlice("repos")
 	if repo != "" {
@@ -33,7 +32,6 @@ func CliParse(verbose bool, daemon bool, refresh int, forceMerge bool, repo stri
 		forceMerge: forceMerge,
 		repos:      repos,
 		repoCfgMap: parseRepoConfigMap(viper.Get("repo_config")),
-		concurrent: concurrent,
 	}
 	return args
 }
@@ -64,7 +62,7 @@ func RunCli(args Args) {
 	}
 
 	gui := NewGUI(args.daemon)
-	syncController := NewSyncController(repos, ctx, gui, args.concurrent)
+	syncController := NewSyncController(repos, ctx, gui)
 
 	// run at least once
 	syncController.Run()

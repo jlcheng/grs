@@ -30,7 +30,6 @@ var (
 	refresh int     // how often to check for changes, in seconds
 	forceMerge bool // ignore access time check when auto-merging
 	repo string     // a single repo to process
-	concurrent bool // processes repos concurrently
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -41,9 +40,7 @@ var rootCmd = &cobra.Command{
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, _ []string) {
-		refresh = viper.GetInt("refresh")
-		concurrent = viper.GetBool("concurrent")
-		args := script.CliParse(verbose, daemon, refresh, forceMerge, repo, concurrent)
+		args := script.CliParse(verbose, daemon, refresh, forceMerge, repo)
 		script.RunCli(args)
 	},
 }
@@ -65,10 +62,8 @@ func init() {
 	rootCmd.PersistentFlags().IntVarP(&refresh, "refresh", "t", 600, "how often to check for changes, in seconds")
 	rootCmd.PersistentFlags().BoolVarP(&forceMerge, "force", "m", false, "ignore access time check when auto-merging")
 	rootCmd.PersistentFlags().StringVarP(&repo, "repo", "r", "", "the repository to process")
-	rootCmd.PersistentFlags().BoolVar(&concurrent, "concurrent", true, "process repos concurrently")
 
 	viper.BindPFlag("refresh", rootCmd.PersistentFlags().Lookup("refresh"))
-	viper.BindPFlag("concurrent", rootCmd.PersistentFlags().Lookup("concurrent"))
 }
 
 // initConfig reads in config file and ENV variables if set.
