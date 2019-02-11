@@ -4,7 +4,6 @@ import (
 	"testing"
 )
 
-
 // Verifies that the default GetGitExec() is `git`
 func TestGetGitExecDefault(t *testing.T) {
 	ctx := NewAppContext()
