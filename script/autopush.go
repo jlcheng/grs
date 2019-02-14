@@ -27,13 +27,13 @@ func (s *Script) AutoPush() bool {
 	var err error
 	var command shexec.Command
 	if repo.Index == INDEX_MODIFIED {
-		command := ctx.CommandRunner.Command(git, "add", "-A")
+		command := ctx.CommandRunner.Command(git, "add", "-A").WithDir(repo.Path)
 		if out, err = command.CombinedOutput(); err != nil {
 			shexec.Debug("git add failed. %v, %v", err, string(out))
 			return false
 		}
 
-		command = ctx.CommandRunner.Command(git, "commit", "-m", commitMsg)
+		command = ctx.CommandRunner.Command(git, "commit", "-m", commitMsg).WithDir(repo.Path)
 		if out, err = command.CombinedOutput(); err != nil {
 			shexec.Debug("git commit failed. commit-msg=%v\nerr-msg:%v\nout:%v", commitMsg, err, string(out))
 			return false
@@ -42,7 +42,7 @@ func (s *Script) AutoPush() bool {
 	}
 
 
-	command = ctx.CommandRunner.Command(git, "push")
+	command = ctx.CommandRunner.Command(git, "push").WithDir(repo.Path)
 	if out, err = command.CombinedOutput(); err != nil {
 		shexec.Debug("git push failed. %v, %v", err, string(out))
 		return false

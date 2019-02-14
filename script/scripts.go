@@ -22,12 +22,14 @@ func (s *Script) BeforeScript() {
 	if s.err != nil {
 		return
 	}
-	if err := os.Chdir(s.repo.Path); err != nil {
+
+	if finfo, err := os.Stat(s.repo.Path); err != nil || !finfo.IsDir() {
 		s.repo.Dir = DIR_INVALID
 		return
 	}
+
 	git := s.ctx.GitExec
-	command := s.ctx.CommandRunner.Command(git, "show-ref", "-q", "--head", "HEAD")
+	command := s.ctx.CommandRunner.Command(git, "show-ref", "-q", "--head", "HEAD").WithDir(s.repo.Path)
 	if _, err := command.CombinedOutput(); err != nil {
 		s.repo.Dir = DIR_INVALID
 		return

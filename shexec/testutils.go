@@ -17,6 +17,11 @@ type CommandHelper struct {
 	f func() ([]byte, error)
 }
 
+func (m *CommandHelper) WithDir(dir string) Command {
+	// no-op
+	return m
+}
+
 func (m *CommandHelper) CombinedOutput() ([]byte, error) {
 	return m.f()
 }

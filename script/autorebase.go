@@ -15,7 +15,7 @@ func (s *Script) AutoRebase() error {
 	//  1. Identify merge-base
 	git := ctx.GitExec
 	p := "@{upstream}"
-	cmd := runner.Command(git, "merge-base", "HEAD", p)
+	cmd := runner.Command(git, "merge-base", "HEAD", p).WithDir(s.repo.Path)
 	bytes, err := cmd.CombinedOutput()
 	if err != nil {
 		return errors.New(fmt.Sprintf("%v %v", err, string(bytes)))
@@ -23,7 +23,7 @@ func (s *Script) AutoRebase() error {
 	mergeBase := strings.TrimSpace(string(bytes))
 
 	//  2. Identify the graph of child commits from merge-base to HEAD
-	cmd = runner.Command(git, "rev-list", p, "^"+mergeBase)
+	cmd = runner.Command(git, "rev-list", p, "^"+mergeBase).WithDir(s.repo.Path)
 	bytes, err = cmd.CombinedOutput()
 	if err != nil {
 		return errors.New(fmt.Sprintf("%v %v", err, string(bytes)))
@@ -33,12 +33,12 @@ func (s *Script) AutoRebase() error {
 	var rebaseErr error
 	for i := len(revlist) - 1; i >= 0 && rebaseErr == nil; i-- {
 		commit := revlist[i]
-		cmd = runner.Command(git, "rebase", commit)
+		cmd = runner.Command(git, "rebase", commit).WithDir(s.repo.Path)
 		_, err1 := cmd.CombinedOutput()
 		if err1 != nil {
 			//  4. Stop when conflict is detected
 			rebaseErr = err1
-			cmd = runner.Command(git, "rebase", "--abort")
+			cmd = runner.Command(git, "rebase", "--abort").WithDir(s.repo.Path)
 			bytes2, err2 := cmd.CombinedOutput()
 			if err != nil {
 				return errors.New(fmt.Sprintf("%s %s", err2, string(bytes2)))

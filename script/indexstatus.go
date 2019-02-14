@@ -14,7 +14,7 @@ func (s *Script) GetIndexStatus() {
 	git := ctx.GitExec
 
 	repo.Index = INDEX_UNKNOWN
-	command := ctx.CommandRunner.Command(git, "ls-files", "--exclude-standard", "-om")
+	command := ctx.CommandRunner.Command(git, "ls-files", "--exclude-standard", "-om").WithDir(repo.Path)
 	var out []byte
 	var err error
 	if out, err = command.CombinedOutput(); err != nil {
@@ -26,7 +26,7 @@ func (s *Script) GetIndexStatus() {
 		return
 	}
 
-	command = ctx.CommandRunner.Command(git, "diff-index", "HEAD")
+	command = ctx.CommandRunner.Command(git, "diff-index", "HEAD").WithDir(repo.Path)
 	if out, err = command.CombinedOutput(); err != nil {
 		shexec.Debug("diff-index failed: %v\n%v\n", err, string(out))
 		return

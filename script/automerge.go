@@ -15,7 +15,7 @@ func (s *Script) AutoFFMerge() bool {
 
 	git := ctx.GitExec
 
-	command := ctx.CommandRunner.Command(git, "merge", "--ff-only", "@{upstream}")
+	command := ctx.CommandRunner.Command(git, "merge", "--ff-only", "@{upstream}").WithDir(s.repo.Path)
 	var out []byte
 	var err error
 	if out, err = command.CombinedOutput(); err != nil {

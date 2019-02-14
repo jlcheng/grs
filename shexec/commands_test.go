@@ -122,7 +122,10 @@ func TestMockCommand_HistoryCount(t *testing.T) {
 
 // Fails if ExecRunner does not implement CommandRunner
 func TestExecRunner(t *testing.T) {
-	var runner CommandRunner
-	runner = &ExecRunner{}
-	_ = runner
+	var _ CommandRunner = &ExecRunner{}
 }
+
+func TestCommandWrapper(t *testing.T) {
+	var _ Command = &CommandWrapper{}
+}
+

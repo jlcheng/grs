@@ -21,7 +21,7 @@ func (s *Script) GetRepoStatus() {
 	var out []byte
 	var err error
 
-	command = ctx.CommandRunner.Command(git, "rev-parse", "@{upstream}")
+	command = ctx.CommandRunner.Command(git, "rev-parse", "@{upstream}").WithDir(repo.Path)
 	if out, err = command.CombinedOutput(); err != nil {
 		shexec.Debug("GetRepoStatus: no upstream detected. %s, %s", err, strings.TrimSpace(string(out)))
 		repo.Branch = BRANCH_UNTRACKED
@@ -29,7 +29,7 @@ func (s *Script) GetRepoStatus() {
 	}
 
 	shexec.Debug("CMD: git rev-list --left-right --count @{upstream}...HEAD")
-	command = ctx.CommandRunner.Command(git, "rev-list", "--left-right", "--count", "@{upstream}...HEAD")
+	command = ctx.CommandRunner.Command(git, "rev-list", "--left-right", "--count", "@{upstream}...HEAD").WithDir(repo.Path)
 	if out, err = command.CombinedOutput(); err != nil {
 		shexec.Debug("git rev-list failed: %v\n%v", err, string(out))
 		repo.Dir = DIR_INVALID
@@ -70,7 +70,7 @@ func (s *Script) GetCommitTime() {
 	var out []byte
 	var err error
 
-	command = ctx.CommandRunner.Command(git, "log", "-1", "--format=%cr")
+	command = ctx.CommandRunner.Command(git, "log", "-1", "--format=%cr").WithDir(repo.Path)
 	shexec.Debug("CMD: git log -1 --format=%%cr")
 	if out, err = command.CombinedOutput(); err != nil {
 		shexec.Debug("failed: %v\n%v\n", err, string(out))

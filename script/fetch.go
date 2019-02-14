@@ -10,7 +10,7 @@ func (s *Script) Fetch() {
 
 	git := s.ctx.GitExec
 
-	command := s.ctx.CommandRunner.Command(git, "fetch")
+	command := s.ctx.CommandRunner.Command(git, "fetch").WithDir(s.repo.Path)
 	if out, err := command.CombinedOutput(); err != nil {
 		// fetch may have failed for common reasons, such as not adding yourxk ssh key to the agent
 		shexec.Debug("git fetch failed: %v\n%v", err, string(out))
