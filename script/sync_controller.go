@@ -2,6 +2,7 @@ package script
 
 import (
 	"jcheng/grs/shexec"
+	"sync"
 )
 
 // SyncController provides a struct that can check and report on status of a collection of repositories
@@ -20,23 +21,33 @@ func NewSyncController(repos []Repo, ctx *shexec.AppContext, gui AnsiGUI) SyncCo
 }
 
 func (d *SyncController) runIteration() {
+	var wg sync.WaitGroup
+	wg.Add(len(d.repos))
 	for i, _ := range d.repos {
-		repo := &d.repos[i]
-		s := NewScript(d.ctx, repo)
-		s.BeforeScript()
-		s.Fetch()
-		s.GetRepoStatus()
-		s.GetIndexStatus()
-
-		switch repo.Branch {
-		case BRANCH_BEHIND:
-			s.AutoFFMerge()
-		case BRANCH_DIVERGED:
-			s.AutoRebase()
-		}
-		s.AutoPush()
-		s.GetCommitTime()
+		script := NewScript(d.ctx, &d.repos[i])
+		go func() {
+			processRepo(script)
+			wg.Done()
+		}()
 	}
+	wg.Wait()
+}
+
+func processRepo(s *Script) {
+	s.BeforeScript()
+	s.Fetch()
+	s.GetRepoStatus()
+	s.GetIndexStatus()
+
+	switch s.repo.Branch {
+	case BRANCH_BEHIND:
+		s.AutoFFMerge()
+	case BRANCH_DIVERGED:
+		s.AutoRebase()
+	}
+	s.AutoPush()
+	s.GetCommitTime()
+
 }
 
 func (d *SyncController) Run() {
