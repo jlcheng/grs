@@ -1,7 +1,6 @@
 # Go parameters
 GOCMD=go
 GOBUILD=$(GOCMD) build
-GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
 GORUN=$(GOCMD) run
@@ -21,7 +20,6 @@ test:
 
 .PHONY: clean
 clean: 
-	$(GOCLEAN)
 	rm -rf $(OUTDIR)
 
 install: all
