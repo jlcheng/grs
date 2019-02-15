@@ -16,8 +16,7 @@ func NewScript(ctx *shexec.AppContext, repo *Repo) *Script {
 }
 
 // BeforeScript sets up the Script object for future operations.
-// First, it os.Chdir to the repo directory and validates the repo.
-// Second, it sets rstat.Dir to `DIR_VALID` if a git command can be executed
+// It sets repo.Dir to DIR_VALID if the repo.Path exists and appears valid.
 func (s *Script) BeforeScript() {
 	if s.err != nil {
 		return
