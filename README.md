@@ -1,15 +1,15 @@
 # GRS (Grease)
 
-Grease is a cron-job like daemon that polls your git repos and keep them up to date. You can think of it as a glorified
-cron job with a few differences.
+Grease is a daemon that polls your git repos and keep them up to date. You can think of it as a glorified cron job with
+a few differences.
 
-1. Grease will try to auto-rebase your local changes. If a conflict arises, Grease will keep your local files unchanged.
+1. Grease will try to auto-rebase your local changes. If there is a conflict, Grease will keep your local files unchanged.
 2. Grease can optionally auto-push your changes.
 
 I use it as a replacement for Dropbox and Evernote. Many files that matter to me are text files: scripts, org-mode
 documents, journals. Git does a good job of auto-resolving simple conflicts where possible. It helps that I am familiar
 with Git, which allows me to effectively resolve conflicts. Finally, as an engineer, this tool gives me more control
-over where my data will be stored. I can pay for git hosting and take ownership over my data.
+over where my data will be stored. I can pay for git hosting and take ownership of my data.
 
 I usually run it in a terminal window and just let it do its thing:
 ```
@@ -43,4 +43,9 @@ repos = [
 id = "/home/jcheng/repos/foo"
 push_allowed = true
 ENDL
+```
+
+Finally, run Grease as a daemon
+```
+~/bin/grs -d
 ```
