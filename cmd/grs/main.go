@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
-	"jcheng/grs/script"
+	"jcheng/grs/ui"
 	"os"
 )
 
@@ -19,13 +19,7 @@ func main() {
 		// Uncomment the following line if your bare application
 		// has an action associated with it:
 		Run: func(cmd *cobra.Command, _ []string) {
-			verbose := viper.GetBool("verbose")
-			daemon := viper.GetBool("daemon")
-			refresh := viper.GetInt("refresh")
-			forceMerge := viper.GetBool("merge-ignore-atime")
-			repo := viper.GetString("repo")
-			args := script.CliParse(verbose, daemon, refresh, forceMerge, repo)
-			script.RunCli(args)
+			ui.RunCli(ui.CliParse())
 		},
 	}
 

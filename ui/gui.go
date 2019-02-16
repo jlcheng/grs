@@ -1,8 +1,9 @@
-package script
+package ui
 
 import (
 	"fmt"
 	"time"
+	"jcheng/grs/script"
 )
 
 type AnsiGUI struct {
@@ -15,7 +16,7 @@ func NewGUI(clr bool) AnsiGUI {
 	}
 }
 
-func (gui *AnsiGUI) Run(repos []Repo) {
+func (gui *AnsiGUI) Run(repos []script.Repo) {
 	// setup/clear screen
 	if gui.clr {
 		fmt.Print("\033[2J\033[H")
@@ -28,15 +29,15 @@ func (gui *AnsiGUI) Run(repos []Repo) {
 	}
 }
 
-func colorI(s Indexstat) string {
-	if s == INDEX_UNMODIFIED {
+func colorI(s script.Indexstat) string {
+	if s == script.INDEX_UNMODIFIED {
 		return fmt.Sprintf("%v", s)
 	}
 	return fmt.Sprintf("\033[31m%v\033[0m", s)
 }
 
-func colorB(s Branchstat) string {
-	if s == BRANCH_UPTODATE {
+func colorB(s script.Branchstat) string {
+	if s == script.BRANCH_UPTODATE {
 		return fmt.Sprintf("%v", s)
 	}
 	return fmt.Sprintf("\033[31m%v\033[0m", s)

@@ -1,9 +1,10 @@
-package script
+package ui
 
 import (
 	"fmt"
 	"github.com/spf13/viper"
 	"jcheng/grs/base"
+	"jcheng/grs/script"
 	"os"
 	"time"
 )
@@ -18,18 +19,19 @@ type Args struct {
 	repoCfgMap map[string]RepoConfig
 }
 
-func CliParse(verbose bool, daemon bool, refresh int, forceMerge bool, repo string) Args {
-	// command line arg takes precedence over repos
+// CliParse uses spf13/viper to create the program parameters
+func CliParse() Args {
+	// allow one to override the repo_config setting to run one-off tests
 	repos := viper.GetStringSlice("repos")
-	if repo != "" {
+	if repo := viper.GetString("repo"); repo != "" {
 		repos = []string{repo}
 	}
 
 	var args = Args{
-		verbose:    verbose,
-		daemon:     daemon,
+		verbose:    viper.GetBool("verbose"),
+		daemon:     viper.GetBool("daemon"),
 		refresh:    viper.GetInt("refresh"),
-		forceMerge: forceMerge,
+		forceMerge: viper.GetBool("merge-ignore-atime"),
 		repos:      repos,
 		repoCfgMap: parseRepoConfigMap(viper.Get("repo_config")),
 	}
@@ -53,7 +55,7 @@ func RunCli(args Args) {
 		base.SetLogLevel(base.DEBUG)
 	}
 
-	ctx := NewAppContext()
+	ctx := script.NewAppContext()
 	repos := ReposFromStringSlice(args.repos, args.repoCfgMap)
 
 	if len(repos) == 0 {
@@ -82,10 +84,10 @@ func RunCli(args Args) {
 
 
 // TODO: JCHENG unit test improvements
-func ReposFromStringSlice(repos []string, repoCfg map[string]RepoConfig) []Repo {
-	r := make([]Repo, len(repos))
+func ReposFromStringSlice(repos []string, repoCfg map[string]RepoConfig) []script.Repo {
+	r := make([]script.Repo, len(repos))
 	for idx, repoPath := range repos {
-		r[idx] = Repo{Path: repoPath}
+		r[idx] = script.Repo{Path: repoPath}
 		repo := &r[idx]
 
 		config, ok := repoCfg[repoPath]

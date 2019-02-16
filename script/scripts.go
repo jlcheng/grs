@@ -34,3 +34,7 @@ func (s *Script) BeforeScript() {
 	}
 	s.repo.Dir = DIR_VALID
 }
+
+func (s *Script) GetRepo() *Repo {
+	return s.repo
+}
