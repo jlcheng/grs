@@ -7,7 +7,7 @@ const (
 	DIR_VALID
 )
 
-var dirstatStr = [DIR_VALID + 1]string{
+var dirstatStr = []string{
 	"INVALID",
 	"VALID",
 }
@@ -25,7 +25,7 @@ const (
 	BRANCH_UNTRACKED
 )
 
-var branchstatdir = [BRANCH_UNTRACKED + 1]string{
+var branchstatdir = []string{
 	"UNKNOWN",
 	"UP-TO-DATE",
 	"AHEAD",
@@ -44,7 +44,7 @@ const (
 	INDEX_UNMODIFIED
 )
 
-var indexstatdir = [INDEX_UNMODIFIED + 1]string{
+var indexstatdir = []string{
 	"UNKNOWN",
 	"MODIFIED",
 	"UNMODIFIED",

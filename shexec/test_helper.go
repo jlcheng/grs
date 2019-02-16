@@ -6,11 +6,6 @@ import (
 	"strings"
 )
 
-type clist struct {
-	pattern  *regexp.Regexp
-	commands []Command
-}
-
 // CommandHelper allows one to easily mock a CommandRunner interface. Useful when you wan to return the same output
 // given any input.
 type CommandHelper struct {
@@ -45,7 +40,7 @@ func Ok(msg string) Command {
 }
 
 // MockRunner holds a sequence of Commands, mapped to their command-line text. When the user specifies a command text,
-// it returns the corresponding command and advances to the next command in memory.
+// it returns the corresponding Command and advances to the next Command.
 type MockRunner struct {
 	_commands []Command
 	commands  map[string]*clist
@@ -73,7 +68,7 @@ func (m *MockRunner) Command(name string, arg ...string) Command {
 	m.history = append(m.history, full)
 
 	if len(m._commands) == 0 && len(m.commands) == 0 {
-		return NewCommandHelper(make([]byte, 0), errors.New("no commands configured"))
+		return Error("no commands configured")
 	}
 
 	for k := range m.commands {
@@ -86,7 +81,7 @@ func (m *MockRunner) Command(name string, arg ...string) Command {
 		}
 	}
 	if len(m._commands) == 0 {
-		return NewCommandHelper(make([]byte, 0), errors.New("mock has no commands that match: "+name))
+		return Error("mock has no commands that match: "+ name)
 	}
 
 	r := m._commands[0]
@@ -113,4 +108,9 @@ func NewMockRunner() *MockRunner {
 		commands:  make(map[string]*clist),
 		history:   make([]string, 0),
 	}
+}
+
+type clist struct {
+	pattern  *regexp.Regexp
+	commands []Command
 }

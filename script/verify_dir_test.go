@@ -18,8 +18,7 @@ func TestBeforeScript_Fail(t *testing.T) {
 	s := NewScript(NewAppContext(WithCommandRunner(runner)), repo)
 	s.BeforeScript()
 	if repo.Dir == DIR_VALID {
-		t.Errorf("expected %s, got: %v\n"+
-			"", DIR_INVALID, repo.Dir)
+		t.Errorf("expected %s, got: %v\n", DIR_INVALID, repo.Dir)
 	}
 }
 
