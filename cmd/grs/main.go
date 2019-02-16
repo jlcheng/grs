@@ -4,18 +4,10 @@ import (
 	"fmt"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"jcheng/grs/script"
 	"os"
-)
-
-var (
-	cfgFile string  // viper config
-	verbose bool    // enables more logging
-	daemon  bool    // runs in daemon mode
-	refresh int     // how often to check for changes, in seconds
-	forceMerge bool // ignore access time check when auto-merging
-	repo string     // a single repo to process
 )
 
 func main() {
@@ -27,20 +19,24 @@ func main() {
 		// Uncomment the following line if your bare application
 		// has an action associated with it:
 		Run: func(cmd *cobra.Command, _ []string) {
+			verbose := viper.GetBool("verbose")
+			daemon := viper.GetBool("daemon")
+			refresh := viper.GetInt("refresh")
+			forceMerge := viper.GetBool("merge-ignore-atime")
+			repo := viper.GetString("repo")
 			args := script.CliParse(verbose, daemon, refresh, forceMerge, repo)
 			script.RunCli(args)
 		},
 	}
 
 	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.grs.toml)")
-	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbosity")
-	rootCmd.PersistentFlags().BoolVarP(&daemon, "daemon", "d", false, "daemon mode")
-	rootCmd.PersistentFlags().IntVarP(&refresh, "refresh", "t", 600, "how often to check for changes, in seconds")
-	rootCmd.PersistentFlags().BoolVarP(&forceMerge, "force", "m", false, "ignore access time check when auto-merging")
-	rootCmd.PersistentFlags().StringVarP(&repo, "repo", "r", "", "the repository to process")
-
-	viper.BindPFlag("refresh", rootCmd.PersistentFlags().Lookup("refresh"))
+	pflag.String("config", "", "config file (default is $HOME/.grs.toml)")
+	pflag.BoolP("verbose", "v", false, "output verbose logs")
+	pflag.BoolP("daemon", "d", false, "run in daemon mode")
+	pflag.IntP("refresh", "t", 600, "how often to poll for changes, in seconds")
+	pflag.BoolP("merge-ignore-atime", "m", false, "ignore access time check when auto-merging")
+	pflag.StringP("repo", "r", "", "the repository to process")
+	viper.BindPFlags(pflag.CommandLine)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
@@ -50,6 +46,7 @@ func main() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
+	cfgFile := viper.GetString("config")
 	if cfgFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
