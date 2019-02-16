@@ -10,20 +10,21 @@ import (
 	"strings"
 )
 
-// An ErrorExecRunner is a stateful utility that refuses to execute further Commands once an error occurs.
+// GitTestHelper simplifies setting up Git repos on the filesysytem. If any method calls results in an error, all
+// further method calls will be a no-op.
 // It applies the Scanner.Err() technique as mentioned in https://blog.golang.org/errors-are-values
-type ErrorExecRunner struct {
+type GitTestHelper struct {
 	err       error
 	errCause  string
 	git       string
-	runner    *shexec.ExecRunner
+	runner    shexec.CommandRunner
 	debugExec bool
 }
 
-func NewExecRunner() *ErrorExecRunner {
+func NewGitTestHelper() *GitTestHelper {
 	_, debugExec := os.LookupEnv("GRS_TEST_EXEC_DEBUG")
 
-	return &ErrorExecRunner{
+	return &GitTestHelper{
 		err:       nil,
 		git:       ResolveGit(),
 		runner:    &shexec.ExecRunner{},
@@ -31,27 +32,27 @@ func NewExecRunner() *ErrorExecRunner {
 	}
 }
 
-func (s *ErrorExecRunner) Git() string {
+func (s *GitTestHelper) Git() string {
 	return s.git
 }
 
-func (s *ErrorExecRunner) Err() error {
+func (s *GitTestHelper) Err() error {
 	return s.err
 }
 
-func (s *ErrorExecRunner) ErrCause() string {
+func (s *GitTestHelper) ErrCause() string {
 	return s.errCause
 }
 
-func (s *ErrorExecRunner) ErrString() string {
+func (s *GitTestHelper) ErrString() string {
 	return fmt.Sprintf("%v\n\n%v", s.errCause, s.err)
 }
 
-func (s *ErrorExecRunner) ExecRunner() *shexec.ExecRunner {
+func (s *GitTestHelper) CommandRunner() shexec.CommandRunner {
 	return s.runner
 }
 
-func (s *ErrorExecRunner) Mkdir(subdir string) bool {
+func (s *GitTestHelper) Mkdir(subdir string) bool {
 	if s.err != nil {
 		return false
 	}
@@ -63,7 +64,7 @@ func (s *ErrorExecRunner) Mkdir(subdir string) bool {
 	return true
 }
 
-func (s *ErrorExecRunner) Chdir(dir string) bool {
+func (s *GitTestHelper) Chdir(dir string) bool {
 	if s.err != nil {
 		return false
 	}
@@ -75,7 +76,7 @@ func (s *ErrorExecRunner) Chdir(dir string) bool {
 	return true
 }
 
-func (s *ErrorExecRunner) Touch(file string) bool {
+func (s *GitTestHelper) Touch(file string) bool {
 	if s.err != nil {
 		return false
 	}
@@ -93,7 +94,7 @@ func (s *ErrorExecRunner) Touch(file string) bool {
 	return true
 }
 
-func (s *ErrorExecRunner) SetContents(file, contents string) (ok bool) {
+func (s *GitTestHelper) SetContents(file, contents string) (ok bool) {
 	if s.err != nil {
 		return false
 	}
@@ -121,7 +122,7 @@ func (s *ErrorExecRunner) SetContents(file, contents string) (ok bool) {
 	return ok
 }
 
-func (s *ErrorExecRunner) Exec(first string, arg ...string) bool {
+func (s *GitTestHelper) Exec(first string, arg ...string) bool {
 	if s.err != nil {
 		return false
 	}
@@ -139,11 +140,11 @@ func (s *ErrorExecRunner) Exec(first string, arg ...string) bool {
 	return true
 }
 
-func (s *ErrorExecRunner) Add(path string) bool {
+func (s *GitTestHelper) Add(path string) bool {
 	return s.Exec(s.git, "add", path)
 }
 
-func (s *ErrorExecRunner) Commit(msg string) bool {
+func (s *GitTestHelper) Commit(msg string) bool {
 	if s.err != nil {
 		return false
 	}
@@ -151,7 +152,7 @@ func (s *ErrorExecRunner) Commit(msg string) bool {
 	return s.Exec(git, "commit", "-m", msg)
 }
 
-func (s *ErrorExecRunner) TouchAndCommit(file, msg string) bool {
+func (s *GitTestHelper) TouchAndCommit(file, msg string) bool {
 	return s.Touch(file) &&
 		s.Add(file) &&
 		s.Commit(msg)

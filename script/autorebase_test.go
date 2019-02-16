@@ -16,7 +16,7 @@ a--b---c---f  @{UPSTREAM} origin/master
     g---h     cloned_repo/master
 */
 func TestAutoRebase_IT_Test_2(t *testing.T) {
-	exec := NewExecRunner()
+	exec := NewGitTestHelper()
 
 	oldwd, tmpdir := MkTmpDir(t, "AutoRebase_IT_Test_2", "TestAutoRebase_IT_Test_2")
 	defer CleanTmpDir(t, oldwd, tmpdir, "TestAutoRebase_IT_Test_2")
@@ -50,7 +50,7 @@ func TestAutoRebase_IT_Test_2(t *testing.T) {
 		t.Fatal("test setup failed")
 	}
 
-	ctx := NewAppContext(WithCommandRunner(exec.ExecRunner()))
+	ctx := NewAppContext(WithCommandRunner(exec.CommandRunner()))
 	repo := NewRepo("")
 	repo.Dir = DIR_VALID
 	s := NewScript(ctx, repo)
@@ -73,7 +73,7 @@ a--b---c---f  @{UPSTREAM} origin/master
     g---h     cloned_repo/master (g has a conflict with commit d)
 */
 func TestAutoRebase_IT_Test_3(t *testing.T) {
-	exec := NewExecRunner()
+	exec := NewGitTestHelper()
 
 	oldwd, tmpdir := MkTmpDir(t, "AutoRebase_IT_Test_3", "TestAutoRebase_IT_Test_3")
 	defer CleanTmpDir(t, oldwd, tmpdir, "TestAutoRebase_IT_Test_3")
@@ -112,7 +112,7 @@ func TestAutoRebase_IT_Test_3(t *testing.T) {
 		t.Fatal("test setup failed", exec.Err())
 	}
 
-	ctx := NewAppContext(WithCommandRunner(exec.ExecRunner()))
+	ctx := NewAppContext(WithCommandRunner(exec.CommandRunner()))
 	repo := NewRepo("")
 	repo.Dir = DIR_VALID
 	s := NewScript(ctx, repo)
