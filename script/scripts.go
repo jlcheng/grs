@@ -1,17 +1,16 @@
 package script
 
 import (
-	"jcheng/grs/shexec"
 	"os"
 )
 
 type Script struct {
-	ctx  *shexec.AppContext
+	ctx  *AppContext
 	repo *Repo
 	err  error
 }
 
-func NewScript(ctx *shexec.AppContext, repo *Repo) *Script {
+func NewScript(ctx *AppContext, repo *Repo) *Script {
 	return &Script{ctx: ctx, repo: repo}
 }
 

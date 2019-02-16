@@ -3,6 +3,7 @@ package script
 import (
 	"errors"
 	"fmt"
+	"jcheng/grs/base"
 	"jcheng/grs/shexec"
 	"strconv"
 	"strings"
@@ -23,22 +24,22 @@ func (s *Script) GetRepoStatus() {
 
 	command = ctx.CommandRunner.Command(git, "rev-parse", "@{upstream}").WithDir(repo.Path)
 	if out, err = command.CombinedOutput(); err != nil {
-		shexec.Debug("GetRepoStatus: no upstream detected. %s, %s", err, strings.TrimSpace(string(out)))
+		base.Debug("GetRepoStatus: no upstream detected. %s, %s", err, strings.TrimSpace(string(out)))
 		repo.Branch = BRANCH_UNTRACKED
 		return
 	}
 
-	shexec.Debug("CMD: git rev-list --left-right --count @{upstream}...HEAD")
+	base.Debug("CMD: git rev-list --left-right --count @{upstream}...HEAD")
 	command = ctx.CommandRunner.Command(git, "rev-list", "--left-right", "--count", "@{upstream}...HEAD").WithDir(repo.Path)
 	if out, err = command.CombinedOutput(); err != nil {
-		shexec.Debug("git rev-list failed: %v\n%v", err, string(out))
+		base.Debug("git rev-list failed: %v\n%v", err, string(out))
 		repo.Dir = DIR_INVALID
 		return
 	}
-	shexec.Debug(strings.TrimSpace(string(out)))
+	base.Debug(strings.TrimSpace(string(out)))
 	diff, err := parseRevList(out)
 	if err != nil {
-		shexec.Debug("cannot parse `git rev-list...` output: %q", string(out))
+		base.Debug("cannot parse `git rev-list...` output: %q", string(out))
 		repo.Dir = DIR_INVALID
 		return
 	}
@@ -71,12 +72,12 @@ func (s *Script) GetCommitTime() {
 	var err error
 
 	command = ctx.CommandRunner.Command(git, "log", "-1", "--format=%cr").WithDir(repo.Path)
-	shexec.Debug("CMD: git log -1 --format=%%cr")
+	base.Debug("CMD: git log -1 --format=%%cr")
 	if out, err = command.CombinedOutput(); err != nil {
-		shexec.Debug("failed: %v\n%v\n", err, string(out))
+		base.Debug("failed: %v\n%v\n", err, string(out))
 		repo.CommitTime = "Unknown"
 	}
-	shexec.Debug(strings.TrimSpace(string(out)))
+	base.Debug(strings.TrimSpace(string(out)))
 	repo.CommitTime = strings.Trim(string(out), "\n")
 }
 

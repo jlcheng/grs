@@ -1,4 +1,4 @@
-package shexec
+package script
 
 import (
 	"testing"

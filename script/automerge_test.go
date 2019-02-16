@@ -20,7 +20,7 @@ func TestAutoFFMerge_Ok(t *testing.T) {
 	runner := shexec.NewMockRunner()
 	runner.AddMap("git merge --ff-only", shexec.Ok(""))
 
-	ctx := shexec.NewAppContext(shexec.WithCommandRunner(runner))
+	ctx := NewAppContext(WithCommandRunner(runner))
 
 	repo := NewRepo("")
 	repo.Dir = DIR_VALID
@@ -37,7 +37,7 @@ func verify_AutoFFMerge_NoGitExec(t *testing.T, dir Dirstat, branch Branchstat, 
 	runner := shexec.NewMockRunner()
 	runner.AddMap("git", shexec.Ok(""))
 
-	ctx := shexec.NewAppContext(shexec.WithCommandRunner(runner))
+	ctx := NewAppContext(WithCommandRunner(runner))
 
 	repo := NewRepo("")
 	repo.Dir = dir

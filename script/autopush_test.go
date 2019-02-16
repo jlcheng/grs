@@ -37,7 +37,7 @@ func TestAutoPush_Ok(t *testing.T) {
 	runner.AddMap("git commit -m ", shexec.Ok(""))
 	runner.AddMap("git push", shexec.Ok(""))
 
-	ctx := shexec.NewAppContext(shexec.WithCommandRunner(runner))
+	ctx := NewAppContext(WithCommandRunner(runner))
 
 	repo := NewRepo("")
 	repo.Dir = DIR_VALID
@@ -59,7 +59,7 @@ func verify_AutoPush_NoGitExec(t *testing.T, dir Dirstat, branch Branchstat, ind
 	runner := shexec.NewMockRunner()
 	runner.AddMap("git", shexec.Ok(""))
 
-	ctx := shexec.NewAppContext(shexec.WithCommandRunner(runner))
+	ctx := NewAppContext(WithCommandRunner(runner))
 
 	repo := NewRepo("")
 	repo.Dir = dir
@@ -117,7 +117,7 @@ func TestAutoPush_IT_Test_1(t *testing.T) {
 
 	exec.Touch("c.txt")
 
-	ctx := shexec.NewAppContext()
+	ctx := NewAppContext()
 	repo := NewRepo("")
 	repo.Dir = DIR_VALID
 	repo.Branch = BRANCH_UPTODATE

@@ -1,8 +1,8 @@
-package shexec
+package base
 
 import "fmt"
 
-var level int = INFO
+var level = INFO
 
 const (
 	DEBUG = iota

@@ -1,13 +1,15 @@
-package shexec
+package script
+
+import "jcheng/grs/shexec"
 
 type AppContext struct {
-	CommandRunner
+	shexec.CommandRunner
 	GitExec string
 }
 
 func newAppCtxWithDefaults() *AppContext {
 	return &AppContext{
-		CommandRunner: &ExecRunner{},
+		CommandRunner: &shexec.ExecRunner{},
 		GitExec:       "git",
 	}
 }
@@ -29,7 +31,7 @@ func WithDefaultGitExec(gitExec string) AppContextOption {
 	}
 }
 
-func WithCommandRunner(runner CommandRunner) AppContextOption {
+func WithCommandRunner(runner shexec.CommandRunner) AppContextOption {
 	return func(ctx *AppContext) {
 		ctx.CommandRunner = runner
 	}

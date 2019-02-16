@@ -2,7 +2,6 @@ package script
 
 import (
 	"io/ioutil"
-	"jcheng/grs/shexec"
 	"os"
 	"testing"
 )
@@ -51,7 +50,7 @@ func TestAutoRebase_IT_Test_2(t *testing.T) {
 		t.Fatal("test setup failed")
 	}
 
-	ctx := shexec.NewAppContext(shexec.WithCommandRunner(exec.ExecRunner()))
+	ctx := NewAppContext(WithCommandRunner(exec.ExecRunner()))
 	repo := NewRepo("")
 	repo.Dir = DIR_VALID
 	s := NewScript(ctx, repo)
@@ -113,7 +112,7 @@ func TestAutoRebase_IT_Test_3(t *testing.T) {
 		t.Fatal("test setup failed", exec.Err())
 	}
 
-	ctx := shexec.NewAppContext(shexec.WithCommandRunner(exec.ExecRunner()))
+	ctx := NewAppContext(WithCommandRunner(exec.ExecRunner()))
 	repo := NewRepo("")
 	repo.Dir = DIR_VALID
 	s := NewScript(ctx, repo)

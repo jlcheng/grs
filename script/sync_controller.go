@@ -1,18 +1,17 @@
 package script
 
 import (
-	"jcheng/grs/shexec"
 	"sync"
 )
 
 // SyncController provides a struct that can check and report on status of a collection of repositories
 type SyncController struct {
 	repos []Repo             // a set of repositories to check and report on
-	ctx   *shexec.AppContext // the application context, e.g., dependencies
+	ctx   *AppContext // the application context, e.g., dependencies
 	gui   AnsiGUI            // notifies the display subsystem to re-render the UI
 }
 
-func NewSyncController(repos []Repo, ctx *shexec.AppContext, gui AnsiGUI) SyncController {
+func NewSyncController(repos []Repo, ctx *AppContext, gui AnsiGUI) SyncController {
 	return SyncController{
 		repos: repos,
 		ctx:   ctx,

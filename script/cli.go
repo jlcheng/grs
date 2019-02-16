@@ -3,7 +3,7 @@ package script
 import (
 	"fmt"
 	"github.com/spf13/viper"
-	"jcheng/grs/shexec"
+	"jcheng/grs/base"
 	"os"
 	"time"
 )
@@ -50,10 +50,10 @@ type RepoConfig struct {
 
 func RunCli(args Args) {
 	if args.verbose {
-		shexec.SetLogLevel(shexec.DEBUG)
+		base.SetLogLevel(base.DEBUG)
 	}
 
-	ctx := shexec.NewAppContext()
+	ctx := NewAppContext()
 	repos := ReposFromStringSlice(args.repos, args.repoCfgMap)
 
 	if len(repos) == 0 {

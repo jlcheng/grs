@@ -2,6 +2,7 @@ package script
 
 import (
 	"fmt"
+	"jcheng/grs/base"
 	"jcheng/grs/shexec"
 	"time"
 )
@@ -19,7 +20,7 @@ func (s *Script) AutoPush() bool {
 		return false
 	}
 
-	shexec.Debug("git auto-push ok: %v", repo)
+	base.Debug("git auto-push ok: %v", repo)
 	ctx := s.ctx
 	git := ctx.GitExec
 	commitMsg := AutoPushGenCommitMsg(NewStdClock())
@@ -29,13 +30,13 @@ func (s *Script) AutoPush() bool {
 	if repo.Index == INDEX_MODIFIED {
 		command := ctx.CommandRunner.Command(git, "add", "-A").WithDir(repo.Path)
 		if out, err = command.CombinedOutput(); err != nil {
-			shexec.Debug("git add failed. %v, %v", err, string(out))
+			base.Debug("git add failed. %v, %v", err, string(out))
 			return false
 		}
 
 		command = ctx.CommandRunner.Command(git, "commit", "-m", commitMsg).WithDir(repo.Path)
 		if out, err = command.CombinedOutput(); err != nil {
-			shexec.Debug("git commit failed. commit-msg=%v\nerr-msg:%v\nout:%v", commitMsg, err, string(out))
+			base.Debug("git commit failed. commit-msg=%v\nerr-msg:%v\nout:%v", commitMsg, err, string(out))
 			return false
 		}
 		repo.Index = INDEX_UNMODIFIED
@@ -44,7 +45,7 @@ func (s *Script) AutoPush() bool {
 
 	command = ctx.CommandRunner.Command(git, "push").WithDir(repo.Path)
 	if out, err = command.CombinedOutput(); err != nil {
-		shexec.Debug("git push failed. %v, %v", err, string(out))
+		base.Debug("git push failed. %v, %v", err, string(out))
 		return false
 	}
 	repo.Branch = BRANCH_UPTODATE
