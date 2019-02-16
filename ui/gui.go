@@ -2,8 +2,8 @@ package ui
 
 import (
 	"fmt"
-	"time"
 	"jcheng/grs/script"
+	"time"
 )
 
 type AnsiGUI struct {

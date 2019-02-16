@@ -26,7 +26,7 @@ func NewAppContext(options ...AppContextOption) *AppContext {
 type AppContextOption func(*AppContext)
 
 func WithDefaultGitExec(gitExec string) AppContextOption {
-	return func(ctx *AppContext){
+	return func(ctx *AppContext) {
 		ctx.GitExec = gitExec
 	}
 }
@@ -36,4 +36,5 @@ func WithCommandRunner(runner shexec.CommandRunner) AppContextOption {
 		ctx.CommandRunner = runner
 	}
 }
+
 // === END: options ===

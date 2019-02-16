@@ -13,7 +13,7 @@ func TestAutoPushGenCommitMsg(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	clock := &MockClock{NowRetval:nowRetval}
+	clock := &MockClock{NowRetval: nowRetval}
 	if got := AutoPushGenCommitMsg(clock); !strings.Contains(got, "1234-05-06T07:08:09Z") {
 		t.Error("expected timestamp missing. got:", got)
 	}
@@ -71,7 +71,6 @@ func verify_AutoPush_NoGitExec(t *testing.T, dir Dirstat, branch Branchstat, ind
 		t.Errorf("unexpected `git push` given dirstat=%v, branchstat=%v, indexstat=%v\n", dir, branch, index)
 	}
 }
-
 
 // == Integration tests that runs the git executable on a local disk == //
 /*

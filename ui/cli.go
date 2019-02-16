@@ -82,7 +82,6 @@ func RunCli(args Args) {
 	}
 }
 
-
 // TODO: JCHENG unit test improvements
 func ReposFromStringSlice(repos []string, repoCfg map[string]RepoConfig) []script.Repo {
 	r := make([]script.Repo, len(repos))

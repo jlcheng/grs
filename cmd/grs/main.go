@@ -15,7 +15,7 @@ func main() {
 	var rootCmd = &cobra.Command{
 		Use:   "grs",
 		Short: "grs performs two-way sync of Git repos",
-		Long: "grs performs two-way sync of Git repos",
+		Long:  "grs performs two-way sync of Git repos",
 		// Uncomment the following line if your bare application
 		// has an action associated with it:
 		Run: func(cmd *cobra.Command, _ []string) {

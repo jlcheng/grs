@@ -81,7 +81,7 @@ func (m *MockRunner) Command(name string, arg ...string) Command {
 		}
 	}
 	if len(m._commands) == 0 {
-		return Error("mock has no commands that match: "+ name)
+		return Error("mock has no commands that match: " + name)
 	}
 
 	r := m._commands[0]
