@@ -30,6 +30,7 @@ func main() {
 	pflag.IntP("refresh", "t", 600, "how often to poll for changes, in seconds")
 	pflag.BoolP("merge-ignore-atime", "m", false, "ignore access time check when auto-merging")
 	pflag.StringP("repo", "r", "", "the repository to process")
+	pflag.Bool("use-cui", false, "use the experiment CuiGUI ui")
 	viper.BindPFlags(pflag.CommandLine)
 
 	if err := rootCmd.Execute(); err != nil {

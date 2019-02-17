@@ -10,6 +10,7 @@ type SyncController struct {
 	repos []script.Repo      // a set of repositories to check and report on
 	ctx   *script.AppContext // the application context, e.g., dependencies
 	gui   AnsiGUI            // notifies the display subsystem to re-render the UI
+	Cui   *CuiGUI
 }
 
 func NewSyncController(repos []script.Repo, ctx *script.AppContext, gui AnsiGUI) SyncController {
@@ -52,5 +53,10 @@ func processRepo(s *script.Script) {
 
 func (d *SyncController) Run() {
 	d.runIteration()
-	d.gui.Run(d.repos)
+	// TODO hack, should properly model gui types using interface
+	if d.Cui != nil {
+		d.Cui.Run(d.repos)
+	} else {
+		d.gui.Run(d.repos)
+	}
 }

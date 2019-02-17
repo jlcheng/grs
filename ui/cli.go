@@ -1,11 +1,10 @@
 package ui
 
 import (
-	"fmt"
 	"github.com/spf13/viper"
 	"jcheng/grs/base"
 	"jcheng/grs/script"
-	"os"
+	"log"
 	"time"
 )
 
@@ -17,6 +16,7 @@ type Args struct {
 	refresh    int
 	forceMerge bool
 	repoCfgMap map[string]RepoConfig
+	useCui     bool
 }
 
 // CliParse uses spf13/viper to create the program parameters
@@ -34,6 +34,7 @@ func CliParse() Args {
 		forceMerge: viper.GetBool("merge-ignore-atime"),
 		repos:      repos,
 		repoCfgMap: parseRepoConfigMap(viper.Get("repo_config")),
+		useCui:     viper.GetBool("use-cui"),
 	}
 	return args
 }
@@ -59,12 +60,21 @@ func RunCli(args Args) {
 	repos := ReposFromStringSlice(args.repos, args.repoCfgMap)
 
 	if len(repos) == 0 {
-		fmt.Println("repos not specified")
-		os.Exit(1)
+		log.Fatal("repos not specified")
 	}
 
 	gui := NewGUI(args.daemon)
 	syncController := NewSyncController(repos, ctx, gui)
+
+	if args.useCui {
+		cui := NewCuiGUI()
+		if err := cui.Init(); err != nil {
+			log.Fatal("cannot initialize the terminal", err)
+		}
+		defer cui.Close()
+		go cui.MainLoop()
+		syncController.Cui = cui
+	}
 
 	// run at least once
 	syncController.Run()
@@ -72,14 +82,20 @@ func RunCli(args Args) {
 		ticker := time.NewTicker(time.Duration(args.refresh) * time.Second)
 		defer ticker.Stop() // remove? not strictly necessary as we don't offer a way to gracefully shutdown
 
-		// use Ctrl-C to stop this program
+		// TODO Need a better way of stopping. This performs an interation before stopping. HACK
+		L:
 		for {
+			if syncController.Cui != nil && syncController.Cui.stopped {
+				break L
+			}
+
 			select {
 			case <-ticker.C:
 				syncController.Run()
 			}
 		}
 	}
+
 }
 
 // TODO: JCHENG unit test improvements
