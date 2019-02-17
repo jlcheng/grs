@@ -139,22 +139,13 @@ func (c *CuiGUI) Close() {
 
 func _layout(g *gocui.Gui) error {
 	maxX, maxY := g.Size()
-	if v, err := g.SetView("main", 0, 0, maxX-1, maxY-5); err != nil {
+	if v, err := g.SetView("main", 0, 0, maxX-1, maxY-1); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}
 		v.Title = "Grs"
-		fmt.Fprintln(v, "Fetching repo data")
+		fmt.Fprintln(v, "Fetching repo data...")
 	}
-
-	if v, err := g.SetView("help", 0, maxY-4, maxX-1, maxY-1); err != nil {
-		if err != gocui.ErrUnknownView {
-			return err
-		}
-		v.Title = "Help"
-		fmt.Fprintln(v, "CTRL-C (quit)")
-	}
-
 	return nil
 }
 // === END: CUI implementation ===
