@@ -64,7 +64,7 @@ func (d *SyncController) Run() {
 }
 
 // === START: Dual Loop Process ===
-// RunLoops starts two goroutines 1) to sync repos and 2) update the UI. It blocks until the UI goroutine sends a quit signal.
+// RunLoops starts two goroutines 1) to sync repos and 2) tells the UI it needs to redraw. It blocks until the UI goroutine sends a quit signal.
 func (d *SyncController) RunLoops() {
 	quit := d.Cui.GetQuitChannel()
 	ticker := time.NewTicker(d.Duration)
@@ -84,7 +84,6 @@ UI_LOOP:
 		case repos := <-from:
 			gui.Run(repos)
 		case <-quit:
-			gui.Close()
 			break UI_LOOP
 		}
 	}

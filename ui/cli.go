@@ -71,15 +71,22 @@ func RunCli(args Args) {
 
 	if args.useCui {
 		cui := NewCuiGUI()
+		// Sets up a `done` channel. The `done` channel can only be closed by the terminal UI. Closing the channel
+		// will cascade to various goroutines that coordinate the UI and application code.
 		if err := cui.Init(); err != nil {
 			log.Fatal("cannot initialize the terminal", err)
 		}
 		defer cui.Close()
+		// SyncController needs to know about the terminal UI to tell it to redraw
 		syncController.Cui = cui
+		// SyncController needs to know about the refresh interval to know often it should run the `sync repo` code
 		syncController.Duration = time.Duration(args.refresh) * time.Second
+		// Gets reference of the `done` channel so the main goroutine can block until the UI receives a `done` signal
 		done := cui.done
 
-		// starts goroutines to 1) receive ticks and sends []Repo; 2) recieve []Repo and send to UI
+		// starts two goroutines
+		//  syncer: a tick event triggers `sync repo` code, which outputs a `repos synced` event
+		//  uiForwarder: a `repos synced` event triggers code to use the cui API to redraw the terminal UI
 		go syncController.RunLoops()
 
 		// starts goroutine for terminal UI
