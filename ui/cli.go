@@ -67,36 +67,49 @@ func RunCli(args Args) {
 	syncController := NewSyncController(repos, ctx, gui)
 
 	if args.useCui {
+	}
+
+	if args.useCui {
 		cui := NewCuiGUI()
 		if err := cui.Init(); err != nil {
 			log.Fatal("cannot initialize the terminal", err)
 		}
 		defer cui.Close()
-		go cui.MainLoop()
 		syncController.Cui = cui
-	}
+		syncController.Duration = time.Duration(args.refresh) * time.Second
+		done := cui.done
 
-	// run at least once
-	syncController.Run()
-	if args.daemon {
-		ticker := time.NewTicker(time.Duration(args.refresh) * time.Second)
-		defer ticker.Stop()
-		if args.useCui {
-			DAEMON_LOOP:
-			for !syncController.Cui.stopped {
-				select {
-				case <-ticker.C:
-					syncController.Run()
-				case <-syncController.Cui.done:
-					break DAEMON_LOOP
+		// starts goroutines to 1) receive ticks and sends []Repo; 2) recieve []Repo and send to UI
+		go syncController.RunLoops()
+
+		// starts goroutine for terminal UI
+		go cui.MainLoop()
+
+		// blocks until the UI has been stopped
+		<- done
+	} else {
+		// run at least once
+		syncController.Run()
+		if args.daemon {
+			ticker := time.NewTicker(time.Duration(args.refresh) * time.Second)
+			defer ticker.Stop()
+			if args.useCui {
+				DAEMON_LOOP:
+				for !syncController.Cui.stopped {
+					select {
+					case <-ticker.C:
+						syncController.Run()
+					case <-syncController.Cui.done:
+						break DAEMON_LOOP
+					}
 				}
-			}
 
-		} else {
-			for {
-				select {
-				case <-ticker.C:
-					syncController.Run()
+			} else {
+				for {
+					select {
+					case <-ticker.C:
+						syncController.Run()
+					}
 				}
 			}
 		}

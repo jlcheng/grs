@@ -61,11 +61,11 @@ func NewCuiGUI() *CuiGUI {
 
 func (c *CuiGUI) Init() error {
 	g, err := gocui.NewGui(gocui.Output256)
-	g.ASCII = false
-
 	if err != nil {
 		return err
 	}
+
+	g.ASCII = false
 
 	c.cui = g
 	g.SetManagerFunc(_layout)
@@ -108,7 +108,7 @@ func (c *CuiGUI) Run(repos []script.Repo) {
 			return err
 		}
 		v.Clear()
-		var time = time.Now().Format("[Jan _2 3:04PM PST]")
+		var time = time.Now().Format("[Jan _2 3:04:05PM PST]")
 		v.Title = fmt.Sprintf("Grs %s", time)
 
 		for _, repo := range repos {
@@ -127,11 +127,16 @@ func (c *CuiGUI) MainLoop() error {
 	return nil
 }
 
+func (c *CuiGUI) GetQuitChannel() <-chan struct{} {
+	return c.done
+}
+
 func (c *CuiGUI) Close() {
 	c.doneLock.Lock()
 	if c.done != nil {
 		close(c.done)
 	}
+	c.done = nil
 	c.doneLock.Unlock()
 
 	c.cui.Close()

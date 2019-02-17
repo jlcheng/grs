@@ -3,6 +3,7 @@ package ui
 import (
 	"jcheng/grs/script"
 	"sync"
+	"time"
 )
 
 // SyncController provides a struct that can check and report on status of a collection of repositories
@@ -11,6 +12,7 @@ type SyncController struct {
 	ctx   *script.AppContext // the application context, e.g., dependencies
 	gui   AnsiGUI            // notifies the display subsystem to re-render the UI
 	Cui   *CuiGUI
+	Duration time.Duration   // how often to sync repos
 }
 
 func NewSyncController(repos []script.Repo, ctx *script.AppContext, gui AnsiGUI) SyncController {
@@ -60,3 +62,68 @@ func (d *SyncController) Run() {
 		d.gui.Run(d.repos)
 	}
 }
+
+// === START: Dual Loop Process ===
+// RunLoops starts two goroutines 1) to sync repos and 2) update the UI. It blocks until the UI goroutine sends a quit signal.
+func (d *SyncController) RunLoops() {
+	quit := d.Cui.GetQuitChannel()
+	ticker := time.NewTicker(d.Duration)
+	defer ticker.Stop()
+	syncerToUI := make(chan []script.Repo)
+	defer close(syncerToUI)
+	go d.uiLoop(quit, syncerToUI)
+	go d.syncerLoop(quit, ticker.C, syncerToUI)
+	<-quit
+}
+
+func (d *SyncController) uiLoop(quit <-chan struct{}, from <-chan []script.Repo) {
+	gui := d.Cui
+UI_LOOP:
+	for {
+		select {
+		case repos := <-from:
+			gui.Run(repos)
+		case <-quit:
+			gui.Close()
+			break UI_LOOP
+		}
+	}
+}
+
+// repoLoop reacts to `tick` events by processes repos and sends a notification of the results to `to`
+func (d *SyncController) syncerLoop(quit <-chan struct{}, ticker <-chan time.Time, syncerToUI chan<- []script.Repo) {
+
+	processRepoSlice := func() []script.Repo {
+		var wg sync.WaitGroup
+		wg.Add(len(d.repos))
+		for i, _ := range d.repos {
+			repo := &d.repos[i]
+			go func() {
+				processRepo(script.NewScript(d.ctx, repo))
+				wg.Done()
+			}()
+		}
+		wg.Wait()
+		return d.repos
+	}
+
+	// run at least once
+	syncerToUI <- processRepoSlice()
+SYNC_LOOP:
+	for {
+		// tie breaker in case ticker has an event and the goroutine is notified to stop q
+		select {
+		case <-quit:
+			break SYNC_LOOP
+		default:
+		}
+
+		select {
+		case <-ticker:
+			syncerToUI <- processRepoSlice()
+		case <-quit:
+			break SYNC_LOOP
+		}
+	}
+}
+// === END: Dual Loop Process ===
