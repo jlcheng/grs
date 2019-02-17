@@ -80,18 +80,24 @@ func RunCli(args Args) {
 	syncController.Run()
 	if args.daemon {
 		ticker := time.NewTicker(time.Duration(args.refresh) * time.Second)
-		defer ticker.Stop() // remove? not strictly necessary as we don't offer a way to gracefully shutdown
-
-		// TODO Need a better way of stopping. This performs an interation before stopping. HACK
-		L:
-		for {
-			if syncController.Cui != nil && syncController.Cui.stopped {
-				break L
+		defer ticker.Stop()
+		if args.useCui {
+			DAEMON_LOOP:
+			for !syncController.Cui.stopped {
+				select {
+				case <-ticker.C:
+					syncController.Run()
+				case <-syncController.Cui.done:
+					break DAEMON_LOOP
+				}
 			}
 
-			select {
-			case <-ticker.C:
-				syncController.Run()
+		} else {
+			for {
+				select {
+				case <-ticker.C:
+					syncController.Run()
+				}
 			}
 		}
 	}
