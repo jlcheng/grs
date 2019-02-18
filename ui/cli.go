@@ -63,75 +63,21 @@ func RunCli(args Args) {
 		log.Fatal("repos not specified")
 	}
 
-	gui := NewGUI(args.daemon)
-	syncController := NewSyncController(repos, ctx, gui)
 
+	var cliUI CliUI
+	var err error
 	if args.useCui {
-		var cliUI CliUI
-		var err error
 		cliUI, err = NewConsoleUI()
-		if err != nil {
-			log.Fatal("cannot initialize the termina", err)
-		}
-		defer cliUI.Close()
-
-		syncController.Duration = time.Duration(args.refresh) * time.Second
-		syncController.CliUI = cliUI
-		syncController.CliUIImpl()
-
-
-		//cui := NewCuiGUI()
-		//// Sets up a `done` channel. The `done` channel can only be closed by the terminal UI. Closing the channel
-		//// will cascade to various goroutines that coordinate the UI and application code.
-		//if err := cui.Init(); err != nil {
-		//	log.Fatal("cannot initialize the terminal", err)
-		//}
-		//defer cui.Close()
-		//// SyncController needs to know about the terminal UI to tell it to redraw
-		//syncController.Cui = cui
-		//// SyncController needs to know about the refresh interval to know often it should run the `sync repo` code
-		//syncController.Duration = time.Duration(args.refresh) * time.Second
-		//// Gets reference of the `done` channel so the main goroutine can block until the UI receives a `done` signal
-		//done := cui.done
-		//
-		//// starts two goroutines
-		////  syncer: a tick event triggers `sync repo` code, which outputs a `repos synced` event
-		////  uiForwarder: a `repos synced` event triggers code to use the cui API to redraw the terminal UI
-		//go syncController.RunLoops()
-		//
-		//// starts goroutine for terminal UI
-		//go cui.MainLoop()
-		//
-		//// blocks until the UI has been stopped
-		//<- done
 	} else {
-		// run at least once
-		syncController.Run()
-		if args.daemon {
-			ticker := time.NewTicker(time.Duration(args.refresh) * time.Second)
-			defer ticker.Stop()
-			if args.useCui {
-				DAEMON_LOOP:
-				for !syncController.Cui.stopped {
-					select {
-					case <-ticker.C:
-						syncController.Run()
-					case <-syncController.Cui.done:
-						break DAEMON_LOOP
-					}
-				}
-
-			} else {
-				for {
-					select {
-					case <-ticker.C:
-						syncController.Run()
-					}
-				}
-			}
-		}
+		cliUI, err = NewPrintUI()
 	}
-
+	if err != nil {
+			log.Fatal("cannot initialize the terminal", err)
+	}
+	defer cliUI.Close()
+	syncController := NewSyncController(repos, ctx, cliUI)
+	syncController.Duration = time.Duration(args.refresh) * time.Second
+	syncController.CliUIImpl()
 }
 
 // TODO: JCHENG unit test improvements
