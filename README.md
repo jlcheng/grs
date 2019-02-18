@@ -1,10 +1,11 @@
 # GRS (Grease)
 
-Grs is a daemon that polls your Git repos and keep them up to date. You can think of it as a glorified cron job with
-a few differences.
+Gfrs is a command-line program that polls your Git repos and keep them up to date. You can think of it as a glorified
+cron job with a few differences.
 
 1. Grs will try to auto-rebase your local changes. If there is a conflict, Grs will keep your local files unchanged.
 2. Grs can optionally auto-push your changes.
+3. Grs provides a dashboard view of your Git repos.
 
 I use Grs as a replacement for Dropbox and Evernote. Many files that matter to me are text files: scripts, org-mode
 documents, and journals. Thus, it is natural for me to use Git to manage them. Git does a good job of auto-resolving
@@ -22,6 +23,8 @@ repo [/home/jcheng/org] status IS UP-TO-DATE, UNMODIFIED, 2 seconds ago.
 ```
 
 # tldr;
+Go version 1.11+ is required. Grs uses Go modules for dependencies management.
+
 Install Grs
 ```
 $ make all     # Runs tests and creates out/grs
@@ -45,7 +48,7 @@ push_allowed = true
 ENDL
 ```
 
-Finally, run Grs as a daemon
+Finally, run Grs in a terminal window
 ```
-~/bin/grs -d
+~/bin/grs --use-cui
 ```

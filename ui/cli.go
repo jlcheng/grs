@@ -12,11 +12,10 @@ type Args struct {
 	repos      []string
 	verbose    bool
 	command    string
-	daemon     bool
 	refresh    int
 	forceMerge bool
 	repoCfgMap map[string]RepoConfig
-	useCui     bool
+	useTui     bool
 }
 
 // CliParse uses spf13/viper to create the program parameters
@@ -29,12 +28,11 @@ func CliParse() Args {
 
 	var args = Args{
 		verbose:    viper.GetBool("verbose"),
-		daemon:     viper.GetBool("daemon"),
 		refresh:    viper.GetInt("refresh"),
 		forceMerge: viper.GetBool("merge-ignore-atime"),
 		repos:      repos,
 		repoCfgMap: parseRepoConfigMap(viper.Get("repo_config")),
-		useCui:     viper.GetBool("use-cui"),
+		useTui:     viper.GetBool("use-tui"),
 	}
 	return args
 }
@@ -66,7 +64,7 @@ func RunCli(args Args) {
 
 	var cliUI CliUI
 	var err error
-	if args.useCui {
+	if args.useTui {
 		cliUI, err = NewConsoleUI()
 	} else {
 		cliUI, err = NewPrintUI()

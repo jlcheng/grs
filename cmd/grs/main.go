@@ -26,11 +26,10 @@ func main() {
 	cobra.OnInitialize(initConfig)
 	pflag.String("config", "", "config file (default is $HOME/.grs.toml)")
 	pflag.BoolP("verbose", "v", false, "output verbose logs")
-	pflag.BoolP("daemon", "d", false, "run in daemon mode")
 	pflag.IntP("refresh", "t", 600, "how often to poll for changes, in seconds")
 	pflag.BoolP("merge-ignore-atime", "m", false, "ignore access time check when auto-merging")
 	pflag.StringP("repo", "r", "", "the repository to process")
-	pflag.Bool("use-cui", false, "use the experiment CuiGUI ui")
+	pflag.Bool("use-tui", false, "use the experiment text-based UI")
 	viper.BindPFlags(pflag.CommandLine)
 
 	if err := rootCmd.Execute(); err != nil {
