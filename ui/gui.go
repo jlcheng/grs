@@ -154,3 +154,91 @@ func _layout(g *gocui.Gui) error {
 	return nil
 }
 // === END: CUI implementation ===
+
+// === START: CliUI implementation ===
+type CliUI interface {
+	DoneSender() <-chan struct{}
+	MainLoop() error
+	Draw(repos []script.Repo)
+	Close()
+}
+
+type ConsoleUI struct {
+	gui *gocui.Gui
+	done chan struct{}
+	doneLock sync.Mutex
+}
+
+func NewConsoleUI() (*ConsoleUI, error) {
+	gui, err := gocui.NewGui(gocui.Output256)
+	if err != nil {
+		return nil, err
+	}
+
+	gui.SetManagerFunc(_layout)
+
+	consoleUI := &ConsoleUI{
+		gui: gui,
+		done: make(chan struct{}),
+	}
+
+	if err := consoleUI.initKeyBindings(); err != nil {
+		return nil, err
+	}
+
+	return consoleUI, nil
+}
+
+func (consoleUI *ConsoleUI) initKeyBindings() error {
+	quitFunc := func(_ *gocui.Gui, _ *gocui.View) error {
+		consoleUI.doneLock.Lock()
+		defer consoleUI.doneLock.Unlock()
+		if consoleUI.done == nil {
+			return nil
+		}
+		close(consoleUI.done)
+		consoleUI.done = nil
+		return gocui.ErrQuit
+	}
+	if err := consoleUI.gui.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, quitFunc); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (consoleUI *ConsoleUI) DoneSender() <-chan struct{} {
+	return consoleUI.done
+}
+
+func (consoleUI *ConsoleUI) MainLoop() error {
+	return consoleUI.gui.MainLoop()
+}
+
+func (consoleUI *ConsoleUI) Draw(repos []script.Repo) {
+	if consoleUI.done == nil {
+		return
+	}
+
+	consoleUI.gui.Update(func(g *gocui.Gui) error {
+		v, err := g.View("main")
+		if err != nil {
+			return err
+		}
+		v.Clear()
+		var time = time.Now().Format("[Jan _2 3:04:05PM PST]")
+		v.Title = fmt.Sprintf("Grs %s", time)
+
+		for _, repo := range repos {
+			line := fmt.Sprintf("repo [%v] status IS %v, %v, %v.",
+				repo.Path, colorB(repo.Branch), colorI(repo.Index), repo.CommitTime)
+			fmt.Fprintln(v, line)
+		}
+		return nil
+	})
+}
+
+func (consoleUI *ConsoleUI) Close() {
+	consoleUI.gui.Close()
+}
+var _consoleUIImpl CliUI = &ConsoleUI{}
+// === END: CliUI implementation ===
