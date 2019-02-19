@@ -1,7 +1,7 @@
 # GRS (Grease)
 
-Gfrs is a command-line program that polls your Git repos and keep them up to date. You can think of it as a glorified
-cron job with a few differences.
+Grs is a dashboard for your Git repos and keep your repos up-to-date. You can think of it as a glorified cron job with a
+few differences.
 
 1. Grs will try to auto-rebase your local changes. If there is a conflict, Grs will keep your local files unchanged.
 2. Grs can optionally auto-push your changes.
