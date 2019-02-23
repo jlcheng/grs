@@ -89,7 +89,6 @@ A--B--C        source
 */
 func TestAutoPush_IT_Test_1(t *testing.T) {
 	const TEST_LABEL = "TestAutoPush_IT_Test_1"
-	// TODO JCHENG tedious work of writing out this test case :)
 	exec := NewGitTestHelper()
 
 	oldwd, tmpdir := MkTmpDir(t, TEST_LABEL, TEST_LABEL)

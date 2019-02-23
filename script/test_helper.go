@@ -20,6 +20,7 @@ type GitTestHelper struct {
 	runner    shexec.CommandRunner
 	debugExec bool
 }
+type option func(*GitTestHelper)
 
 func NewGitTestHelper() *GitTestHelper {
 	_, debugExec := os.LookupEnv("GRS_TEST_EXEC_DEBUG")
@@ -29,6 +30,25 @@ func NewGitTestHelper() *GitTestHelper {
 		git:       ResolveGit(),
 		runner:    &shexec.ExecRunner{},
 		debugExec: debugExec,
+	}
+}
+
+func NewGitTestHelperWithOptions(options ...option) *GitTestHelper {
+	retval := &GitTestHelper{
+		err: nil,
+		git: ResolveGit(),
+		runner: &shexec.ExecRunner{},
+		debugExec: false,
+	}
+	for _, o := range options {
+		o(retval)
+	}
+	return retval
+}
+
+func WithDebug(debugExec bool) option {
+	return func(g *GitTestHelper) {
+		g.debugExec = debugExec
 	}
 }
 
@@ -129,7 +149,8 @@ func (s *GitTestHelper) Exec(first string, arg ...string) bool {
 	cmd := s.runner.Command(first, arg...)
 	bytes, err := cmd.CombinedOutput()
 	if s.debugExec {
-		fmt.Println(first + strings.Join(arg, " "))
+		words := append([]string{">>>", first}, arg...)
+		fmt.Println(strings.Join(words, " "))
 		fmt.Println(string(bytes))
 	}
 	if err != nil {
