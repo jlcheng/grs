@@ -72,9 +72,8 @@ func verify_AutoPush_NoGitExec(t *testing.T, dir Dirstat, branch Branchstat, ind
 	}
 }
 
-// == Integration tests that runs the git executable on a local disk == //
 /*
-commits *c and pushes it upstrea
+commits *c and pushes it upstream
 
 After setup, before run
 A--B            source, @{UPSTREAM}, or origin/master
@@ -89,7 +88,6 @@ A--B--C        source
 */
 func TestAutoPush_IT_Test_1(t *testing.T) {
 	const TEST_LABEL = "TestAutoPush_IT_Test_1"
-	exec := NewGitTestHelper()
 
 	oldwd, tmpdir := MkTmpDir(t, TEST_LABEL, TEST_LABEL)
 	defer CleanTmpDir(t, oldwd, tmpdir, TEST_LABEL)
@@ -97,6 +95,7 @@ func TestAutoPush_IT_Test_1(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	exec := NewGitTestHelper(WithDebug(false), WithWd(tmpdir))
 	git := exec.Git()
 	exec.Mkdir("source")
 	exec.Chdir("source")
@@ -116,7 +115,7 @@ func TestAutoPush_IT_Test_1(t *testing.T) {
 	exec.Touch("c.txt")
 
 	ctx := NewAppContext()
-	repo := NewRepo("")
+	repo := NewRepo(exec.Getwd())
 	repo.Dir = DIR_VALID
 	repo.Branch = BRANCH_UPTODATE
 	repo.Index = INDEX_MODIFIED

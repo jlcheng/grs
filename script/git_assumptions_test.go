@@ -29,7 +29,7 @@ func TestRebasePullConflict(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	exec := NewGitTestHelperWithOptions(WithDebug(false))
+	exec := NewGitTestHelper(WithDebug(false), WithWd(tmpdir))
 	git := exec.Git()
 	exec.Mkdir("source")
 	exec.Chdir("source")

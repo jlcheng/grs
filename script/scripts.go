@@ -21,6 +21,11 @@ func (s *Script) BeforeScript() {
 		return
 	}
 
+	if s.repo.Path == "" {
+		s.repo.Dir = DIR_INVALID
+		return
+	}
+
 	if finfo, err := os.Stat(s.repo.Path); err != nil || !finfo.IsDir() {
 		s.repo.Dir = DIR_INVALID
 		return

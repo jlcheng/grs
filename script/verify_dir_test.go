@@ -9,10 +9,10 @@ import (
 func TestBeforeScript_Fail(t *testing.T) {
 	runner := shexec.NewMockRunner()
 	var repo *Repo
-	if cwd, e := os.Getwd(); e != nil {
+	if wd, e := os.Getwd(); e != nil {
 		t.Error(e)
 	} else {
-		repo = NewRepo(cwd)
+		repo = NewRepo(wd)
 	}
 	runner.Add(shexec.Error("failed"))
 	s := NewScript(NewAppContext(WithCommandRunner(runner)), repo)
@@ -25,10 +25,10 @@ func TestBeforeScript_Fail(t *testing.T) {
 func TestBeforeScript_OK(t *testing.T) {
 	runner := shexec.NewMockRunner()
 	var repo *Repo
-	if cwd, e := os.Getwd(); e != nil {
+	if wd, e := os.Getwd(); e != nil {
 		t.Error(e)
 	} else {
-		repo = NewRepo(cwd)
+		repo = NewRepo(wd)
 	}
 
 	runner.Add(shexec.Ok(""))

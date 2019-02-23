@@ -16,14 +16,13 @@ a--b---c---f  @{UPSTREAM} origin/master
     g---h     cloned_repo/master
 */
 func TestAutoRebase_IT_Test_2(t *testing.T) {
-	exec := NewGitTestHelper()
-
 	oldwd, tmpdir := MkTmpDir(t, "AutoRebase_IT_Test_2", "TestAutoRebase_IT_Test_2")
 	defer CleanTmpDir(t, oldwd, tmpdir, "TestAutoRebase_IT_Test_2")
 	if err := os.Chdir(tmpdir); err != nil {
 		t.Fatal(err)
 	}
 
+	exec := NewGitTestHelper(WithDebug(false), WithWd(tmpdir))
 	git := exec.Git()
 	exec.Mkdir("source")
 	exec.Chdir("source")
@@ -51,7 +50,7 @@ func TestAutoRebase_IT_Test_2(t *testing.T) {
 	}
 
 	ctx := NewAppContext(WithCommandRunner(exec.CommandRunner()))
-	repo := NewRepo("")
+	repo := NewRepo(exec.Getwd())
 	repo.Dir = DIR_VALID
 	s := NewScript(ctx, repo)
 	s.Fetch()
@@ -73,14 +72,13 @@ a--b---c---f  @{UPSTREAM} origin/master
     g---h     cloned_repo/master (g has a conflict with commit d)
 */
 func TestAutoRebase_IT_Test_3(t *testing.T) {
-	exec := NewGitTestHelper()
-
 	oldwd, tmpdir := MkTmpDir(t, "AutoRebase_IT_Test_3", "TestAutoRebase_IT_Test_3")
 	defer CleanTmpDir(t, oldwd, tmpdir, "TestAutoRebase_IT_Test_3")
 	if err := os.Chdir(tmpdir); err != nil {
 		t.Fatal(err)
 	}
 
+	exec := NewGitTestHelper(WithDebug(false), WithWd(tmpdir))
 	git := exec.Git()
 	exec.Mkdir("source")
 	exec.Chdir("source")
@@ -113,7 +111,7 @@ func TestAutoRebase_IT_Test_3(t *testing.T) {
 	}
 
 	ctx := NewAppContext(WithCommandRunner(exec.CommandRunner()))
-	repo := NewRepo("")
+	repo := NewRepo(exec.Getwd())
 	repo.Dir = DIR_VALID
 	s := NewScript(ctx, repo)
 	s.Fetch()

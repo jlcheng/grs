@@ -7,6 +7,7 @@ import (
 	"jcheng/grs/shexec"
 	"os"
 	"os/exec"
+	"path"
 	"strings"
 )
 
@@ -19,21 +20,11 @@ type GitTestHelper struct {
 	git       string
 	runner    shexec.CommandRunner
 	debugExec bool
+	wd        string
 }
 type option func(*GitTestHelper)
 
-func NewGitTestHelper() *GitTestHelper {
-	_, debugExec := os.LookupEnv("GRS_TEST_EXEC_DEBUG")
-
-	return &GitTestHelper{
-		err:       nil,
-		git:       ResolveGit(),
-		runner:    &shexec.ExecRunner{},
-		debugExec: debugExec,
-	}
-}
-
-func NewGitTestHelperWithOptions(options ...option) *GitTestHelper {
+func NewGitTestHelper(options ...option) *GitTestHelper {
 	retval := &GitTestHelper{
 		err: nil,
 		git: ResolveGit(),
@@ -43,12 +34,26 @@ func NewGitTestHelperWithOptions(options ...option) *GitTestHelper {
 	for _, o := range options {
 		o(retval)
 	}
+
+	if retval.wd == "" {
+		retval.wd, _ = os.Getwd()
+	}
+	if retval.wd == "" {
+		retval.wd = os.TempDir()
+	}
+
 	return retval
 }
 
 func WithDebug(debugExec bool) option {
 	return func(g *GitTestHelper) {
 		g.debugExec = debugExec
+	}
+}
+
+func WithWd(wd string) option {
+	return func(g *GitTestHelper) {
+		g.wd = wd
 	}
 }
 
@@ -72,13 +77,14 @@ func (s *GitTestHelper) CommandRunner() shexec.CommandRunner {
 	return s.runner
 }
 
-func (s *GitTestHelper) Mkdir(subdir string) bool {
+func (s *GitTestHelper) Mkdir(dir string) bool {
 	if s.err != nil {
 		return false
 	}
-	if err := os.Mkdir(subdir, 0755); err != nil {
+	target := s.toAbsPath(dir)
+	if err := os.Mkdir(target, 0755); err != nil {
 		s.err = err
-		s.errCause = "mkdir " + subdir
+		s.errCause = "mkdir " + target
 		return false
 	}
 	return true
@@ -88,22 +94,24 @@ func (s *GitTestHelper) Chdir(dir string) bool {
 	if s.err != nil {
 		return false
 	}
-	if err := os.Chdir(dir); err != nil {
-		s.err = err
-		s.errCause = "chdir " + dir
-		return false
-	}
+	target := s.toAbsPath(dir)
+	s.wd = target
 	return true
+}
+
+func (s *GitTestHelper) Getwd() string {
+	return s.wd
 }
 
 func (s *GitTestHelper) Touch(file string) bool {
 	if s.err != nil {
 		return false
 	}
-	f, err := os.Create(file)
+	target := s.toAbsPath(file)
+	f, err := os.Create(target)
 	if err != nil {
 		s.err = err
-		s.errCause = "touch " + file
+		s.errCause = "touch " + target
 		return false
 	}
 	if f != nil {
@@ -118,35 +126,38 @@ func (s *GitTestHelper) SetContents(file, contents string) (ok bool) {
 	if s.err != nil {
 		return false
 	}
-	f, err := os.Create(file)
+	target := s.toAbsPath(file)
+	f, err := os.Create(target)
 	if err != nil {
 		s.err = err
-		s.errCause = fmt.Sprintf("opening %v for write", file)
+		s.errCause = fmt.Sprintf("opening %v for write", target)
 		return false
 	}
 	defer func() {
 		err2 := f.Close()
 		if err2 != nil {
 			s.err = err2
-			s.errCause = fmt.Sprintf("closing %v after write", file)
+			s.errCause = fmt.Sprintf("closing %v after write", target)
 			ok = false
 		}
 	}()
 	_, err = f.WriteString(contents)
 	if err != nil {
 		s.err = err
-		s.errCause = "writing to " + file
+		s.errCause = "writing to " + target
 		return false
 	}
 	ok = true
 	return ok
 }
 
+// Exec executes the given command using GetWd() as the working directory.
+// For example, `NewGitHelper(WithWd("/tmp")); Exec("ls")` will list the contents of `/tmp`.
 func (s *GitTestHelper) Exec(first string, arg ...string) bool {
 	if s.err != nil {
 		return false
 	}
-	cmd := s.runner.Command(first, arg...)
+	cmd := s.runner.Command(first, arg...).WithDir(s.Getwd())
 	bytes, err := cmd.CombinedOutput()
 	if s.debugExec {
 		words := append([]string{">>>", first}, arg...)
@@ -194,4 +205,20 @@ type Result struct {
 
 func (cmd *Result) String() string {
 	return cmd.delegate.Stdout.(*bytes.Buffer).String()
+}
+
+// Given the current working directory and a target path, turn the target path to an absolute path
+func (s *GitTestHelper) toAbsPath(name string) string {
+	if path.IsAbs(name) {
+		return name
+	}
+	wd := s.Getwd()
+	if wd == "" {
+		wd, _ = os.Getwd()
+		if wd == "" {
+			wd = os.TempDir()
+		}
+	}
+
+	return path.Join(s.wd, name)
 }
