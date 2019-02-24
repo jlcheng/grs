@@ -2,7 +2,7 @@ package script
 
 import (
 	"jcheng/grs/shexec"
-	"os"
+	"path"
 	"strings"
 	"testing"
 	"time"
@@ -87,45 +87,36 @@ A--B--C        source
         C      dest
 */
 func TestAutoPush_IT_Test_1(t *testing.T) {
-	const TEST_LABEL = "TestAutoPush_IT_Test_1"
-
-	oldwd, tmpdir := MkTmpDir(t, TEST_LABEL, TEST_LABEL)
-	defer CleanTmpDir(t, oldwd, tmpdir, TEST_LABEL)
-	if err := os.Chdir(tmpdir); err != nil {
-		t.Fatal(err)
-	}
-
+	const TEST_ID = "TestAutoPush_IT_Test_1"
+	tmpdir, cleanup := MkTmpDir1(t, TEST_ID)
+	defer cleanup()
 	exec := NewGitTestHelper(WithDebug(false), WithWd(tmpdir))
+	exec.NewRepoPair(tmpdir)
+	exec.Chdir(path.Join(tmpdir, "dest"))
 	git := exec.Git()
-	exec.Mkdir("source")
-	exec.Chdir("source")
-	exec.Exec(git, "init", "--bare")
-	exec.Chdir("..")
-	exec.Exec(git, "clone", "source", "dest")
 
-	exec.Chdir("dest")
-	exec.TouchAndCommit(".gitignore", "Commit_A")
-	exec.TouchAndCommit("b.txt", "Commit_B")
-	exec.TouchAndCommit("git", "push")
+	repo := NewRepo(exec.Getwd())
+	repo.PushAllowed = true
+	s := NewScript(NewAppContext(), repo)
 
-	if exec.Err() != nil {
-		t.Fatal("test setup failed\n" + exec.ErrString())
+	exec.TouchAndCommit("A.txt", "Commit A")
+	exec.TouchAndCommit("B.txt", "Commit B")
+	exec.Exec(git, "push")
+
+	exec.Touch("C.txt")
+
+	s.BeforeScript()
+	s.GetIndexStatus()
+	s.GetRepoStatus()
+	s.GetCommitTime()
+
+	if repo.Branch != BRANCH_UPTODATE || repo.Index != INDEX_MODIFIED {
+		t.Fatal(TEST_ID + ": setup failed")
 	}
 
-	exec.Touch("c.txt")
-
-	ctx := NewAppContext()
-	repo := NewRepo(exec.Getwd())
-	repo.Dir = DIR_VALID
-	repo.Branch = BRANCH_UPTODATE
-	repo.Index = INDEX_MODIFIED
-	repo.PushAllowed = true
-	s := NewScript(ctx, repo)
-	s.Fetch()
 	s.AutoPush()
-	s.GetRepoStatus()
 
-	if exec.Err() != nil {
-		t.Fatal("test failed", exec.Err())
+	if repo.Branch != BRANCH_UPTODATE || repo.Index != INDEX_UNMODIFIED {
+		t.Fatal(TEST_ID + ": got repo was not UPTODATE and UNMODIEFIED")
 	}
 }

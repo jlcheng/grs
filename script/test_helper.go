@@ -185,7 +185,7 @@ func (s *GitTestHelper) NewRepoPair(basedir string) {
 	s.Exec(git, "clone", "source", "dest")
 
 	s.Chdir("dest")
-	s.TouchAndCommit(".gitignore", "Commit_A")
+	s.TouchAndCommit("init.txt", "Initial commit")
 	s.Exec(git, "push", "origin")
 
 	s.Chdir(target)

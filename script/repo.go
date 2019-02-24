@@ -2,6 +2,7 @@ package script
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"time"
@@ -43,4 +44,15 @@ func GetActivityTime(repo string) (time.Time, error) {
 		}
 	}
 	return atime, nil
+}
+
+func (repo *Repo) String() string {
+	tpl := `{
+ path: %s
+ dir: %s
+ branch: %s
+ index: %s
+ commitTime: %s
+}`
+	return fmt.Sprintf(tpl, repo.Path, repo.Dir, repo.Branch, repo.Index, repo.CommitTime)
 }
