@@ -135,6 +135,32 @@ func MkTmpDir(t *testing.T, prefix string, errid string) (oldwd string, d string
 	return oldwd, d
 }
 
+// MkTmpDir creates a temporary directory usiing ioutil.TempDir and calls t.Fatal if the attempt fails. On success, it
+// returns:
+// - the created directory
+// - a no-arg function which deletes the temp directory and os.Chdir to the current working directory
+func MkTmpDir1(t *testing.T, errid string) (string, func()) {
+	var err error
+	oldwd, err := os.Getwd()
+	if err != nil {
+		t.Fatal(errid, err)
+	}
+	tempDir, err := ioutil.TempDir("", errid)
+	if err != nil {
+		t.Fatal(errid, err)
+	}
+
+	return tempDir, func() {
+		if err := os.Chdir(oldwd); err != nil {
+			t.Fatal(errid, err)
+		}
+		if err := os.RemoveAll(tempDir); err != nil {
+			t.Fatal(errid, err)
+		}
+	}
+}
+
+
 func CleanTmpDir(t *testing.T, oldwd string, tmpdir string, errid string) {
 
 	if err := os.Chdir(oldwd); err != nil {

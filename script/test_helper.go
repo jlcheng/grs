@@ -172,6 +172,25 @@ func (s *GitTestHelper) Exec(first string, arg ...string) bool {
 	return true
 }
 
+// NewRepoPair creates two repos under the specified directory named source and dest. The source repo is initialized
+// as a bare repository. The dest repo is used to add an initial commit and push said commit to source. This method
+// changes the helper's working directory to the specified path.
+func (s *GitTestHelper) NewRepoPair(basedir string) {
+	git := s.Git()
+	target := s.toAbsPath(basedir)
+	s.Mkdir("source")
+	s.Chdir("source")
+	s.Exec(git, "init", "--bare")
+	s.Chdir("..")
+	s.Exec(git, "clone", "source", "dest")
+
+	s.Chdir("dest")
+	s.TouchAndCommit(".gitignore", "Commit_A")
+	s.Exec(git, "push", "origin")
+
+	s.Chdir(target)
+}
+
 func (s *GitTestHelper) Add(path string) bool {
 	return s.Exec(s.git, "add", path)
 }

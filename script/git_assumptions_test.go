@@ -3,7 +3,6 @@
 package script
 
 import (
-	"os"
 	"strings"
 	"testing"
 )
@@ -18,50 +17,53 @@ import (
 //
 // However, this experiment shows that git `git pull --rebase` will leave the index in a "must resolve conflict"
 // mode. This behavior is the motivation for the "autorebase" functionality of Grs.
-func TestRebasePullConflict(t *testing.T) {
-	// === START: repo initialization ===
-	// TODO JCHENG take this initialization section and move it into GitHelper
-	// Creates a bare repo named '$tmp_dir/source' and a working directory named `$tmp_dir/dest`
-	const TEST_LABEL = "TestRebasePullConflict"
-	oldwd, tmpdir := MkTmpDir(t, TEST_LABEL, TEST_LABEL)
-	defer CleanTmpDir(t, oldwd, tmpdir, TEST_LABEL)
-	if err := os.Chdir(tmpdir); err != nil {
-		t.Fatal(err)
-	}
 
+/*
+Assume A, B, C are conflct-free changes, but D and E conflicts.
+
+    A--B--D  origin
+     \
+      C--E   local
+
+AutoRebase changes local to this. Git's rebase does not support this.
+
+    A--B--D    origin
+        \
+         C--E  local
+
+Not included here, but rebase using `git pull --rebase -s recursive -X ours` does not yield what I expect either:
+
+    A--B--D    origin
+        \
+         D--C  local, E got lost
+
+*/
+
+func TestRebasePullConflict(t *testing.T) {
+	tmpdir, cleanup := MkTmpDir1(t, "TestRebasePullConflict")
+	defer cleanup()
 	exec := NewGitTestHelper(WithDebug(false), WithWd(tmpdir))
+	exec.NewRepoPair(tmpdir)
 	git := exec.Git()
-	exec.Mkdir("source")
-	exec.Chdir("source")
-	exec.Exec(git, "init", "--bare")
-	exec.Chdir("..")
-	exec.Exec(git, "clone", "source", "dest")
 
 	exec.Chdir("dest")
-	exec.TouchAndCommit(".gitignore", "Commit_A")
-
-	if exec.Err() != nil {
-		t.Fatal("test setup failed\n" + exec.ErrString())
-	}
-	// === END: repo initialization ===
-
-	exec.SetContents("a_1.txt", "1\n2\n3\n")
-	exec.Add("a_1.txt")
-    exec.Commit("conflict-free change on a")
+	exec.TouchAndCommit("B.txt", "B: conflict-free change on origin")
+	exec.SetContents("conflict.txt", "1\n2\n3\n")
+	exec.Add("conflict.txt")
+	exec.Commit("D: conflicting change on origin")
 	exec.Exec(git, "push", "origin")
 
 	exec.Exec(git, "reset", "--hard", "HEAD~1")
-    exec.TouchAndCommit("be_1.txt", "conflict-free change on b")
-	exec.SetContents("a_1.txt", "1\n3\n")
-	exec.Add("a_1.txt")
-	exec.Commit("conflict on b")
+    exec.TouchAndCommit("C.txt", "C: conflict-free change on local")
+	exec.SetContents("conflict.txt", "1\n3\n")
+	exec.Add("conflict.txt")
+	exec.Commit("E: conflicting change on local")
 	exec.Exec(git, "pull", "--rebase", "-v")
 
-	conflict := strings.Contains(exec.ErrString(), ": Merge conflict in a_1.txt")
+	conflict := strings.Contains(exec.ErrString(), ": Merge conflict in conflict.txt")
 	if !conflict {
 		t.Fatal("Expected conflict, got the following instead.",  "\n\n"+exec.ErrString())
 	}
-
 }
 
 
