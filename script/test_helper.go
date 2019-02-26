@@ -172,12 +172,18 @@ func (s *GitTestHelper) Exec(first string, arg ...string) bool {
 	return true
 }
 
+// GitExec is a convenience method for calling "git ..."
+func (s *GitTestHelper) GitExec(args ...string) bool {
+	return s.Exec(s.Git(), args...)
+}
+
 // NewRepoPair creates two repos under the specified directory named source and dest. The source repo is initialized
 // as a bare repository. The dest repo is used to add an initial commit and push said commit to source. This method
-// changes the helper's working directory to the specified path.
+// changes the helper's working directory to the "dest" directory if possible.
 func (s *GitTestHelper) NewRepoPair(basedir string) {
 	git := s.Git()
 	target := s.toAbsPath(basedir)
+	s.Chdir(target)
 	s.Mkdir("source")
 	s.Chdir("source")
 	s.Exec(git, "init", "--bare")
@@ -187,8 +193,6 @@ func (s *GitTestHelper) NewRepoPair(basedir string) {
 	s.Chdir("dest")
 	s.TouchAndCommit("init.txt", "Initial commit")
 	s.Exec(git, "push", "origin")
-
-	s.Chdir(target)
 }
 
 func (s *GitTestHelper) Add(path string) bool {

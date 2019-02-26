@@ -40,29 +40,28 @@ Not included here, but rebase using `git pull --rebase -s recursive -X ours` doe
 */
 
 func TestRebasePullConflict(t *testing.T) {
-	tmpdir, cleanup := MkTmpDir1(t, "TestRebasePullConflict")
+	const TEST_ID = "TestRebasePullConflict"
+	tmpdir, cleanup := MkTmpDir1(t, TEST_ID)
 	defer cleanup()
-	exec := NewGitTestHelper(WithDebug(false), WithWd(tmpdir))
-	exec.NewRepoPair(tmpdir)
-	git := exec.Git()
+	gh := NewGitTestHelper(WithDebug(false), WithWd(tmpdir))
+	gh.NewRepoPair(tmpdir)
 
-	exec.Chdir("dest")
-	exec.TouchAndCommit("B.txt", "B: conflict-free change on origin")
-	exec.SetContents("conflict.txt", "1\n2\n3\n")
-	exec.Add("conflict.txt")
-	exec.Commit("D: conflicting change on origin")
-	exec.Exec(git, "push", "origin")
+	gh.TouchAndCommit("B.txt", "B: conflict-free change on origin")
+	gh.SetContents("conflict.txt", "1\n2\n3\n")
+	gh.Add("conflict.txt")
+	gh.Commit("D: conflicting change on origin")
+	gh.Exec(gh.Git(), "push", "origin")
 
-	exec.Exec(git, "reset", "--hard", "HEAD~1")
-    exec.TouchAndCommit("C.txt", "C: conflict-free change on local")
-	exec.SetContents("conflict.txt", "1\n3\n")
-	exec.Add("conflict.txt")
-	exec.Commit("E: conflicting change on local")
-	exec.Exec(git, "pull", "--rebase", "-v")
+	gh.Exec(gh.Git(), "reset", "--hard", "HEAD~1")
+    gh.TouchAndCommit("C.txt", "C: conflict-free change on local")
+	gh.SetContents("conflict.txt", "1\n3\n")
+	gh.Add("conflict.txt")
+	gh.Commit("E: conflicting change on local")
+	gh.Exec(gh.Git(), "pull", "--rebase", "-v")
 
-	conflict := strings.Contains(exec.ErrString(), ": Merge conflict in conflict.txt")
+	conflict := strings.Contains(gh.ErrString(), ": Merge conflict in conflict.txt")
 	if !conflict {
-		t.Fatal("Expected conflict, got the following instead.",  "\n\n"+exec.ErrString())
+		t.Fatal("Expected conflict, got the following instead.",  "\n\n"+gh.ErrString())
 	}
 }
 

@@ -43,3 +43,10 @@ func (s *Script) BeforeScript() {
 func (s *Script) GetRepo() *Repo {
 	return s.repo
 }
+
+func (s *Script) Update() {
+	s.GetCommitTime()
+	s.GetIndexStatus()
+	s.GetRepoStatus()
+	s.BeforeScript()
+}

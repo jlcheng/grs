@@ -2,7 +2,6 @@ package script
 
 import (
 	"jcheng/grs/shexec"
-	"path"
 	"strings"
 	"testing"
 	"time"
@@ -73,14 +72,14 @@ func verify_AutoPush_NoGitExec(t *testing.T, dir Dirstat, branch Branchstat, ind
 }
 
 /*
-commits *c and pushes it upstream
+commits *modified and pushes it upstream
 
 After setup, before run
-A--B            source, @{UPSTREAM}, or origin/master
+A--B            source
     \
-     *modified  dest, or master
+     *modified  dest
 
-After run, *modified turned into commit c and is pushed to @{UPSTREAM}
+After AutoPush(), *modified turned into commit C and is pushed to source
 
 A--B--C        source
        \
@@ -90,25 +89,19 @@ func TestAutoPush_IT_Test_1(t *testing.T) {
 	const TEST_ID = "TestAutoPush_IT_Test_1"
 	tmpdir, cleanup := MkTmpDir1(t, TEST_ID)
 	defer cleanup()
-	exec := NewGitTestHelper(WithDebug(false), WithWd(tmpdir))
-	exec.NewRepoPair(tmpdir)
-	exec.Chdir(path.Join(tmpdir, "dest"))
-	git := exec.Git()
-
-	repo := NewRepo(exec.Getwd())
+	gh := NewGitTestHelper(WithDebug(false), WithWd(tmpdir))
+	gh.NewRepoPair(tmpdir)
+	repo := NewRepo(gh.Getwd())
 	repo.PushAllowed = true
 	s := NewScript(NewAppContext(), repo)
-
-	exec.TouchAndCommit("A.txt", "Commit A")
-	exec.TouchAndCommit("B.txt", "Commit B")
-	exec.Exec(git, "push")
-
-	exec.Touch("C.txt")
-
 	s.BeforeScript()
-	s.GetIndexStatus()
-	s.GetRepoStatus()
-	s.GetCommitTime()
+
+	gh.TouchAndCommit("A.txt", "Commit A")
+	gh.TouchAndCommit("B.txt", "Commit B")
+	gh.Exec(gh.Git(), "push")
+	gh.Touch("C.txt")
+
+	s.Update()
 
 	if repo.Branch != BRANCH_UPTODATE || repo.Index != INDEX_MODIFIED {
 		t.Fatal(TEST_ID + ": setup failed")
