@@ -3,118 +3,139 @@ package script
 import (
 	"io/ioutil"
 	"os"
+	"reflect"
 	"testing"
 )
 
-// dest rebases without conflicts on top of source
+// Verifies we can rebase without conflicts on top of source
 /*
 Given
 
-    a--b---c---e
-     \  \     /   source, which is a non-trivial graph
+    a--b---c---f
+     \  \     /   remote branch, which is a non-trivial graph
       \  d---e
        \
-        g---h     dest, which is a trivial graph of a->g->h
+        g---h     local branch, which is a trivial graph of a->h->i
 
 Then AutoRebase() should create
 
-    a--b---c---e
+    a--b---c---f
         \     / \
-         d---e   g---h dest, which is a non-trivial graph of a->(complex)->f->g->h
+         d---e   g---h   local branch contains all changes from source
 */
 func TestAutoRebase_IT_Test_2(t *testing.T) {
 	const TEST_ID = "TestAutoRebase_IT_Test_2"
 	tmpdir, cleanup := MkTmpDir1(t, TEST_ID)
 	defer cleanup()
-	gh := NewGitTestHelper(WithDebug(true), WithWd(tmpdir))
+	gh := NewGitTestHelper(WithDebug(false), WithWd(tmpdir))
 	gh.NewRepoPair(tmpdir)
 	repo := NewRepo(gh.Getwd())
 	repo.PushAllowed = true
 	s := NewScript(NewAppContext(), repo)
 	s.BeforeScript()
 
-	gh.TouchAndCommit("A.txt", "Commit_A")
-	gh.GitExec("tag", "Commit_A")
-	gh.TouchAndCommit("B.txt", "Commit_B")
-	gh.GitExec("tag", "Commit_B")
-	gh.TouchAndCommit("C.txt", "Commit_C")
-	gh.GitExec("checkout", "-b", "source_2", "Commit_B")
-	gh.TouchAndCommit("D.txt", "Commit_D")
-	gh.TouchAndCommit("E.txt", "Commit_E")
-	gh.GitExec("checkout", "master")
-	gh.GitExec("merge", "source_2")
-	gh.GitExec("push")
-	gh.GitExec("reset", "--hard", "Commit_A")
-	gh.TouchAndCommit("G.txt", "Commit_G")
-	gh.TouchAndCommit("H.txt", "Commit_H")
+	gh.TouchAndCommit("A.txt", "A")
+	gh.RunGit("tag", "A")
+	gh.TouchAndCommit("B.txt", "B")
+	gh.RunGit("tag", "B")
+	gh.TouchAndCommit("C.txt", "C")
+	gh.RunGit("checkout", "-b", "source_2", "B")
+	gh.TouchAndCommit("D.txt", "D")
+	gh.TouchAndCommit("E.txt", "E")
+	gh.RunGit("checkout", "master")
+	gh.RunGit("merge", "source_2", "-m", "F")
+	gh.RunGit("push")
+	gh.RunGit("reset", "--hard", "A")
+	gh.TouchAndCommit("G.txt", "G")
+	gh.TouchAndCommit("H.txt", "H")
 
 	s.AutoRebase()
 	s.Update()
 
-	gh.GitExec("log", "--pretty=%h %p") // TODO kept for debugging
-	gh.GitExec("log", "--pretty=%h %s") // TODO kept for debugging
-	if repo.Index != INDEX_UNMODIFIED || repo.Branch != BRANCH_AHEAD {
-		t.Fatal("repo is not uptodate and unmodified")
+	got := LogGraph(map[string][]string{
+		"A":    {"init"},
+		"B":    {"A"},
+		"C":    {"B"},
+		"D":    {"B"},
+		"E":    {"D"},
+		"F":    {"C", "E"},
+		"G":    {"F"},
+		"H":    {"G"},
+		"init": {},
+	})
+	expected, _ := gh.LogGraph()
+	if !reflect.DeepEqual(got, expected) {
+		t.Fatal("unexpected commit graph", got)
 	}
 }
 
+// Verifies that rebase does not happen when there is a conflict upstream
 /*
-cloned_repo/master rebases with conflicts on to @{UPSTREAM}
+Given the following, where h and c conflicts
 
-a--b---c---f  @{UPSTREAM} origin/master
- \  \     /
-  \  d---e    origin/branch_B
+a--b---c---f
+ \  \     /   remote branch, where c modifies conflicts.txt
+  \  d---e
    \
-    g---h     cloned_repo/master (g has a conflict with commit d)
+    g---h     local branch, where h has conflicting changes with c
+
+Then AutoRebase() should create in the local branch
+
+    a--b
+        \
+         d---e---g---h  local branch gets d and e from source, but does not have c and f, which contains conflicts
 */
 func TestAutoRebase_IT_Test_3(t *testing.T) {
-	oldwd, tmpdir := MkTmpDir(t, "AutoRebase_IT_Test_3", "TestAutoRebase_IT_Test_3")
-	defer CleanTmpDir(t, oldwd, tmpdir, "TestAutoRebase_IT_Test_3")
-	if err := os.Chdir(tmpdir); err != nil {
-		t.Fatal(err)
+	const TEST_ID = "TestAutoRebase_IT_Test_3"
+	tmpdir, cleanup := MkTmpDir1(t, TEST_ID)
+	defer cleanup()
+	gh := NewGitTestHelper(WithDebug(false), WithWd(tmpdir))
+	gh.NewRepoPair(tmpdir)
+	repo := NewRepo(gh.Getwd())
+	repo.PushAllowed = true
+	s := NewScript(NewAppContext(), repo)
+	s.BeforeScript()
+
+	gh.TouchAndCommit("A.txt", "A")
+	gh.RunGit("tag", "A")
+	gh.TouchAndCommit("B.txt", "B")
+	gh.RunGit("tag", "B")
+	gh.SetContents("conflict.txt", "C")
+	gh.Add("conflict.txt")
+	gh.TouchAndCommit("C.txt", "C")
+	gh.RunGit("checkout", "-b", "source_2", "B")
+	gh.TouchAndCommit("D.txt", "D")
+	gh.TouchAndCommit("E.txt", "E")
+	gh.RunGit("checkout", "master")
+	gh.RunGit("merge", "source_2", "-m", "F")
+	gh.RunGit("push")
+	gh.RunGit("reset", "--hard", "A")
+
+	gh.TouchAndCommit("G.txt", "G")
+	gh.SetContents("conflict.txt", "H")
+	gh.Add("conflict.txt")
+	gh.TouchAndCommit("H.txt", "H")
+
+	if gh.Err() != nil {
+		t.Fatal("test setup failed", gh.Err())
 	}
 
-	exec := NewGitTestHelper(WithDebug(false), WithWd(tmpdir))
-	git := exec.Git()
-	exec.Mkdir("source")
-	exec.Chdir("source")
-	exec.Exec(git, "init")
-	exec.TouchAndCommit(".gitignore", "Commit_A")
-	exec.Chdir("..")
-	exec.Exec(git, "clone", "source", "dest")
-
-	exec.Chdir("./source")
-	exec.TouchAndCommit("b.txt", "Commit_B")
-	exec.TouchAndCommit("c.txt", "Commit_C")
-	exec.Exec(git, "checkout", "-b", "branch_B")
-	exec.SetContents("conflict.txt", "D")
-	exec.Add("conflict.txt")
-	exec.TouchAndCommit("d.txt", "Commit_D")
-	exec.TouchAndCommit("e.txt", "Commit_E")
-	exec.Exec(git, "checkout", "master")
-	exec.Exec(git, "merge", "--no-ff", "branch_B")
-
-	exec.Chdir("..")
-	exec.Chdir("dest")
-	exec.SetContents("conflict.txt", "G")
-
-	exec.Add("conflict.txt")
-	exec.TouchAndCommit("g.txt", "Commit_G")
-	exec.TouchAndCommit("h.txt", "Commit_H")
-
-	if exec.Err() != nil {
-		t.Fatal("test setup failed", exec.Err())
-	}
-
-	ctx := NewAppContext(WithCommandRunner(exec.CommandRunner()))
-	repo := NewRepo(exec.Getwd())
-	repo.Dir = DIR_VALID
-	s := NewScript(ctx, repo)
 	s.Fetch()
 	s.AutoRebase()
 	s.GetRepoStatus()
-	if repo.Branch != BRANCH_DIVERGED {
-		t.Fatalf("expected BRANCH_DIVERGED, but was %v\n", repo.Branch)
+
+	got := LogGraph(map[string][]string{
+		"A":    {"init"},
+		"B":    {"A"},
+		"D":    {"B"},
+		"E":    {"D"},
+		"G":    {"E"},
+		"H":    {"G"},
+		"init": {},
+	})
+	expected, _ := gh.LogGraph()
+	if !reflect.DeepEqual(got, expected) {
+		t.Fatal("unexpected commit graph", got)
 	}
 }
 

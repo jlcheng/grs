@@ -172,8 +172,8 @@ func (s *GitTestHelper) Exec(first string, arg ...string) bool {
 	return true
 }
 
-// GitExec is a convenience method for calling "git ..."
-func (s *GitTestHelper) GitExec(args ...string) bool {
+// RunGit is a convenience method for calling "git ..."
+func (s *GitTestHelper) RunGit(args ...string) bool {
 	return s.Exec(s.Git(), args...)
 }
 
@@ -191,7 +191,7 @@ func (s *GitTestHelper) NewRepoPair(basedir string) {
 	s.Exec(git, "clone", "source", "dest")
 
 	s.Chdir("dest")
-	s.TouchAndCommit("init.txt", "Initial commit")
+	s.TouchAndCommit("init.txt", "init")
 	s.Exec(git, "push", "origin")
 }
 

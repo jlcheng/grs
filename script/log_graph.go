@@ -1,22 +1,32 @@
 package script
 
 import (
+	"encoding/json"
 	"fmt"
 	"jcheng/grs/shexec"
 	"sort"
 	"strings"
 )
 
-func (s *Script) LogGraph() (map[string][]string, error) {
+type LogGraph map[string][]string
+func (lg LogGraph) String() string {
+      b, err := json.MarshalIndent(lg, "", "  ")
+      if err == nil {
+	      return string(b)
+      }
+      return fmt.Sprintf("%v", map[string][]string(lg))
+}
+
+
+func (s *GitTestHelper) LogGraph() (LogGraph, error) {
 	var bytes []byte
 	var err error
 	var command shexec.Command
 	var lines []string
-	git := s.ctx.GitExec
+	git := s.git
 
-	command = s.ctx.CommandRunner.Command(git, "log", "--pretty=%h %s").WithDir(s.repo.Path)
+	command = s.runner.Command(git, "log", "--pretty=%h %s").WithDir(s.wd)
 	if bytes, err = command.CombinedOutput(); err != nil {
-		s.repo.Dir = DIR_INVALID
 		return nil, err
 	}
 	lines = strings.Split(string(bytes), "\n")
@@ -35,9 +45,8 @@ func (s *Script) LogGraph() (map[string][]string, error) {
 		id_msg[id] = msg
 	}
 
-	command = s.ctx.CommandRunner.Command(git, "log", "--pretty=%h %p").WithDir(s.repo.Path)
+	command = s.runner.Command(git, "log", "--pretty=%h %p").WithDir(s.wd)
 	if bytes, err = command.CombinedOutput(); err != nil {
-		s.repo.Dir = DIR_INVALID
 		return nil, err
 	}
 	lines = strings.Split(string(bytes), "\n")
