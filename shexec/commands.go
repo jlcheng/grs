@@ -12,6 +12,7 @@ type Command interface {
 	CombinedOutput() ([]byte, error)
 }
 
+// CommandWrapper implements the shexec.Command interface
 type CommandWrapper struct {
 	delegate *exec.Cmd
 }

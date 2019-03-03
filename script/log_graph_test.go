@@ -14,28 +14,28 @@ func TestLogGraph(t *testing.T) {
 	gh.NewRepoPair(tmpdir)
 
 	// Creates commit log with this form
-	//  a--b---c---e
+	//  a--b---c---f
 	//      \     /
 	//       d---e
-	gh.TouchAndCommit("A.txt", "Commit_A")
+	gh.TouchAndCommit("A.txt", "A")
 	gh.RunGit("tag", "Tag_A")
-	gh.TouchAndCommit("B.txt", "Commit_B")
+	gh.TouchAndCommit("B.txt", "B")
 	gh.RunGit("tag", "Tag_B")
-	gh.TouchAndCommit("C.txt", "Commit_C")
+	gh.TouchAndCommit("C.txt", "C")
 	gh.RunGit("checkout", "-b", "source_2", "Tag_B")
-	gh.TouchAndCommit("D.txt", "Commit_D")
-	gh.TouchAndCommit("E.txt", "Commit_E")
+	gh.TouchAndCommit("D.txt", "D")
+	gh.TouchAndCommit("E.txt", "E")
 	gh.RunGit("checkout", "master")
-	gh.RunGit("merge", "source_2", "-m", "Merge_C_E")
+	gh.RunGit("merge", "source_2", "-m", "F")
 
 	expected := LogGraph(map[string][]string{
-		"Merge_C_E": {"Commit_C", "Commit_E"},
-		"Commit_E": {"Commit_D"},
-		"Commit_D": {"Commit_B"},
-		"Commit_C": {"Commit_B"},
-		"Commit_B": {"Commit_A"},
-		"Commit_A": {"Initial commit"},
-		"Initial commit": {},
+		"F": {"C", "E"},
+		"E": {"D"},
+		"D": {"B"},
+		"C": {"B"},
+		"B": {"A"},
+		"A": {"init"},
+		"init": {},
 	})
 	lg, err := gh.LogGraph()
 	if err != nil {
