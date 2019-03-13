@@ -8,7 +8,7 @@ import (
 // Verifies that Scirpt.LogGraph produces a graph object
 func TestLogGraph(t *testing.T) {
 	const TEST_ID = "TestLogGraph"
-	tmpdir, cleanup := MkTmpDir1(t, TEST_ID)
+	tmpdir, cleanup := MkTmpDir(t, TEST_ID)
 	defer cleanup()
 	gh := NewGitTestHelper(WithDebug(false), WithWd(tmpdir))
 	gh.NewRepoPair(tmpdir)

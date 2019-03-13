@@ -15,12 +15,27 @@ func colorI(s script.Indexstat) string {
 	return fmt.Sprintf("\033[31m%v\033[0m", s)
 }
 
+func colorIGrs(s script.Indexstat) string {
+	if s == script.INDEX_UNMODIFIED {
+		return fmt.Sprintf("%v", s)
+	}
+	return fmt.Sprintf("\033[31m%v\033[0m", s)
+}
+
 func colorB(s script.Branchstat) string {
 	if s == script.BRANCH_UPTODATE {
 		return fmt.Sprintf("%v", s)
 	}
 	return fmt.Sprintf("\033[31m%v\033[0m", s)
 }
+
+func colorBGrs(s script.Branchstat) string {
+	if s == script.BRANCH_UPTODATE {
+		return fmt.Sprintf("%v", s)
+	}
+	return fmt.Sprintf("\033[31m%v\033[0m", s)
+}
+
 
 func _layout(g *gocui.Gui) error {
 	maxX, maxY := g.Size()
@@ -38,7 +53,7 @@ func _layout(g *gocui.Gui) error {
 type CliUI interface {
 	DoneSender() <-chan struct{}
 	MainLoop() error
-	Draw(repos []script.Repo)
+	DrawGrs(repo []script.GrsRepo)
 	Close()
 }
 
@@ -94,7 +109,7 @@ func (consoleUI *ConsoleUI) MainLoop() error {
 	return consoleUI.gui.MainLoop()
 }
 
-func (consoleUI *ConsoleUI) Draw(repos []script.Repo) {
+func (consoleUI *ConsoleUI) DrawGrs(repos []script.GrsRepo) {
 	if consoleUI.done == nil {
 		return
 	}
@@ -109,13 +124,14 @@ func (consoleUI *ConsoleUI) Draw(repos []script.Repo) {
 		v.Title = fmt.Sprintf("Grs %s", time)
 
 		for _, repo := range repos {
-			line := fmt.Sprintf("repo [%v] status IS %v, %v, %v.",
-				repo.Path, colorB(repo.Branch), colorI(repo.Index), repo.CommitTime)
+			line := fmt.Sprintf("repo [%v] status is %v, %v, %v.",
+				repo.GetLocal() , colorBGrs(repo.GetStats().Branch), colorIGrs(repo.GetStats().Index), repo.GetStats().CommitTime)
 			fmt.Fprintln(v, line)
 		}
 		return nil
 	})
 }
+
 
 func (consoleUI *ConsoleUI) Close() {
 	consoleUI.gui.Close()
@@ -140,13 +156,13 @@ func (printUI *PrintUI) MainLoop() error {
 	return nil
 }
 
-func (printUI *PrintUI) Draw(repos []script.Repo) {
+func (printUI *PrintUI) DrawGrs(repos []script.GrsRepo) {
 	fmt.Print("\033[2J\033[H")
 	fmt.Println(time.Now().Format("=== Jan _2 3:04PM MST ==="))
 
 	for _, repo := range repos {
 		fmt.Printf("repo [%v] status IS %v, %v, %v.\n",
-			repo.Path, colorB(repo.Branch), colorI(repo.Index), repo.CommitTime)
+			repo.GetLocal(), repo.GetStats().Branch, repo.GetStats().Index, repo.GetStats().CommitTime)
 	}
 }
 

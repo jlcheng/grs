@@ -23,8 +23,6 @@ func TestHelperProcess(*testing.T) {
 	default:
 		os.Exit(1)
 	}
-	fmt.Println(os.Args[3:])
-	fmt.Println("hello world")
 }
 
 func helperCommand(s ...string) (cmd *exec.Cmd) {

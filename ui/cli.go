@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/viper"
 	"jcheng/grs/base"
 	"jcheng/grs/script"
+	"jcheng/grs/shexec"
 	"log"
 	"time"
 )
@@ -54,10 +55,9 @@ func RunCli(args Args) {
 		base.SetLogLevel(base.DEBUG)
 	}
 
-	ctx := script.NewAppContext()
-	repos := ReposFromStringSlice(args.repos, args.repoCfgMap)
+	grsRepos := GrsRepos(args.repos, args.repoCfgMap)
 
-	if len(repos) == 0 {
+	if len(grsRepos) == 0 {
 		log.Fatal("repos not specified")
 	}
 
@@ -73,25 +73,24 @@ func RunCli(args Args) {
 			log.Fatal("cannot initialize the terminal", err)
 	}
 	defer cliUI.Close()
-	syncController := NewSyncController(repos, ctx, cliUI)
+	syncController := NewSyncController(grsRepos, cliUI)
 	syncController.Duration = time.Duration(args.refresh) * time.Second
 	syncController.CliUIImpl()
 }
 
-// TODO: JCHENG unit test improvements
-func ReposFromStringSlice(repos []string, repoCfg map[string]RepoConfig) []script.Repo {
-	r := make([]script.Repo, len(repos))
-	for idx, repoPath := range repos {
-		r[idx] = script.Repo{Path: repoPath}
-		repo := &r[idx]
-
-		config, ok := repoCfg[repoPath]
-		if !ok {
-			continue
-		}
-		repo.PushAllowed = config.pushAllowed
+func GrsRepos(paths []string, repoCfg map[string]RepoConfig) []script.GrsRepo {
+	commandRunner := &shexec.ExecRunner{}
+	repos := make([]script.GrsRepo, len(paths))
+	for idx, path := range paths {
+		config, _ := repoCfg[path]
+		pushAllowed := config.pushAllowed
+		repos[idx] = script.NewGrsRepo(
+			script.WithLocalGrsRepo(path),
+			script.WithPushAllowed(pushAllowed),
+			script.WithCommandRunnerGrsRepo(commandRunner),
+		)
 	}
-	return r
+	return repos
 }
 
 func GetBool(stringMap map[string]interface{}, key string, fallback bool) bool {

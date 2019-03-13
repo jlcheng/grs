@@ -2,54 +2,8 @@ package script
 
 import (
 	"fmt"
-	"jcheng/grs/base"
-	"jcheng/grs/shexec"
 	"time"
 )
-
-// AutoPush runs `git push...` when the branch is ahead. It also autocommits changes.
-func (s *Script) AutoPush() bool {
-	repo := s.repo
-	if s.err != nil ||
-		repo.Dir != DIR_VALID ||
-		repo.Index == INDEX_UNKNOWN ||
-		!repo.PushAllowed {
-		return false
-	}
-	if !(repo.Branch == BRANCH_AHEAD || repo.Branch == BRANCH_UPTODATE) {
-		return false
-	}
-
-	base.Debug("git auto-push ok: %v", repo)
-	ctx := s.ctx
-	git := ctx.GitExec
-	commitMsg := AutoPushGenCommitMsg(NewStdClock())
-	var out []byte
-	var err error
-	var command shexec.Command
-	if repo.Index == INDEX_MODIFIED {
-		command := ctx.CommandRunner.Command(git, "add", "-A").WithDir(repo.Path)
-		if out, err = command.CombinedOutput(); err != nil {
-			base.Debug("git add failed. %v, %v", err, string(out))
-			return false
-		}
-
-		command = ctx.CommandRunner.Command(git, "commit", "-m", commitMsg).WithDir(repo.Path)
-		if out, err = command.CombinedOutput(); err != nil {
-			base.Debug("git commit failed. commit-msg=%v\nerr-msg:%v\nout:%v", commitMsg, err, string(out))
-			return false
-		}
-		repo.Index = INDEX_UNMODIFIED
-	}
-
-	command = ctx.CommandRunner.Command(git, "push").WithDir(repo.Path)
-	if out, err = command.CombinedOutput(); err != nil {
-		base.Debug("git push failed. %v, %v", err, string(out))
-		return false
-	}
-	repo.Branch = BRANCH_UPTODATE
-	return true
-}
 
 func AutoPushGenCommitMsg(clock Clock) string {
 	return fmt.Sprintf("grs-autocommit:%v", clock.Now().Format(time.RFC3339))

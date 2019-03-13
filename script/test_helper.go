@@ -11,8 +11,10 @@ import (
 	"strings"
 )
 
-// GitTestHelper simplifies setting up Git repos on the filesysytem. If any method calls results in an error, all
-// further method calls will be a no-op.
+// GitTestHelper provides convenience methods for setting up a Git repo. To simplify error-handling, if any convenience
+// method fails, the error is stored and future calls are ignored. The current error state can be retrieved using
+// Err().
+//
 // It applies the Scanner.Err() technique as mentioned in https://blog.golang.org/errors-are-values
 type GitTestHelper struct {
 	err       error

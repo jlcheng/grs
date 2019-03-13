@@ -8,35 +8,31 @@ import (
 
 // SyncController provides a struct that can check and report on status of a collection of repositories
 type SyncController struct {
-	repos    []script.Repo      // a set of repositories to check and report on
-	ctx      *script.AppContext // the application context, e.g., dependencies
+	grsRepos []script.GrsRepo   // slice of repositories to check and report on
 	Duration time.Duration   // how often to sync repos
 	ui       CliUI
 }
 
-func NewSyncController(repos []script.Repo, ctx *script.AppContext, ui CliUI) SyncController {
+func NewSyncController(grsRepos []script.GrsRepo, ui CliUI) SyncController {
 	return SyncController{
-		repos: repos,
-		ctx:   ctx,
+		grsRepos: grsRepos,
 		ui:    ui,
 	}
 }
 
-func processRepo(s *script.Script) {
-	s.BeforeScript()
-	s.Fetch()
-	s.GetRepoStatus()
-	s.GetIndexStatus()
-
-	switch s.GetRepo().Branch {
+func processGrsRepo(gr *script.GrsRepo) {
+	gr.Update()
+	gr.Fetch()
+	gr.UpdateRepoStatus()
+	gr.UpdateIndexStatus()
+	switch gr.GetStats().Branch {
 	case script.BRANCH_BEHIND:
-		s.AutoFFMerge()
+		gr.AutoFFMerge()
 	case script.BRANCH_DIVERGED:
-		s.AutoRebase()
+		gr.AutoRebase()
 	}
-	s.AutoPush()
-	s.GetCommitTime()
-
+	gr.AutoPush()
+	gr.Update()
 }
 
 
@@ -45,38 +41,39 @@ func (sc *SyncController) CliUIImpl() {
 	done := sc.ui.DoneSender()
 	ticker := time.NewTicker(sc.Duration)
 	defer ticker.Stop()
-	syncerToUI := make(chan []script.Repo)
+	syncerToUI := make(chan []script.GrsRepo)
 	defer close(syncerToUI)
-	go sc.uiDispatchLoop(done, syncerToUI)
-	go sc.appLoop(done, ticker.C, syncerToUI)
+	//go sc.uiDispatchLoop(done, syncerToUI)
+	//go sc.appLoop(done, ticker.C, syncerToUI)
+	go sc.uiGrsDispatchLoop(done, syncerToUI)
+	go sc.appGrsLoop(done, ticker.C, syncerToUI)
 	sc.ui.MainLoop()
 }
 
-func (sc *SyncController) uiDispatchLoop(done <-chan struct{}, from <-chan []script.Repo) {
+func (sc *SyncController) uiGrsDispatchLoop(done <-chan struct{}, from <-chan []script.GrsRepo) {
 UI_LOOP:
 	for {
 		select {
 		case repos := <-from:
-			sc.ui.Draw(repos)
+			sc.ui.DrawGrs(repos)
 		case <-done:
 			break UI_LOOP
 		}
 	}
 }
 
-func (sc *SyncController) appLoop(done <-chan struct{}, ticker <-chan time.Time, syncerToUI chan<- []script.Repo) {
-	processRepoSlice := func() []script.Repo {
+func (sc *SyncController) appGrsLoop(done <-chan struct{}, ticker <-chan time.Time, syncerToUI chan<- []script.GrsRepo) {
+	processRepoSlice := func() []script.GrsRepo {
 		var wg sync.WaitGroup
-		wg.Add(len(sc.repos))
-		for i, _ := range sc.repos {
-			repo := &sc.repos[i]
-			go func() {
-				processRepo(script.NewScript(sc.ctx, repo))
+		wg.Add(len(sc.grsRepos))
+		for idx, _ := range sc.grsRepos {
+			go func(idx int) {
+				processGrsRepo(&sc.grsRepos[idx])
 				wg.Done()
-			}()
+			}(idx)
 		}
 		wg.Wait()
-		return sc.repos
+		return sc.grsRepos
 	}
 	// run at least once
 	syncerToUI <- processRepoSlice()
