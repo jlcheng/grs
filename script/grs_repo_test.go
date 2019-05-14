@@ -180,6 +180,50 @@ func TestAutoPush(t *testing.T) {
 	}
 }
 
+func TestAutoPushUntracked(t *testing.T) {
+	const TEST_ID = "TestAutoPushUntracked"
+	tmpdir, cleanup := MkTmpDir(t, TEST_ID)
+	defer cleanup()
+	gh := NewGitTestHelper(WithDebug(false), WithWd(tmpdir))
+	gh.NewRepoPair(tmpdir)
+	commandRunner := &shexec.ExecRunner{}
+
+	gr := NewGrsRepo(WithLocalGrsRepo(gh.Getwd()), WithCommandRunnerGrsRepo(commandRunner), WithPushAllowed(true))
+	gh.TouchAndCommit("A.txt", "A")
+	gh.RunGit("tag", "A")
+	gh.TouchAndCommit("B.txt", "B")
+	gh.RunGit("push")
+	gh.RunGit("reset", "--hard", "A")
+	gh.Touch("C.txt")
+
+	gr.Update()
+	gr.AutoPush()
+
+	expected := NewGrsStats(
+		WithBranchstat(BRANCH_DIVERGED),
+		WithDirstat(GRSDIR_VALID),
+		WithIndexstat(INDEX_UNMODIFIED),
+	)
+	if noCommitTime(gr.GetStats()) != expected {
+		t.Fatal("unexpected stats:", gr.GetStats())
+	}
+
+	logGraph, _ := gh.LogGraph()
+	if _, ok := logGraph["A"]; !ok {
+		t.Fatal("missing commit A")
+	}
+	var commit = false
+	for k, v := range logGraph {
+		if strings.HasPrefix(k, "grs-autocommit") && v[0] == "A" {
+			commit = true
+		}
+	}
+	if !commit {
+		t.Fatal("missing autocommit")
+	}
+}
+
+
 func TestAutoRebase(t *testing.T) {
 	const TEST_ID = "TestAutoRebase"
 	tmpdir, cleanup := MkTmpDir(t, TEST_ID)

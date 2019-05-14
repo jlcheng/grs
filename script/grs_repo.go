@@ -188,8 +188,7 @@ func (gr *GrsRepo) AutoPush() {
 		gr.stats.Dir != GRSDIR_VALID ||
 		gr.stats.Index == INDEX_UNKNOWN ||
 		gr.stats.Branch == BRANCH_UNKNOWN ||
-		gr.stats.Branch == BRANCH_UNTRACKED ||
-		gr.stats.Branch == BRANCH_BEHIND {
+		gr.stats.Branch == BRANCH_UNTRACKED {
 		return
 	}
 
@@ -216,13 +215,17 @@ func (gr *GrsRepo) AutoPush() {
 		statsPtr.Index = INDEX_UNMODIFIED
 	}
 
-	command = gr.commandRunner.Command(gr.git, "push").WithDir(gr.local)
-	if out, err = command.CombinedOutput(); err != nil {
-		base.Debug("git push failed. %v, %v", err, string(out))
-		gr.err = err
-		return
+	if gr.stats.Branch == BRANCH_BEHIND {
+		statsPtr.Branch = BRANCH_DIVERGED
+	} else {
+		command = gr.commandRunner.Command(gr.git, "push").WithDir(gr.local)
+		if out, err = command.CombinedOutput(); err != nil {
+			base.Debug("git push failed. %v, %v", err, string(out))
+			gr.err = err
+			return
+		}
+		statsPtr.Branch = BRANCH_UPTODATE
 	}
-	statsPtr.Branch = BRANCH_UPTODATE
 }
 
 func (gr *GrsRepo) AutoRebase() {
