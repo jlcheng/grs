@@ -299,6 +299,26 @@ func TestAutoFFMerge(t *testing.T) {
 	}
 }
 
+func TestNewRepo(t *testing.T) {
+	const testID = "TestNewRepo"
+	tmpdir, cleanup := MkTmpDir(t, testID)
+	defer cleanup()
+	gh := NewGitTestHelper(WithDebug(false), WithWd(tmpdir))
+	gh.NewRepoPair(tmpdir)
+	commandRunner := &shexec.ExecRunner{}
+
+	gr := NewGrsRepo(WithLocalGrsRepo(gh.Getwd()), WithCommandRunnerGrsRepo(commandRunner))
+	gr.Update()
+	expected := NewGrsStats(
+		WithBranchstat(BRANCH_UPTODATE),
+		WithDirstat(GRSDIR_VALID),
+		WithIndexstat(INDEX_UNMODIFIED),
+	)
+	if noCommitTime(gr.GetStats()) != expected {
+		t.Fatal( "unexpected stats:", gr.GetStats())
+	}
+}
+
 func noCommitTime(stats GrsStats) GrsStats {
 	statsCopy := stats
 	statsCopy.CommitTime = ""
