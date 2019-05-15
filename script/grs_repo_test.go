@@ -168,7 +168,6 @@ func TestAutoPush(t *testing.T) {
 	gh.TouchAndCommit("new.txt", "A")
 	gr.Update()
 	gr.AutoPush()
-	gr.Update()
 
 	expected := NewGrsStats(
 		WithBranchstat(BRANCH_UPTODATE),

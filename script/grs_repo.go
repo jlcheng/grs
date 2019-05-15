@@ -225,7 +225,6 @@ func (gr *GrsRepo) AutoPush() {
 	var out []byte
 	var err error
 	var command shexec.Command
-	var statsPtr = &gr.stats
 	if gr.stats.Index == INDEX_MODIFIED {
 		command := gr.commandRunner.Command(gr.git, "add", "-A").WithDir(gr.local)
 		if out, err = command.CombinedOutput(); err != nil {
@@ -240,20 +239,19 @@ func (gr *GrsRepo) AutoPush() {
 			gr.err = err
 			return
 		}
-		statsPtr.Index = INDEX_UNMODIFIED
 	}
 
-	if gr.stats.Branch == BRANCH_BEHIND {
-		statsPtr.Branch = BRANCH_DIVERGED
-	} else {
+	if gr.stats.Branch == BRANCH_UPTODATE || gr.stats.Branch == BRANCH_AHEAD {
 		command = gr.commandRunner.Command(gr.git, "push").WithDir(gr.local)
 		if out, err = command.CombinedOutput(); err != nil {
 			base.Debug("git push failed. %v, %v", err, string(out))
 			gr.err = err
 			return
 		}
-		statsPtr.Branch = BRANCH_UPTODATE
 	}
+
+	gr.UpdateIndexStatus()
+	gr.UpdateRepoStatus()
 }
 
 // AutoRebase runs a smarter version of 'git --rebase'
