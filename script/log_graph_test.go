@@ -29,12 +29,12 @@ func TestLogGraph(t *testing.T) {
 	gh.RunGit("merge", "source_2", "-m", "F")
 
 	expected := LogGraph(map[string][]string{
-		"F": {"C", "E"},
-		"E": {"D"},
-		"D": {"B"},
-		"C": {"B"},
-		"B": {"A"},
-		"A": {"init"},
+		"F":    {"C", "E"},
+		"E":    {"D"},
+		"D":    {"B"},
+		"C":    {"B"},
+		"B":    {"A"},
+		"A":    {"init"},
 		"init": {},
 	})
 	lg, err := gh.LogGraph()
@@ -45,4 +45,3 @@ func TestLogGraph(t *testing.T) {
 		t.Fatalf("unexpected commit graph: %s\n", lg)
 	}
 }
-

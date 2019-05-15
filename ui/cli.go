@@ -61,7 +61,6 @@ func RunCli(args Args) {
 		log.Fatal("repos not specified")
 	}
 
-
 	var cliUI CliUI
 	var err error
 	if args.useTui {
@@ -70,7 +69,7 @@ func RunCli(args Args) {
 		cliUI, err = NewPrintUI()
 	}
 	if err != nil {
-			log.Fatal("cannot initialize the terminal", err)
+		log.Fatal("cannot initialize the terminal", err)
 	}
 	defer cliUI.Close()
 	syncController := NewSyncController(grsRepos, cliUI)

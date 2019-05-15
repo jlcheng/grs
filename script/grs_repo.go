@@ -21,6 +21,27 @@ type GrsRepo struct {
 // GrsRepoOpt provides functional options
 type GrsRepoOpt func(gr *GrsRepo)
 
+// WithCommandRunnerGrsRepo is an option for the CommandRunner
+func WithCommandRunnerGrsRepo(commandRunner shexec.CommandRunner) GrsRepoOpt {
+	return func(gr *GrsRepo) {
+		gr.commandRunner = commandRunner
+	}
+}
+
+// WithLocalGrsRepo is an option for the repo's path on the local file system
+func WithLocalGrsRepo(local string) GrsRepoOpt {
+	return func(gr *GrsRepo) {
+		gr.local = local
+	}
+}
+
+// WithPushAllowed is an option to enable auto-push
+func WithPushAllowed(pushAllowed bool) GrsRepoOpt {
+	return func(gr *GrsRepo) {
+		gr.pushAllowed = pushAllowed
+	}
+}
+
 // NewGrsRepo returns an instance of GresRepo
 func NewGrsRepo(options ...GrsRepoOpt) GrsRepo {
 	retval := GrsRepo{
@@ -315,7 +336,7 @@ func (gr *GrsRepo) GetLocal() string {
 	return gr.local
 }
 
-// GrsStats returns information on GrsRepo
+// GetStats returns information on GrsRepo
 func (gr *GrsRepo) GetStats() GrsStats {
 	return gr.stats
 }
@@ -329,24 +350,3 @@ func (gr *GrsRepo) ClearError() {
 func (gr *GrsRepo) GetError() error {
 	return gr.err
 }
-
-// === START: GrsRepoOpt ===
-// WithCommandRunnerGrsRepo is an option for the CommandRunner
-func WithCommandRunnerGrsRepo(commandRunner shexec.CommandRunner) GrsRepoOpt {
-	return func(gr *GrsRepo) {
-		gr.commandRunner = commandRunner
-	}
-}
-// WithLocalGrsRepo is an option for the repo's path on the local file system
-func WithLocalGrsRepo(local string) GrsRepoOpt {
-	return func(gr *GrsRepo) {
-		gr.local = local
-	}
-}
-// WithPushAllowed is an option to enable auto-push
-func WithPushAllowed(pushAllowed bool) GrsRepoOpt {
-	return func(gr *GrsRepo) {
-		gr.pushAllowed = pushAllowed
-	}
-}
-// === END: GrsRepoOpt ===

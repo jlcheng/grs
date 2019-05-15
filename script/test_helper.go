@@ -28,9 +28,9 @@ type option func(*GitTestHelper)
 
 func NewGitTestHelper(options ...option) *GitTestHelper {
 	retval := &GitTestHelper{
-		err: nil,
-		git: ResolveGit(),
-		runner: &shexec.ExecRunner{},
+		err:       nil,
+		git:       ResolveGit(),
+		runner:    &shexec.ExecRunner{},
 		debugExec: false,
 	}
 	for _, o := range options {

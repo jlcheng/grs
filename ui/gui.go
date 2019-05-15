@@ -36,7 +36,6 @@ func colorBGrs(s script.Branchstat) string {
 	return fmt.Sprintf("\033[31m%v\033[0m", s)
 }
 
-
 func _layout(g *gocui.Gui) error {
 	maxX, maxY := g.Size()
 	if v, err := g.SetView("main", 0, 0, maxX-1, maxY-1); err != nil {
@@ -58,10 +57,11 @@ type CliUI interface {
 }
 
 type ConsoleUI struct {
-	gui *gocui.Gui
-	done chan struct{}
+	gui      *gocui.Gui
+	done     chan struct{}
 	doneLock sync.Mutex
 }
+
 var _consoleUIImpl CliUI = &ConsoleUI{}
 
 func NewConsoleUI() (*ConsoleUI, error) {
@@ -73,7 +73,7 @@ func NewConsoleUI() (*ConsoleUI, error) {
 	gui.SetManagerFunc(_layout)
 
 	consoleUI := &ConsoleUI{
-		gui: gui,
+		gui:  gui,
 		done: make(chan struct{}),
 	}
 
@@ -125,13 +125,12 @@ func (consoleUI *ConsoleUI) DrawGrs(repos []script.GrsRepo) {
 
 		for _, repo := range repos {
 			line := fmt.Sprintf("repo [%v] status is %v, %v, %v.",
-				repo.GetLocal() , colorBGrs(repo.GetStats().Branch), colorIGrs(repo.GetStats().Index), repo.GetStats().CommitTime)
+				repo.GetLocal(), colorBGrs(repo.GetStats().Branch), colorIGrs(repo.GetStats().Index), repo.GetStats().CommitTime)
 			fmt.Fprintln(v, line)
 		}
 		return nil
 	})
 }
-
 
 func (consoleUI *ConsoleUI) Close() {
 	consoleUI.gui.Close()
@@ -152,7 +151,7 @@ func (printUI *PrintUI) DoneSender() <-chan struct{} {
 }
 
 func (printUI *PrintUI) MainLoop() error {
-	<- printUI.done
+	<-printUI.done
 	return nil
 }
 
@@ -171,4 +170,5 @@ func (printUI *PrintUI) Close() {
 }
 
 var _printUIImpl CliUI = &PrintUI{}
+
 // === END: CliUI implementation ===

@@ -8,15 +8,15 @@ import (
 
 // SyncController provides a struct that can check and report on status of a collection of repositories
 type SyncController struct {
-	grsRepos []script.GrsRepo   // slice of repositories to check and report on
-	Duration time.Duration   // how often to sync repos
+	grsRepos []script.GrsRepo // slice of repositories to check and report on
+	Duration time.Duration    // how often to sync repos
 	ui       CliUI
 }
 
 func NewSyncController(grsRepos []script.GrsRepo, ui CliUI) SyncController {
 	return SyncController{
 		grsRepos: grsRepos,
-		ui:    ui,
+		ui:       ui,
 	}
 }
 
@@ -34,7 +34,6 @@ func processGrsRepo(gr *script.GrsRepo) {
 	gr.AutoPush()
 	gr.Update()
 }
-
 
 // === START: CliUI implementation ===
 func (sc *SyncController) CliUIImpl() {
@@ -94,4 +93,5 @@ SYNC_LOOP:
 		}
 	}
 }
+
 // === END: CliUI implementation ===

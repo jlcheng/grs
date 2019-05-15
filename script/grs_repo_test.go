@@ -9,8 +9,8 @@ import (
 )
 
 func TestUpdateDirstat(t *testing.T) {
-	const TEST_ID = "TestUpdateDirstat"
-	tmpdir, cleanup := MkTmpDir(t, TEST_ID)
+	const testID = "TestUpdateDirstat"
+	tmpdir, cleanup := MkTmpDir(t, testID)
 	defer cleanup()
 	gh := NewGitTestHelper()
 	gh.NewRepoPair(tmpdir)
@@ -33,8 +33,8 @@ func TestUpdateDirstat(t *testing.T) {
 }
 
 func TestGrsStats(t *testing.T) {
-	const TEST_ID = "TestUpdateGrsStats"
-	tmpdir, cleanup := MkTmpDir(t, TEST_ID)
+	const testID = "TestUpdateGrsStats"
+	tmpdir, cleanup := MkTmpDir(t, testID)
 	defer cleanup()
 	gh := NewGitTestHelper()
 	gh.NewRepoPair(tmpdir)
@@ -111,8 +111,8 @@ func TestGrsStats(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
-	const TEST_ID = "TestFetch"
-	tmpdir, cleanup := MkTmpDir(t, TEST_ID)
+	const testID = "TestFetch"
+	tmpdir, cleanup := MkTmpDir(t, testID)
 	defer cleanup()
 	gh := NewGitTestHelper()
 	gh.NewRepoPair(tmpdir)
@@ -142,8 +142,8 @@ func TestFetch(t *testing.T) {
 }
 
 func TestUpdateCommitTime(t *testing.T) {
-	const TEST_ID = "TestUpdateCommitTime"
-	tmpdir, cleanup := MkTmpDir(t, TEST_ID)
+	const testID = "TestUpdateCommitTime"
+	tmpdir, cleanup := MkTmpDir(t, testID)
 	defer cleanup()
 	gh := NewGitTestHelper()
 	gh.NewRepoPair(tmpdir)
@@ -157,8 +157,8 @@ func TestUpdateCommitTime(t *testing.T) {
 }
 
 func TestAutoPush(t *testing.T) {
-	const TEST_ID = "TestAutoPush"
-	tmpdir, cleanup := MkTmpDir(t, TEST_ID)
+	const testID = "TestAutoPush"
+	tmpdir, cleanup := MkTmpDir(t, testID)
 	defer cleanup()
 	gh := NewGitTestHelper()
 	gh.NewRepoPair(tmpdir)
@@ -181,8 +181,8 @@ func TestAutoPush(t *testing.T) {
 }
 
 func TestAutoPushUntracked(t *testing.T) {
-	const TEST_ID = "TestAutoPushUntracked"
-	tmpdir, cleanup := MkTmpDir(t, TEST_ID)
+	const testID = "TestAutoPushUntracked"
+	tmpdir, cleanup := MkTmpDir(t, testID)
 	defer cleanup()
 	gh := NewGitTestHelper(WithDebug(false), WithWd(tmpdir))
 	gh.NewRepoPair(tmpdir)
@@ -223,10 +223,9 @@ func TestAutoPushUntracked(t *testing.T) {
 	}
 }
 
-
 func TestAutoRebase(t *testing.T) {
-	const TEST_ID = "TestAutoRebase"
-	tmpdir, cleanup := MkTmpDir(t, TEST_ID)
+	const testID = "TestAutoRebase"
+	tmpdir, cleanup := MkTmpDir(t, testID)
 	defer cleanup()
 	gh := NewGitTestHelper(WithDebug(false), WithWd(tmpdir))
 	gh.NewRepoPair(tmpdir)
@@ -271,8 +270,8 @@ func TestAutoRebase(t *testing.T) {
 }
 
 func TestAutoFFMerge(t *testing.T) {
-	const TEST_ID = "TestAutoRebase"
-	tmpdir, cleanup := MkTmpDir(t, TEST_ID)
+	const testID = "TestAutoRebase"
+	tmpdir, cleanup := MkTmpDir(t, testID)
 	defer cleanup()
 	gh := NewGitTestHelper(WithDebug(false), WithWd(tmpdir))
 	gh.NewRepoPair(tmpdir)

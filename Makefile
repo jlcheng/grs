@@ -34,5 +34,9 @@ install: all
 run:
 	$(GORUN) $(MAIN_PRIME)
 
+.PHONY: fmt
+fmt:
+	gofmt -w ./
+
 out/grs: $(GENERATED)
 	$(GOBUILD) -o $(OUT_PRIME) $(MAIN_PRIME)

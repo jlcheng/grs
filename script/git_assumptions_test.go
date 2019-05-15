@@ -7,7 +7,6 @@ import (
 	"testing"
 )
 
-
 // Justification for autorebase. Documents the behavior of `git pull --rebase` when there is a conflict.
 // Here, origin and master each has one conflict-free change and one conflicting change. The desirable state is for
 // master (local) to end up with:
@@ -53,7 +52,7 @@ func TestRebasePullConflict(t *testing.T) {
 	gh.Exec(gh.Git(), "push", "origin")
 
 	gh.Exec(gh.Git(), "reset", "--hard", "HEAD~1")
-    gh.TouchAndCommit("C.txt", "C: conflict-free change on local")
+	gh.TouchAndCommit("C.txt", "C: conflict-free change on local")
 	gh.SetContents("conflict.txt", "1\n3\n")
 	gh.Add("conflict.txt")
 	gh.Commit("E: conflicting change on local")
@@ -61,8 +60,6 @@ func TestRebasePullConflict(t *testing.T) {
 
 	conflict := strings.Contains(gh.ErrString(), ": Merge conflict in conflict.txt")
 	if !conflict {
-		t.Fatal("Expected conflict, got the following instead.",  "\n\n"+gh.ErrString())
+		t.Fatal("Expected conflict, got the following instead.", "\n\n"+gh.ErrString())
 	}
 }
-
-
