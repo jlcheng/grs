@@ -53,6 +53,10 @@ func NewGrsRepo(options ...GrsRepoOpt) GrsRepo {
 	return retval
 }
 
+func (gr *GrsRepo) IsPushAllowed() bool {
+	return gr.pushAllowed
+}
+
 // UpdateCommitTime reads the last commit time from Git
 func (gr *GrsRepo) UpdateCommitTime() {
 	if gr.err != nil || gr.stats.Dir != GRSDIR_VALID {
@@ -293,7 +297,7 @@ func (gr *GrsRepo) AutoRebase() {
 			rebaseErr = err1
 			cmd = gr.commandRunner.Command(gr.git, "rebase", "--abort").WithDir(gr.local)
 			bytes2, err2 := cmd.CombinedOutput()
-			if err != nil {
+			if err2 != nil {
 				gr.err = fmt.Errorf("%v %v", err2, string(bytes2))
 				return
 			}

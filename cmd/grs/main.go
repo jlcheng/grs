@@ -30,7 +30,10 @@ func main() {
 	pflag.BoolP("merge-ignore-atime", "m", false, "ignore access time check when auto-merging")
 	pflag.StringP("repo", "r", "", "the repository to process")
 	pflag.Bool("use-tui", false, "use the experiment text-based UI")
-	viper.BindPFlags(pflag.CommandLine)
+	if err := viper.BindPFlags(pflag.CommandLine); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)

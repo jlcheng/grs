@@ -43,7 +43,9 @@ func _layout(g *gocui.Gui) error {
 			return err
 		}
 		v.Title = "Grs"
-		fmt.Fprintln(v, "Fetching repo data...")
+		if _, err := fmt.Fprintln(v, "Fetching repo data..."); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -120,13 +122,20 @@ func (consoleUI *ConsoleUI) DrawGrs(repos []script.GrsRepo) {
 			return err
 		}
 		v.Clear()
-		var time = time.Now().Format("[Jan _2 3:04:05PM PST]")
-		v.Title = fmt.Sprintf("Grs %s", time)
+		var timestr = time.Now().Format("[Jan _2 3:04:05PM PST]")
+		v.Title = fmt.Sprintf("Grs %s", timestr)
 
 		for _, repo := range repos {
-			line := fmt.Sprintf("repo [%v] status is %v, %v, %v.",
-				repo.GetLocal(), colorBGrs(repo.GetStats().Branch), colorIGrs(repo.GetStats().Index), repo.GetStats().CommitTime)
-			fmt.Fprintln(v, line)
+			pushIndicator := ""
+			if repo.IsPushAllowed() {
+				pushIndicator = "\033[32m⯅\033[0m"
+			}
+
+			line := fmt.Sprintf("repo [%v]%v status is %v, %v, %v.",
+				repo.GetLocal(), pushIndicator, colorBGrs(repo.GetStats().Branch), colorIGrs(repo.GetStats().Index), repo.GetStats().CommitTime)
+			if _, err := fmt.Fprintln(v, line); err != nil {
+				return err
+			}
 		}
 		return nil
 	})

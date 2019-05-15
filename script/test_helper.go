@@ -160,14 +160,14 @@ func (s *GitTestHelper) Exec(first string, arg ...string) bool {
 		return false
 	}
 	cmd := s.runner.Command(first, arg...).WithDir(s.Getwd())
-	bytes, err := cmd.CombinedOutput()
+	bytearr, err := cmd.CombinedOutput()
 	if s.debugExec {
 		words := append([]string{">>>", first}, arg...)
 		fmt.Println(strings.Join(words, " "))
-		fmt.Println(string(bytes))
+		fmt.Println(string(bytearr))
 	}
 	if err != nil {
-		s.err = errors.New(fmt.Sprintf("%v %v", err, string(bytes)))
+		s.err = errors.New(fmt.Sprintf("%v %v", err, string(bytearr)))
 		s.errCause = first + " " + strings.Join(arg, " ")
 		return false
 	}

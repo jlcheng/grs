@@ -91,7 +91,7 @@ func (m *MockRunner) Command(name string, arg ...string) Command {
 
 // Get a count of matching commands from the runner
 func (m *MockRunner) HistoryCount(command string) int {
-	var ret int = 0
+	var ret = 0
 	p := regexp.MustCompile(command)
 	for _, elem := range m.history {
 		if p.MatchString(elem) {

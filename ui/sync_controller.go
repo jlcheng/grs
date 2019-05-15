@@ -46,7 +46,7 @@ func (sc *SyncController) CliUIImpl() {
 	//go sc.appLoop(done, ticker.C, syncerToUI)
 	go sc.uiGrsDispatchLoop(done, syncerToUI)
 	go sc.appGrsLoop(done, ticker.C, syncerToUI)
-	sc.ui.MainLoop()
+	_ = sc.ui.MainLoop()
 }
 
 func (sc *SyncController) uiGrsDispatchLoop(done <-chan struct{}, from <-chan []script.GrsRepo) {

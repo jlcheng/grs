@@ -300,7 +300,7 @@ func TestAutoFFMerge(t *testing.T) {
 }
 
 func noCommitTime(stats GrsStats) GrsStats {
-	copy := stats
-	copy.CommitTime = ""
-	return copy
+	statsCopy := stats
+	statsCopy.CommitTime = ""
+	return statsCopy
 }
