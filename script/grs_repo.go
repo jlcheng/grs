@@ -1,7 +1,6 @@
 package script
 
 import (
-	"errors"
 	"fmt"
 	"jcheng/grs/base"
 	"jcheng/grs/shexec"
@@ -9,6 +8,7 @@ import (
 	"strings"
 )
 
+// GrsRepo represents a git repository on your local file system.
 type GrsRepo struct {
 	stats         GrsStats
 	err           error  // err is set when a method returns an error; may prevent further methods from running
@@ -17,8 +17,11 @@ type GrsRepo struct {
 	pushAllowed   bool   // If true, GrsRepo is allowed to push changes to remote
 	commandRunner shexec.CommandRunner
 }
+
+// GrsRepoOpt provides functional options
 type GrsRepoOpt func(gr *GrsRepo)
 
+// NewGrsRepo returns an instance of GresRepo
 func NewGrsRepo(options ...GrsRepoOpt) GrsRepo {
 	retval := GrsRepo{
 		git: "git",
@@ -80,6 +83,7 @@ func (gr *GrsRepo) UpdateDirstat() {
 	statsPtr.Dir = GRSDIR_VALID
 }
 
+// UpdateRepoStatus update the "branch" status of a *GrsRepo
 func (gr *GrsRepo) UpdateRepoStatus() {
 	if gr.err != nil || gr.stats.Dir != GRSDIR_VALID {
 		return
@@ -133,6 +137,7 @@ func (gr *GrsRepo) UpdateRepoStatus() {
 	}
 }
 
+// UpdateIndexStatus updates the INDEX status of a GrsRepo
 func (gr *GrsRepo) UpdateIndexStatus() {
 	if gr.err != nil || gr.stats.Dir != GRSDIR_VALID {
 		return
@@ -167,6 +172,7 @@ func (gr *GrsRepo) UpdateIndexStatus() {
 	statsPtr.Index = INDEX_UNMODIFIED
 }
 
+// Fetch runs git fetch on the GrsRepo instance
 func (gr *GrsRepo) Fetch() {
 	if gr.err != nil || gr.stats.Dir != GRSDIR_VALID {
 		return
@@ -182,6 +188,7 @@ func (gr *GrsRepo) Fetch() {
 	base.Debug("git fetch ok: %v", gr.local)
 }
 
+// AutoPush attempts to commit any changes and push them to the remote repo
 func (gr *GrsRepo) AutoPush() {
 	if gr.err != nil ||
 		!gr.pushAllowed ||
@@ -228,6 +235,7 @@ func (gr *GrsRepo) AutoPush() {
 	}
 }
 
+// AutoRebase runs a smarter version of 'git --rebase'
 func (gr *GrsRepo) AutoRebase() {
 	if gr.err != nil ||
 		gr.stats.Dir != GRSDIR_VALID ||
@@ -242,7 +250,7 @@ func (gr *GrsRepo) AutoRebase() {
 	cmd := gr.commandRunner.Command(gr.git, "merge-base", "HEAD", p).WithDir(gr.local)
 	bytes, err := cmd.CombinedOutput()
 	if err != nil {
-		gr.err = errors.New(fmt.Sprintf("%v %v", err, string(bytes)))
+		gr.err = fmt.Errorf("%v %v", err, string(bytes))
 		return
 	}
 	mergeBase := strings.TrimSpace(string(bytes))
@@ -251,7 +259,7 @@ func (gr *GrsRepo) AutoRebase() {
 	cmd = gr.commandRunner.Command(gr.git, "rev-list", p, "^"+mergeBase).WithDir(gr.local)
 	bytes, err = cmd.CombinedOutput()
 	if err != nil {
-		gr.err = errors.New(fmt.Sprintf("%v %v", err, string(bytes)))
+		gr.err = fmt.Errorf("%v %v", err, string(bytes))
 		return
 	}
 	revlist := strings.Split(strings.TrimSpace(string(bytes)), "\n")
@@ -267,13 +275,14 @@ func (gr *GrsRepo) AutoRebase() {
 			cmd = gr.commandRunner.Command(gr.git, "rebase", "--abort").WithDir(gr.local)
 			bytes2, err2 := cmd.CombinedOutput()
 			if err != nil {
-				gr.err = errors.New(fmt.Sprintf("%s %s", err2, string(bytes2)))
+				gr.err = fmt.Errorf("%v %v", err2, string(bytes2))
 				return
 			}
 		}
 	}
 }
 
+// AutoFFMerge runs git merge --ff-only
 func (gr *GrsRepo) AutoFFMerge() {
 	if gr.err != nil ||
 		gr.stats.Dir != GRSDIR_VALID ||
@@ -293,6 +302,7 @@ func (gr *GrsRepo) AutoFFMerge() {
 	return
 }
 
+// Update updates the state of the GrsRepo
 func (gr *GrsRepo) Update() {
 	gr.UpdateDirstat()
 	gr.UpdateCommitTime()
@@ -300,55 +310,40 @@ func (gr *GrsRepo) Update() {
 	gr.UpdateIndexStatus()
 }
 
+// GetLocal returns GrsRepo's directory on the local file system
 func (gr *GrsRepo) GetLocal() string {
 	return gr.local
 }
 
+// GrsStats returns information on GrsRepo
 func (gr *GrsRepo) GetStats() GrsStats {
 	return gr.stats
 }
 
+// ClearError clears the error flag associated with this GrsRepo
 func (gr *GrsRepo) ClearError() {
 	gr.err = nil
 }
 
+// GetError returns the error flag associated with this GrsRepo
 func (gr *GrsRepo) GetError() error {
 	return gr.err
 }
 
-// === START: Compat ===
-func (gr *GrsRepo) GetIndexStatus() {
-	gr.UpdateIndexStatus()
-	return
-}
-
-func (gr *GrsRepo) GetRepoStatus() {
-	gr.UpdateRepoStatus()
-	return
-}
-
-func (gr *GrsRepo) GetCommitTime() {
-	gr.UpdateCommitTime()
-	return
-}
-// === END: Compat ===
-
 // === START: GrsRepoOpt ===
-func WithGitGrsRepo(git string) GrsRepoOpt {
-	return func(gr *GrsRepo) {
-		gr.git = git
-	}
-}
+// WithCommandRunnerGrsRepo is an option for the CommandRunner
 func WithCommandRunnerGrsRepo(commandRunner shexec.CommandRunner) GrsRepoOpt {
 	return func(gr *GrsRepo) {
 		gr.commandRunner = commandRunner
 	}
 }
+// WithLocalGrsRepo is an option for the repo's path on the local file system
 func WithLocalGrsRepo(local string) GrsRepoOpt {
 	return func(gr *GrsRepo) {
 		gr.local = local
 	}
 }
+// WithPushAllowed is an option to enable auto-push
 func WithPushAllowed(pushAllowed bool) GrsRepoOpt {
 	return func(gr *GrsRepo) {
 		gr.pushAllowed = pushAllowed

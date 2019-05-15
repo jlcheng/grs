@@ -40,8 +40,8 @@ Not included here, but rebase using `git pull --rebase -s recursive -X ours` doe
 */
 
 func TestRebasePullConflict(t *testing.T) {
-	const TEST_ID = "TestRebasePullConflict"
-	tmpdir, cleanup := MkTmpDir(t, TEST_ID)
+	const testID = "TestRebasePullConflict"
+	tmpdir, cleanup := MkTmpDir(t, testID)
 	defer cleanup()
 	gh := NewGitTestHelper(WithDebug(false), WithWd(tmpdir))
 	gh.NewRepoPair(tmpdir)

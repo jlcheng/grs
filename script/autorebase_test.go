@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-// MkTmpDir creates a temporary directory usiing ioutil.TempDir and calls t.Fatal if the attempt fails. On success, it
+// MkTmpDir creates a temporary directory using ioutil.TempDir and calls t.Fatal if the attempt fails. On success, it
 // returns:
 // - the created directory
 // - a no-arg function which deletes the temp directory and os.Chdir to the current working directory

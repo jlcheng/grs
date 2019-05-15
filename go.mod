@@ -12,6 +12,11 @@ require (
 	github.com/spf13/pflag v1.0.3
 	github.com/spf13/viper v1.2.1
 	github.com/stretchr/testify v1.3.0 // indirect
-	golang.org/x/sys v0.0.0-20181019160139-8e24a49d80f8 // indirect
-	golang.org/x/tools v0.0.0-20190228203856-589c23e65e65 // indirect
+	golang.org/x/crypto v0.0.0-20190513172903-22d7a77e9e5f // indirect
+	golang.org/x/lint v0.0.0-20190409202823-959b441ac422 // indirect
+	golang.org/x/net v0.0.0-20190514140710-3ec191127204 // indirect
+	golang.org/x/sys v0.0.0-20190514135907-3a4b5fb9f71f // indirect
+	golang.org/x/text v0.3.2 // indirect
+	golang.org/x/tools v0.0.0-20190515012406-7d7faa4812bd // indirect
+	google.golang.org/appengine v1.4.0 // indirect
 )
