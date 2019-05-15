@@ -36,7 +36,7 @@ run:
 
 .PHONY: fmt
 fmt:
-	gofmt -w ./
+	gofmt -s -w ./
 
 out/grs: $(GENERATED)
 	$(GOBUILD) -o $(OUT_PRIME) $(MAIN_PRIME)

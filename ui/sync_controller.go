@@ -65,7 +65,7 @@ func (sc *SyncController) appGrsLoop(done <-chan struct{}, ticker <-chan time.Ti
 	processRepoSlice := func() []script.GrsRepo {
 		var wg sync.WaitGroup
 		wg.Add(len(sc.grsRepos))
-		for idx, _ := range sc.grsRepos {
+		for idx := range sc.grsRepos {
 			go func(idx int) {
 				processGrsRepo(&sc.grsRepos[idx])
 				wg.Done()
