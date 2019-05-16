@@ -88,6 +88,10 @@ SYNC_LOOP:
 		select {
 		case <-ticker:
 			syncerToUI <- processRepoSlice()
+		case event := <-sc.ui.EventSender():
+			if event == EVENT_REFRESH {
+				syncerToUI <- processRepoSlice()
+			}
 		case <-done:
 			break SYNC_LOOP
 		}

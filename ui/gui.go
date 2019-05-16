@@ -8,22 +8,8 @@ import (
 	"time"
 )
 
-func colorI(s script.Indexstat) string {
-	if s == script.INDEX_UNMODIFIED {
-		return fmt.Sprintf("%v", s)
-	}
-	return fmt.Sprintf("\033[31m%v\033[0m", s)
-}
-
 func colorIGrs(s script.Indexstat) string {
 	if s == script.INDEX_UNMODIFIED {
-		return fmt.Sprintf("%v", s)
-	}
-	return fmt.Sprintf("\033[31m%v\033[0m", s)
-}
-
-func colorB(s script.Branchstat) string {
-	if s == script.BRANCH_UPTODATE {
 		return fmt.Sprintf("%v", s)
 	}
 	return fmt.Sprintf("\033[31m%v\033[0m", s)
@@ -38,34 +24,35 @@ func colorBGrs(s script.Branchstat) string {
 
 func _layout(g *gocui.Gui) error {
 	maxX, maxY := g.Size()
-	if v, err := g.SetView("main", 0, 0, maxX-1, maxY-1); err != nil {
-		if err != gocui.ErrUnknownView {
-			return err
-		}
-		v.Title = "Grs"
-		if _, err := fmt.Fprintln(v, "Fetching repo data..."); err != nil {
-			return err
-		}
+	v, err := g.SetView("main", 0, 0, maxX-1, maxY-1)
+	if err != nil {
+		return err
+	}
+
+	v.Title = "Grs"
+	if _, err := fmt.Fprintln(v, "Fetching repo data..."); err != nil {
+		return err
 	}
 	return nil
 }
 
-// === START: CliUI implementation ===
 type CliUI interface {
 	DoneSender() <-chan struct{}
+	EventSender() <-chan UiEvent
 	MainLoop() error
 	DrawGrs(repo []script.GrsRepo)
 	Close()
 }
 
+// ConsoleUI is a prettier and more powerful UI implementation
 type ConsoleUI struct {
 	gui      *gocui.Gui
 	done     chan struct{}
 	doneLock sync.Mutex
+	eventCh  chan UiEvent
 }
 
-var _consoleUIImpl CliUI = &ConsoleUI{}
-
+// NewConsoleUI creates a ConsoleUI and initialize its UI layout and keybindings.
 func NewConsoleUI() (*ConsoleUI, error) {
 	gui, err := gocui.NewGui(gocui.Output256)
 	if err != nil {
@@ -75,8 +62,9 @@ func NewConsoleUI() (*ConsoleUI, error) {
 	gui.SetManagerFunc(_layout)
 
 	consoleUI := &ConsoleUI{
-		gui:  gui,
-		done: make(chan struct{}),
+		gui:     gui,
+		done:    make(chan struct{}),
+		eventCh: make(chan UiEvent),
 	}
 
 	if err := consoleUI.initKeyBindings(); err != nil {
@@ -100,17 +88,39 @@ func (consoleUI *ConsoleUI) initKeyBindings() error {
 	if err := consoleUI.gui.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, quitFunc); err != nil {
 		return err
 	}
+
+	refreshFunc := func(g *gocui.Gui, _ *gocui.View) error {
+		v, err := g.View("main")
+		if err != nil {
+			return err
+		}
+
+		v.Title = "Refreshing"
+		// Careful: If the event queue is full, the refresh event will be lost.
+		select {
+		case consoleUI.eventCh <- EVENT_REFRESH:
+		default:
+		}
+
+		return nil
+	}
+	if err := consoleUI.gui.SetKeybinding("", gocui.KeyCtrlR, gocui.ModNone, refreshFunc); err != nil {
+		return err
+	}
 	return nil
 }
 
+// DoneSender returns a channel that blocks until the ConsoleUI is closed
 func (consoleUI *ConsoleUI) DoneSender() <-chan struct{} {
 	return consoleUI.done
 }
 
+// MainLoop blocks until the UI loop is complete
 func (consoleUI *ConsoleUI) MainLoop() error {
 	return consoleUI.gui.MainLoop()
 }
 
+// DrawGrs enqueues a draw operation in the UI's rendering pipeline
 func (consoleUI *ConsoleUI) DrawGrs(repos []script.GrsRepo) {
 	if consoleUI.done == nil {
 		return
@@ -147,29 +157,42 @@ func (consoleUI *ConsoleUI) DrawGrs(repos []script.GrsRepo) {
 	})
 }
 
+// Close releases resources used by this ConsoleUI instance
 func (consoleUI *ConsoleUI) Close() {
 	consoleUI.gui.Close()
 }
 
-type PrintUI struct {
-	done chan struct{}
+// EventSender returns a channel that someone can poll for UI events
+func (consoleUI *ConsoleUI) EventSender() <-chan UiEvent {
+	return consoleUI.eventCh
 }
 
+// PrintUI is the simpler and less useful implementation of CliUI
+type PrintUI struct {
+	done    chan struct{}
+	eventCh <-chan UiEvent
+}
+
+// NewPrintUI returns a PrintUI instance
 func NewPrintUI() (*PrintUI, error) {
 	return &PrintUI{
-		done: make(chan struct{}),
+		done:    make(chan struct{}),
+		eventCh: make(chan UiEvent),
 	}, nil
 }
 
+// DoneSender returns a channel that blocks until the PrintUI is closed
 func (printUI *PrintUI) DoneSender() <-chan struct{} {
 	return printUI.done
 }
 
+// MainLoop blocks until the UI loop is complete
 func (printUI *PrintUI) MainLoop() error {
 	<-printUI.done
 	return nil
 }
 
+// DrawGrs blocks while it draws the state of the given GrsRepo array to the screen
 func (printUI *PrintUI) DrawGrs(repos []script.GrsRepo) {
 	fmt.Print("\033[2J\033[H")
 	fmt.Println(time.Now().Format("=== Jan _2 3:04PM MST ==="))
@@ -180,10 +203,12 @@ func (printUI *PrintUI) DrawGrs(repos []script.GrsRepo) {
 	}
 }
 
+// Close releases resources used by this PrintUI instance
 func (printUI *PrintUI) Close() {
 	close(printUI.done)
 }
 
-var _printUIImpl CliUI = &PrintUI{}
-
-// === END: CliUI implementation ===
+// EventSender returns a channel that always blocks, as the PrintUI object is too simple to generate UI events
+func (printUI *PrintUI) EventSender() <-chan UiEvent {
+	return printUI.eventCh
+}

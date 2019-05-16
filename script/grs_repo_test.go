@@ -315,7 +315,7 @@ func TestNewRepo(t *testing.T) {
 		WithIndexstat(INDEX_UNMODIFIED),
 	)
 	if noCommitTime(gr.GetStats()) != expected {
-		t.Fatal( "unexpected stats:", gr.GetStats())
+		t.Fatal("unexpected stats:", gr.GetStats())
 	}
 }
 
