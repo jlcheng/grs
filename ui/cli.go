@@ -55,15 +55,28 @@ func RunCli(args Args) {
 		base.SetLogLevel(base.DEBUG)
 	}
 
-	grsRepos := GrsRepos(args.repos, args.repoCfgMap)
+	grsRepos := InitGrsRepos(args.repos, args.repoCfgMap)
+
+	cliUI := InitCliUI(args.useTui)
+	defer cliUI.Close()
+
+	syncController := InitSyncController(args.refresh, grsRepos, cliUI)
+	syncController.CliUIImpl()
+}
+
+func InitGrsRepos(repos []string, repoCfgMap map[string]RepoConfig) []script.GrsRepo {
+	grsRepos := GrsRepos(repos, repoCfgMap)
 
 	if len(grsRepos) == 0 {
 		log.Fatal("repos not specified")
 	}
+	return grsRepos
+}
 
+func InitCliUI(useTui bool) CliUI {
 	var cliUI CliUI
 	var err error
-	if args.useTui {
+	if useTui {
 		cliUI, err = NewConsoleUI()
 	} else {
 		cliUI, err = NewPrintUI()
@@ -71,12 +84,16 @@ func RunCli(args Args) {
 	if err != nil {
 		log.Fatal("cannot initialize the terminal", err)
 	}
-	defer cliUI.Close()
-	syncController := NewSyncController(grsRepos, cliUI)
-	syncController.Duration = time.Duration(args.refresh) * time.Second
-	syncController.CliUIImpl()
+	return cliUI
 }
 
+func InitSyncController(refresh int, grsRepos []script.GrsRepo, cliUI CliUI) SyncController {
+	syncController := NewSyncController(grsRepos, cliUI)
+	syncController.Duration = time.Duration(refresh) * time.Second
+	return syncController
+}
+
+// GrsRepos parses a list of paths and a map of path configurations to derive a list of GrsRepo objects
 func GrsRepos(paths []string, repoCfg map[string]RepoConfig) []script.GrsRepo {
 	commandRunner := &shexec.ExecRunner{}
 	repos := make([]script.GrsRepo, len(paths))
