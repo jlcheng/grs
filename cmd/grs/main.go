@@ -11,13 +11,10 @@ import (
 )
 
 func main() {
-	// rootCmd represents the base command when called without any subcommands
 	var rootCmd = &cobra.Command{
 		Use:   "grs",
 		Short: "grs performs two-way sync of Git repos",
 		Long:  "grs performs two-way sync of Git repos",
-		// Uncomment the following line if your bare application
-		// has an action associated with it:
 		Run: func(cmd *cobra.Command, _ []string) {
 			ui.RunCli(ui.CliParse())
 		},
@@ -49,7 +46,7 @@ func initConfig() {
 		viper.SetConfigFile(cfgFile)
 	} else {
 		// Find home directory.
-		home, err := homedir.Dir()
+		home, err := os.UserHomeDir()
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -60,10 +57,11 @@ func initConfig() {
 		viper.SetConfigName(".grs")
 	}
 
-	viper.AutomaticEnv() // read in environment variables that match
-
 	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
+	if err := viper.ReadInConfig(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	} else {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
 }
