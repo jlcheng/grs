@@ -3,8 +3,8 @@
 Grs is a dashboard for your Git repos and keep your repos up-to-date. You can think of it as a glorified cron job with a
 few differences.
 
-1. Grs will try to auto-rebase your local changes. If there is a conflict, Grs will keep your local files unchanged.
-2. Grs can optionally auto-push your changes.
+1. Grs will try to auto-rebase your local changes. If there is a conflict, Grs will keep your local files modified.
+2. Grs can optionally auto-push your local changes.
 3. Grs provides a dashboard view of your Git repos.
 
 I use Grs as a replacement for Dropbox and Evernote. Many files that matter to me are text files: scripts, org-mode
@@ -23,7 +23,7 @@ repo [/home/jcheng/org] status IS UP-TO-DATE, UNMODIFIED, 2 seconds ago.
 ```
 
 # tldr;
-Go version 1.11+ is required. Grs uses Go modules for dependencies management.
+Go version 1.12+ is required. Grs uses Go modules for dependencies management and 1.12-specific APIs.
 
 Install Grs
 ```
