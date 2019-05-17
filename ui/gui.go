@@ -24,14 +24,14 @@ func colorBGrs(s script.Branchstat) string {
 
 func _layout(g *gocui.Gui) error {
 	maxX, maxY := g.Size()
-	v, err := g.SetView("main", 0, 0, maxX-1, maxY-1)
-	if err != nil {
-		return err
-	}
-
-	v.Title = "Grs"
-	if _, err := fmt.Fprintln(v, "Fetching repo data..."); err != nil {
-		return err
+	if v, err := g.SetView("main", 0, 0, maxX-1, maxY-1); err != nil {
+		if err != gocui.ErrUnknownView {
+			return err
+		}
+		v.Title = "Grs"
+		if _, err := fmt.Fprintln(v, "Fetching repo data..."); err != nil {
+			return err
+		}
 	}
 	return nil
 }
