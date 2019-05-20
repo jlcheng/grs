@@ -320,9 +320,7 @@ func (gr *GrsRepo) AutoFFMerge() {
 	if out, err = command.CombinedOutput(); err != nil {
 		base.Debug("git merge failed: %v\n%v\n", err, string(out))
 		gr.err = err
-		return
 	}
-	return
 }
 
 // Update updates the state of the GrsRepo

@@ -58,17 +58,17 @@ func TestMockCommand_Multi_Ok(t *testing.T) {
 	m.Add(echoTwo)
 	m.Add(failed)
 	cmd := m.Command("echo", "one")
-	out, err := cmd.CombinedOutput()
+	out, _ := cmd.CombinedOutput()
 	if s := string(out); s != "one" {
 		t.Errorf("expected 'one', got %v", s)
 	}
 	cmd = m.Command("echo", "two")
-	out, err = cmd.CombinedOutput()
+	out, _ = cmd.CombinedOutput()
 	if s := string(out); s != "two" {
 		t.Errorf("expected 'two', got %v", s)
 	}
 	cmd = m.Command("invalid")
-	out, err = cmd.CombinedOutput()
+	out, err := cmd.CombinedOutput()
 	if err == nil {
 		t.Error("expected error, got nil")
 	}

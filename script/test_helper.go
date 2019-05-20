@@ -2,7 +2,6 @@ package script
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"jcheng/grs/shexec"
 	"os"
@@ -167,7 +166,7 @@ func (s *GitTestHelper) Exec(first string, arg ...string) bool {
 		fmt.Println(string(bytearr))
 	}
 	if err != nil {
-		s.err = errors.New(fmt.Sprintf("%v %v", err, string(bytearr)))
+		s.err = fmt.Errorf("%v %v", err, string(bytearr))
 		s.errCause = first + " " + strings.Join(arg, " ")
 		return false
 	}
@@ -245,5 +244,5 @@ func (s *GitTestHelper) toAbsPath(name string) string {
 		}
 	}
 
-	return path.Join(s.wd, name)
+	return path.Join(wd, name)
 }

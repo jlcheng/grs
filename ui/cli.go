@@ -12,7 +12,6 @@ import (
 type Args struct {
 	repos      []string
 	verbose    bool
-	command    string
 	refresh    int
 	forceMerge bool
 	repoCfgMap map[string]RepoConfig
@@ -98,7 +97,7 @@ func GrsRepos(paths []string, repoCfg map[string]RepoConfig) []script.GrsRepo {
 	commandRunner := &shexec.ExecRunner{}
 	repos := make([]script.GrsRepo, len(paths))
 	for idx, path := range paths {
-		config, _ := repoCfg[path]
+		config := repoCfg[path]
 		pushAllowed := config.pushAllowed
 		repos[idx] = script.NewGrsRepo(
 			script.WithLocalGrsRepo(path),
