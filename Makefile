@@ -11,6 +11,8 @@ OUT_PRIME=out/grs
 
 GENERATED=script/grs_stat_strings.go ui/gui_event_strings.go
 
+VERSION=`head -n 1 VERSION.txt`
+
 .PHONY: all
 all: test build
 
@@ -39,4 +41,4 @@ fmt:
 	gofmt -s -w ./
 
 out/grs: $(GENERATED)
-	$(GOBUILD) -o $(OUT_PRIME) $(MAIN_PRIME)
+	$(GOBUILD) -ldflags "-X main.Version=$(VERSION)" -o $(OUT_PRIME) $(MAIN_PRIME)

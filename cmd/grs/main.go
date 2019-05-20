@@ -9,11 +9,15 @@ import (
 	"os"
 )
 
+var Version string = "PLACE_HOLDER_VERSION"
+
 func main() {
 	var rootCmd = &cobra.Command{
-		Use:   "grs",
+		Use:   "grs [-t 60] [--use-tui]",
 		Short: "grs performs two-way sync of Git repos",
-		Long:  "grs performs two-way sync of Git repos",
+		Long:  fmt.Sprintf(`grs %v
+Grs performs two-way sync of Git repos
+`, Version),
 		Run: func(cmd *cobra.Command, _ []string) {
 			ui.RunCli(ui.CliParse())
 		},
