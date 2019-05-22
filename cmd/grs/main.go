@@ -15,7 +15,7 @@ func main() {
 	var rootCmd = &cobra.Command{
 		Use:   "grs [-t 60] [--use-tui]",
 		Short: "grs performs two-way sync of Git repos",
-		Long:  fmt.Sprintf(`grs %v
+		Long: fmt.Sprintf(`grs %v
 Grs performs two-way sync of Git repos
 `, Version),
 		Run: func(cmd *cobra.Command, _ []string) {

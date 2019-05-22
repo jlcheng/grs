@@ -1,6 +1,7 @@
 package shexec
 
 import (
+	"os"
 	"os/exec"
 )
 
@@ -40,6 +41,8 @@ type ExecRunner struct{}
 // Command creates an instance of a Command object
 func (r *ExecRunner) Command(name string, arg ...string) Command {
 	delegate := exec.Command(name, arg...)
-	delegate.Env = append(delegate.Env, "GIT_SSH_COMMAND=ssh -o BatchMode=yes")
+	envcopy := make([]string, len(os.Environ()))
+	copy(envcopy, os.Environ())
+	delegate.Env = append(envcopy, "GIT_SSH_COMMAND=ssh -o BatchMode=yes")
 	return &CommandWrapper{delegate}
 }
