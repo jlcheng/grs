@@ -142,13 +142,15 @@ func (consoleUI *ConsoleUI) DrawGrs(repos []script.GrsRepo) {
 			}
 
 			errorIndicator := " "
+			errorMessage := ""
 			if repo.GetError() != nil {
-				errorIndicator = "!"
+				errorIndicator = "\033[31;47m!\033[0m"
+				errorMessage = fmt.Sprintf(" (%v)", repo.GetError().Error())
 			}
 
-			line := fmt.Sprintf("%vrepo [%v]%v status is %v, %v, %v.",
+			line := fmt.Sprintf("%vrepo [%v]%v status is %v, %v, %v.%v",
 				errorIndicator, repo.GetLocal(), pushIndicator, colorBGrs(repo.GetStats().Branch),
-				colorIGrs(repo.GetStats().Index), repo.GetStats().CommitTime)
+				colorIGrs(repo.GetStats().Index), repo.GetStats().CommitTime, errorMessage)
 			if _, err := fmt.Fprintln(v, line); err != nil {
 				return err
 			}
