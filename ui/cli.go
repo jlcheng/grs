@@ -15,7 +15,7 @@ type Args struct {
 	refresh    int
 	forceMerge bool
 	repoCfgMap map[string]RepoConfig
-	useTui     bool
+	simpleUI   bool
 }
 
 // CliParse uses spf13/viper to create the program parameters
@@ -32,7 +32,7 @@ func CliParse() Args {
 		forceMerge: viper.GetBool("merge-ignore-atime"),
 		repos:      repos,
 		repoCfgMap: parseRepoConfigMap(viper.Get("repo_config")),
-		useTui:     viper.GetBool("use-tui"),
+		simpleUI:   viper.GetBool("simple-ui"),
 	}
 	return args
 }
@@ -56,7 +56,7 @@ func RunCli(args Args) {
 
 	grsRepos := InitGrsRepos(args.repos, args.repoCfgMap)
 
-	cliUI := InitCliUI(args.useTui)
+	cliUI := InitCliUI(args.simpleUI)
 	defer cliUI.Close()
 
 	syncController := InitSyncController(args.refresh, grsRepos, cliUI)
@@ -72,13 +72,13 @@ func InitGrsRepos(repos []string, repoCfgMap map[string]RepoConfig) []script.Grs
 	return grsRepos
 }
 
-func InitCliUI(useTui bool) CliUI {
+func InitCliUI(simpleUI bool) CliUI {
 	var cliUI CliUI
 	var err error
-	if useTui {
-		cliUI, err = NewConsoleUI()
-	} else {
+	if simpleUI {
 		cliUI, err = NewPrintUI()
+	} else {
+		cliUI, err = NewConsoleUI()
 	}
 	if err != nil {
 		log.Fatal("cannot initialize the terminal", err)

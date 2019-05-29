@@ -10,6 +10,7 @@ import (
 )
 
 var Version string = "PLACE_HOLDER_VERSION"
+var configFile = ""
 
 func main() {
 	var rootCmd = &cobra.Command{
@@ -24,12 +25,12 @@ Grs performs two-way sync of Git repos
 	}
 
 	cobra.OnInitialize(initConfig)
-	pflag.String("config", "", "config file (default is $HOME/.grs.toml)")
-	pflag.BoolP("verbose", "v", false, "output verbose logs")
-	pflag.IntP("refresh", "t", 600, "how often to poll for changes, in seconds")
-	pflag.BoolP("merge-ignore-atime", "m", false, "ignore access time check when auto-merging")
-	pflag.StringP("repo", "r", "", "the repository to process")
-	pflag.Bool("use-tui", false, "use the experiment text-based UI")
+	pflag.StringVar(&configFile, "config", "", "The config file (default is $HOME/.grs.toml)")
+	pflag.BoolP("verbose", "v", false, "Output verbose logs")
+	pflag.IntP("refresh", "t", 600, "How often to poll for changes, in seconds")
+	pflag.BoolP("merge-ignore-atime", "m", false, "Ignore access time check when auto-merging")
+	pflag.StringP("repo", "r", "", "The repository to process")
+	pflag.Bool("simple-ui", false, "Use a simple UI that does not put terminal into raw mode")
 	if err := viper.BindPFlags(pflag.CommandLine); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -43,10 +44,9 @@ Grs performs two-way sync of Git repos
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	cfgFile := viper.GetString("config")
-	if cfgFile != "" {
+	if configFile != "" {
 		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
+		viper.SetConfigFile(configFile)
 	} else {
 		// Find home directory.
 		home, err := os.UserHomeDir()

@@ -14,12 +14,12 @@ ownership of my data.
 
 I usually run Grs in a terminal window and just let it do its thing:
 ```
-=== Feb 13 9:02PM PST ===
-repo [/home/jcheng/privprjs/dotfiles] status IS UP-TO-DATE, UNMODIFIED, 64 minutes ago.
-repo [/home/jcheng/privprjs/forget] status IS UP-TO-DATE, UNMODIFIED, 4 days ago.
-repo [/home/jcheng/privprjs/grs] status IS UP-TO-DATE, MODIFIED, 13 minutes ago.
-repo [/home/jcheng/privprjs/playground] status IS UP-TO-DATE, UNMODIFIED, 2 days ago.
-repo [/home/jcheng/org] status IS UP-TO-DATE, UNMODIFIED, 2 seconds ago.
+  Grs [May 29 10:28:12AM PST]──────────────────────────────────────────────────────────────────────
+  repo [/home/jcheng/repos/repo1]⯅ status is BRANCH_UPTODATE, INDEX_UNMODIFIED, 20 hours ago.
+  repo [/home/jcheng/repos/repo2] status is BRANCH_AHEAD, INDEX_MODIFIED, 77 seconds ago.
+  repo [/home/jcheng/workspace/repo3]⯅ status is BRANCH_UPTODATE, INDEX_UNMODIFIED, 4 days ago.
+  repo [/home/jcheng/repo4]⯅ status is BRANCH_UPTODATE, INDEX_UNMODIFIED, 55 minutes ago.
+...
 ```
 
 # tldr;
@@ -50,5 +50,8 @@ ENDL
 
 Finally, run Grs in a terminal window
 ```
-~/bin/grs --use-cui
+~/bin/grs
 ```
+
+To manually refresh repo status, simply hit CTRL-R
+
