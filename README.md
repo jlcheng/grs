@@ -33,8 +33,8 @@ $ make install # Installs grs in $HOME/bin
 
 Create a configuration file in ~/.grs.toml
 ```
-cat<<ENDL
-# Tells Grs to run git pull in these three directories
+test -f ~/.grs.toml || cat > ~/.grs.toml <<ENDL
+# Tells Grs to automatically run git fetch, status, and pull in these directories:
 repos = [
   "/home/jcheng/repos/grs",
   "/home/jcheng/repos/git",
