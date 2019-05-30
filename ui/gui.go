@@ -177,7 +177,8 @@ func (consoleUI *ConsoleUI) DrawGrs(repos []script.GrsRepo) {
 			errorIndicator := " "
 			if repo.GetError() != nil {
 				errorIndicator = "\033[31;47m!\033[0m"
-				errorMessage := fmt.Sprintf("%v: %v", repo.GetLocal(), strings.Trim(repo.GetError().Error(), "\n"))
+				errorDetails := strings.Trim(repo.GetError().Error(), "\n")
+				errorMessage := fmt.Sprintf("\033[32m%v\033[0m\n%v\n", repo.GetLocal(), errorDetails)
 				fmt.Fprintln(errView, errorMessage)
 			}
 
