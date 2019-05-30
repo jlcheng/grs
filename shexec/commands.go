@@ -1,6 +1,7 @@
 package shexec
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 )
@@ -26,7 +27,11 @@ func (cmd *CommandWrapper) WithDir(dir string) Command {
 
 // CombinedOutput runs the command and returns its combined standard output and standard error.
 func (cmd *CommandWrapper) CombinedOutput() ([]byte, error) {
-	return cmd.delegate.CombinedOutput()
+	b, err := cmd.delegate.CombinedOutput()
+	if err != nil {
+		return nil, fmt.Errorf(string(b))
+	}
+	return b, nil
 }
 
 // CommandRunner resolves an implmentation of Command

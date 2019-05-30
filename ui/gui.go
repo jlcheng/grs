@@ -5,6 +5,7 @@ import (
 	"github.com/jroimartin/gocui"
 	"jcheng/grs/script"
 	"sync"
+	"strings"
 	"time"
 )
 
@@ -33,6 +34,31 @@ func _layout(g *gocui.Gui) error {
 			return err
 		}
 	}
+
+	// TODO: Determine this number from the number of repos in the dashboard
+	minDashboard := 7
+	errorTop := maxY-20
+	errorBottom := maxY-2
+	errorLeft := 1
+	errorRight := maxX-2
+	if maxY > minDashboard {
+		
+		if errorTop < minDashboard-2 {
+			errorTop = minDashboard-2
+		}
+		if errorBottom < minDashboard-1 {
+			errorBottom = minDashboard-1
+		}
+		
+		if v, err := g.SetView("errors", errorLeft, errorTop, errorRight, errorBottom); err != nil {
+			if err != gocui.ErrUnknownView {
+				return err
+			}
+			v.Title = "Errors"
+			v.Frame = false
+		}
+	}
+	
 	return nil
 }
 
@@ -135,6 +161,13 @@ func (consoleUI *ConsoleUI) DrawGrs(repos []script.GrsRepo) {
 		var timestr = time.Now().Format("[Jan _2 3:04:05PM PST]")
 		v.Title = fmt.Sprintf("Grs %s", timestr)
 
+		errView, err := g.View("errors")
+		if err != nil {
+			return err
+		}
+		errView.Clear()
+
+
 		for _, repo := range repos {
 			pushIndicator := ""
 			if repo.IsPushAllowed() {
@@ -142,15 +175,17 @@ func (consoleUI *ConsoleUI) DrawGrs(repos []script.GrsRepo) {
 			}
 
 			errorIndicator := " "
-			errorMessage := ""
 			if repo.GetError() != nil {
 				errorIndicator = "\033[31;47m!\033[0m"
-				errorMessage = fmt.Sprintf(" (%v)", repo.GetError().Error())
+				errorMessage := fmt.Sprintf("%v: %v", repo.GetLocal(), strings.Trim(repo.GetError().Error(), "\n"))
+				fmt.Fprintln(errView, errorMessage)
 			}
 
-			line := fmt.Sprintf("%vrepo [%v]%v status is %v, %v, %v.%v",
+			line := fmt.Sprintf("%vrepo [%v]%v status is %v, %v, %v.",
 				errorIndicator, repo.GetLocal(), pushIndicator, colorBGrs(repo.GetStats().Branch),
-				colorIGrs(repo.GetStats().Index), repo.GetStats().CommitTime, errorMessage)
+				colorIGrs(repo.GetStats().Index), repo.GetStats().CommitTime)
+
+			// Writes any error messages to the error view
 			if _, err := fmt.Fprintln(v, line); err != nil {
 				return err
 			}
