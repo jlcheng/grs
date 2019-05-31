@@ -56,7 +56,9 @@ func RunCli(args Args) {
 		base.SetLogLevel(base.DEBUG)
 	}
 	if args.logFile != "" {
-		base.SetLogFile(args.logFile)
+		if err := base.SetLogFile(args.logFile); err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	grsRepos := InitGrsRepos(args.repos, args.repoCfgMap)

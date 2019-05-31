@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/jroimartin/gocui"
 	"jcheng/grs/script"
-	"sync"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -37,17 +37,17 @@ func _layout(g *gocui.Gui) error {
 
 	// TODO: Determine this number from the number of repos in the dashboard
 	minDashboard := 7
-	errorTop := maxY-12
-	errorBottom := maxY-2
+	errorTop := maxY - 12
+	errorBottom := maxY - 2
 	errorLeft := 1
-	errorRight := maxX-2
+	errorRight := maxX - 2
 	if maxY > minDashboard {
 
 		if errorTop < minDashboard-2 {
-			errorTop = minDashboard-2
+			errorTop = minDashboard - 2
 		}
 		if errorBottom < minDashboard-1 {
-			errorBottom = minDashboard-1
+			errorBottom = minDashboard - 1
 		}
 
 		if v, err := g.SetView("errors", errorLeft, errorTop, errorRight, errorBottom); err != nil {
@@ -61,7 +61,9 @@ func _layout(g *gocui.Gui) error {
 			v.Highlight = false
 			v.SelFgColor = gocui.ColorCyan
 			v.Overwrite = false
-			g.SetCurrentView("errors")
+			if _, err := g.SetCurrentView("errors"); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -106,7 +108,6 @@ func NewConsoleUI() (*ConsoleUI, error) {
 
 	return consoleUI, nil
 }
-
 
 func cursorUp(g *gocui.Gui, v *gocui.View) error {
 	if v != nil {
@@ -156,7 +157,7 @@ func (consoleUI *ConsoleUI) initKeyBindings() error {
 	if err := consoleUI.gui.SetKeybinding("errors", gocui.KeyArrowUp, gocui.ModNone, cursorUp); err != nil {
 		return err
 	}
-	
+
 	refreshFunc := func(g *gocui.Gui, _ *gocui.View) error {
 		v, err := g.View("main")
 		if err != nil {
@@ -208,7 +209,6 @@ func (consoleUI *ConsoleUI) DrawGrs(repos []script.GrsRepo) {
 			return err
 		}
 		errView.Clear()
-
 
 		for _, repo := range repos {
 			pushIndicator := ""
