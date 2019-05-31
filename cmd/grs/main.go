@@ -31,6 +31,7 @@ Grs performs two-way sync of Git repos
 	pflag.BoolP("merge-ignore-atime", "m", false, "Ignore access time check when auto-merging")
 	pflag.StringP("repo", "r", "", "The repository to process")
 	pflag.Bool("simple-ui", false, "Use a simple UI that does not put terminal into raw mode")
+	pflag.String("log-file", "", "Where to write log messages. If not set, emit logs to stdout.")
 	if err := viper.BindPFlags(pflag.CommandLine); err != nil {
 		fmt.Println(err)
 		os.Exit(1)

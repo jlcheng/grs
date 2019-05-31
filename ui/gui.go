@@ -37,28 +37,34 @@ func _layout(g *gocui.Gui) error {
 
 	// TODO: Determine this number from the number of repos in the dashboard
 	minDashboard := 7
-	errorTop := maxY-20
+	errorTop := maxY-12
 	errorBottom := maxY-2
 	errorLeft := 1
 	errorRight := maxX-2
 	if maxY > minDashboard {
-		
+
 		if errorTop < minDashboard-2 {
 			errorTop = minDashboard-2
 		}
 		if errorBottom < minDashboard-1 {
 			errorBottom = minDashboard-1
 		}
-		
+
 		if v, err := g.SetView("errors", errorLeft, errorTop, errorRight, errorBottom); err != nil {
 			if err != gocui.ErrUnknownView {
 				return err
 			}
+
 			v.Title = "Errors"
-			v.Frame = false
+			v.Frame = true
+			v.Editable = false
+			v.Highlight = false
+			v.SelFgColor = gocui.ColorCyan
+			v.Overwrite = false
+			g.SetCurrentView("errors")
 		}
 	}
-	
+
 	return nil
 }
 
@@ -86,6 +92,7 @@ func NewConsoleUI() (*ConsoleUI, error) {
 	}
 
 	gui.SetManagerFunc(_layout)
+	gui.Cursor = true
 
 	consoleUI := &ConsoleUI{
 		gui:     gui,
@@ -98,6 +105,33 @@ func NewConsoleUI() (*ConsoleUI, error) {
 	}
 
 	return consoleUI, nil
+}
+
+
+func cursorUp(g *gocui.Gui, v *gocui.View) error {
+	if v != nil {
+		ox, oy := v.Origin()
+		cx, cy := v.Cursor()
+		if err := v.SetCursor(cx, cy-1); err != nil && oy > 0 {
+			if err := v.SetOrigin(ox, oy-1); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func cursorDown(g *gocui.Gui, v *gocui.View) error {
+	if v != nil {
+		cx, cy := v.Cursor()
+		if err := v.SetCursor(cx, cy+1); err != nil {
+			ox, oy := v.Origin()
+			if err := v.SetOrigin(ox, oy+1); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 func (consoleUI *ConsoleUI) initKeyBindings() error {
@@ -115,6 +149,14 @@ func (consoleUI *ConsoleUI) initKeyBindings() error {
 		return err
 	}
 
+	if err := consoleUI.gui.SetKeybinding("errors", gocui.KeyArrowDown, gocui.ModNone, cursorDown); err != nil {
+		return err
+	}
+
+	if err := consoleUI.gui.SetKeybinding("errors", gocui.KeyArrowUp, gocui.ModNone, cursorUp); err != nil {
+		return err
+	}
+	
 	refreshFunc := func(g *gocui.Gui, _ *gocui.View) error {
 		v, err := g.View("main")
 		if err != nil {
@@ -191,6 +233,7 @@ func (consoleUI *ConsoleUI) DrawGrs(repos []script.GrsRepo) {
 				return err
 			}
 		}
+
 		return nil
 	})
 }

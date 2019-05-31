@@ -10,12 +10,13 @@ import (
 )
 
 type Args struct {
-	repos      []string
-	verbose    bool
-	refresh    int
 	forceMerge bool
+	logFile    string
+	refresh    int
 	repoCfgMap map[string]RepoConfig
+	repos      []string
 	simpleUI   bool
+	verbose    bool
 }
 
 // CliParse uses spf13/viper to create the program parameters
@@ -27,12 +28,13 @@ func CliParse() Args {
 	}
 
 	var args = Args{
-		verbose:    viper.GetBool("verbose"),
-		refresh:    viper.GetInt("refresh"),
 		forceMerge: viper.GetBool("merge-ignore-atime"),
-		repos:      repos,
+		logFile:    viper.GetString("log-file"),
+		refresh:    viper.GetInt("refresh"),
 		repoCfgMap: parseRepoConfigMap(viper.Get("repo_config")),
+		repos:      repos,
 		simpleUI:   viper.GetBool("simple-ui"),
+		verbose:    viper.GetBool("verbose"),
 	}
 	return args
 }
@@ -52,6 +54,9 @@ type RepoConfig struct {
 func RunCli(args Args) {
 	if args.verbose {
 		base.SetLogLevel(base.DEBUG)
+	}
+	if args.logFile != "" {
+		base.SetLogFile(args.logFile)
 	}
 
 	grsRepos := InitGrsRepos(args.repos, args.repoCfgMap)
