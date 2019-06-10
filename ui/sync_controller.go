@@ -21,6 +21,7 @@ func NewSyncController(grsRepos []script.GrsRepo, ui CliUI) SyncController {
 }
 
 func processGrsRepo(gr *script.GrsRepo) {
+	gr.ClearError()
 	gr.Update()
 	gr.Fetch()
 	gr.UpdateRepoStatus()
