@@ -211,21 +211,20 @@ func (consoleUI *ConsoleUI) DrawGrs(repos []script.GrsRepo) {
 		errView.Clear()
 
 		for _, repo := range repos {
-			pushIndicator := ""
+			indicator := "  "
 			if repo.IsPushAllowed() {
-				pushIndicator = "\033[32m⯅\033[0m"
+				indicator = "\033[32m↑↓\033[0m"
 			}
 
-			errorIndicator := " "
 			if repo.GetError() != nil {
-				errorIndicator = "\033[31;47m!\033[0m"
+				indicator = "\033[31;47m!!\033[0m"
 				errorDetails := strings.Trim(repo.GetError().Error(), "\n")
 				errorMessage := fmt.Sprintf("\033[32m%v\033[0m\n%v\n", repo.GetLocal(), errorDetails)
 				fmt.Fprintln(errView, errorMessage)
 			}
 
-			line := fmt.Sprintf("%vrepo [%v]%v status is %v, %v, %v.",
-				errorIndicator, repo.GetLocal(), pushIndicator, colorBGrs(repo.GetStats().Branch),
+			line := fmt.Sprintf("%vrepo [%v] status is %v, %v, %v.",
+				indicator, repo.GetLocal(), colorBGrs(repo.GetStats().Branch),
 				colorIGrs(repo.GetStats().Index), repo.GetStats().CommitTime)
 
 			// Writes any error messages to the error view
