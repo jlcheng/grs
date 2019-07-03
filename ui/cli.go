@@ -66,8 +66,9 @@ func RunCli(args Args) {
 	cliUI := InitCliUI(args.simpleUI)
 	defer cliUI.Close()
 
-	syncController := InitSyncController(args.refresh, grsRepos, cliUI)
-	syncController.CliUIImpl()
+	refreshInterval := time.Duration(args.refresh) * time.Second
+	syncController := NewSyncController(grsRepos, cliUI, refreshInterval)
+	syncController.Run()
 }
 
 func InitGrsRepos(repos []string, repoCfgMap map[string]RepoConfig) []script.GrsRepo {
@@ -91,12 +92,6 @@ func InitCliUI(simpleUI bool) CliUI {
 		log.Fatal("cannot initialize the terminal", err)
 	}
 	return cliUI
-}
-
-func InitSyncController(refresh int, grsRepos []script.GrsRepo, cliUI CliUI) SyncController {
-	syncController := NewSyncController(grsRepos, cliUI)
-	syncController.Duration = time.Duration(refresh) * time.Second
-	return syncController
 }
 
 // GrsRepos parses a list of paths and a map of path configurations to derive a list of GrsRepo objects
