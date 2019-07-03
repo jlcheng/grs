@@ -41,28 +41,13 @@ func (sc *SyncController) CliUIImpl() {
 	done := sc.ui.DoneSender()
 	ticker := time.NewTicker(sc.Duration)
 	defer ticker.Stop()
-	syncerToUI := make(chan []script.GrsRepo)
-	defer close(syncerToUI)
-	//go sc.uiDispatchLoop(done, syncerToUI)
-	//go sc.appLoop(done, ticker.C, syncerToUI)
-	go sc.uiGrsDispatchLoop(done, syncerToUI)
-	go sc.appGrsLoop(done, ticker.C, syncerToUI)
+	go sc.loop(done, ticker.C)
 	_ = sc.ui.MainLoop()
 }
 
-func (sc *SyncController) uiGrsDispatchLoop(done <-chan struct{}, from <-chan []script.GrsRepo) {
-UI_LOOP:
-	for {
-		select {
-		case repos := <-from:
-			sc.ui.DrawGrs(repos)
-		case <-done:
-			break UI_LOOP
-		}
-	}
-}
-
-func (sc *SyncController) appGrsLoop(done <-chan struct{}, ticker <-chan time.Time, syncerToUI chan<- []script.GrsRepo) {
+// loop listens and reacts to events from the UI (SyncController.ui), including
+// a clock that issues a "refresh" event every few seconds.
+func (sc *SyncController) loop(done <-chan struct{}, ticker <-chan time.Time) {
 	processRepoSlice := func() []script.GrsRepo {
 		var wg sync.WaitGroup
 		wg.Add(len(sc.grsRepos))
@@ -76,7 +61,7 @@ func (sc *SyncController) appGrsLoop(done <-chan struct{}, ticker <-chan time.Ti
 		return sc.grsRepos
 	}
 	// run at least once
-	syncerToUI <- processRepoSlice()
+	sc.ui.DrawGrs(processRepoSlice())
 SYNC_LOOP:
 	for {
 		// tie breaker in case ticker has an event and the goroutine is notified to stop q
@@ -88,10 +73,10 @@ SYNC_LOOP:
 
 		select {
 		case <-ticker:
-			syncerToUI <- processRepoSlice()
+			sc.ui.DrawGrs(processRepoSlice())
 		case event := <-sc.ui.EventSender():
 			if event == EVENT_REFRESH {
-				syncerToUI <- processRepoSlice()
+				sc.ui.DrawGrs(processRepoSlice())
 			}
 		case <-done:
 			break SYNC_LOOP
