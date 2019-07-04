@@ -42,6 +42,13 @@ func WithPushAllowed(pushAllowed bool) GrsRepoOpt {
 	}
 }
 
+// WithStats is an option to initialize a repo's stats
+func WithStats(stats GrsStats) GrsRepoOpt {
+	return func(gr *GrsRepo) {
+		gr.stats = stats
+	}
+}
+
 // NewGrsRepo returns an instance of GresRepo
 func NewGrsRepo(options ...GrsRepoOpt) GrsRepo {
 	retval := GrsRepo{

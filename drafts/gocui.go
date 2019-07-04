@@ -2,28 +2,19 @@ package main
 
 import (
 	"jcheng/grs/ui"
-	"jcheng/grs/script"	
 	"log"
 	"time"
 )
 
 func main() {
-	ui, err := ui.NewConsoleUI()
+	cliUI, err := ui.NewConsoleUI()
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer ui.Close()
-	go func() {
-		time.Sleep(time.Duration(1) * time.Second)
-		ui.DrawGrs([]script.GrsRepo {
-			script.NewGrsRepo(
-				script.WithLocalGrsRepo("/foo/bar"),
-				script.WithPushAllowed(true),
-			),
-		})
-	}()
+	defer cliUI.Close()
+	go UpdateUI(cliUI, time.Duration(10) * time.Millisecond)
 	
-	err = ui.MainLoop()
+	err = cliUI.MainLoop()
 	if err != nil {
 		log.Println(err)
 	}
