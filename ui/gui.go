@@ -157,6 +157,11 @@ func (consoleUI *ConsoleUI) initKeyBindings() error {
 		return err
 	}
 
+	if err := consoleUI.gui.SetKeybinding("", gocui.KeyCtrlQ, gocui.ModNone, quitFunc); err != nil {
+		return err
+	}
+	
+
 	if err := consoleUI.gui.SetKeybinding("errors", gocui.KeyArrowDown, gocui.ModNone, cursorDown); err != nil {
 		return err
 	}
