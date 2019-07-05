@@ -12,7 +12,7 @@ func main() {
 		log.Fatal(err)
 	}
 	defer cliUI.Close()
-	go UpdateUI(cliUI, time.Duration(10) * time.Millisecond)
+	go ui.UpdateUI(cliUI, time.Duration(10) * time.Millisecond)
 	
 	err = cliUI.MainLoop()
 	if err != nil {

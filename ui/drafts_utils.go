@@ -1,13 +1,12 @@
-package main
+package ui
 
 import (
-	"jcheng/grs/ui"
 	"jcheng/grs/script"	
 	"time"
 )
 
 
-func UpdateUI(cliUI ui.CliUI, delay time.Duration) {
+func UpdateUI(cliUI CliUI, delay time.Duration) {
 	time.Sleep(delay)
 	stats := script.NewGrsStats(
 		script.WithBranchstat(script.BRANCH_UPTODATE),

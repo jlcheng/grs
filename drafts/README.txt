@@ -3,5 +3,5 @@ EXAMPLES
 
 ```
 # shows what the UI based on github.com/jroimartin/gocui looks like
-go run shared.go gocui.go
+go run drafts/gocui/main.go
 ```
