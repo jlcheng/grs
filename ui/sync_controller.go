@@ -7,10 +7,15 @@ import (
 	"time"
 )
 
-// SyncController provides a struct that can check and report on status of a collection of repositories
+// SyncController reports on the status of repositories
 type SyncController struct {
-	grsRepos []script.GrsRepo // slice of repositories to check and report on
-	duration time.Duration    // how often to sync repos
+	// Slice of repositories to check and report on
+	grsRepos []script.GrsRepo
+	
+	// How often to sync repos
+	duration time.Duration
+	
+	// Renders the status of repositories
 	ui       CliUI
 }
 

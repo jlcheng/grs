@@ -74,10 +74,7 @@ type CliUI interface {
 	// DoneSender returns a channel that one can listen on to know that CliUI has been gracefully shutdown.
 	// It is currently used by SyncController.loop()
 	//
-	// SyncController.uiGrsDispatchLoop listens for repo updates and draws them to the UI. The DoneSender
-	// signal shutsdown this loop.
-	//
-	// SynController.appGrsLoop listens and react to UI events. The DoneSender shutsdown this loop.
+	// SyncController.loop() listens for repo updates and draws them to the UI. 
 	DoneSender() <-chan struct{}
 	EventSender() <-chan UiEvent
 	MainLoop() error

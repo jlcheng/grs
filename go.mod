@@ -2,6 +2,7 @@ module jcheng/grs
 
 require (
 	github.com/BurntSushi/toml v0.3.1 // indirect
+	github.com/gdamore/tcell v1.1.2
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jroimartin/gocui v0.4.0
 	github.com/mitchellh/mapstructure v1.1.2 // indirect
