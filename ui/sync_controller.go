@@ -11,12 +11,12 @@ import (
 type SyncController struct {
 	// Slice of repositories to check and report on
 	grsRepos []script.GrsRepo
-	
+
 	// How often to sync repos
 	duration time.Duration
-	
-	// Renders the status of repositories
-	ui       CliUI
+
+	// Used to render the status of repositories
+	ui CliUI
 }
 
 // ControllerEvent describes an event dispatched within SyncController's framework
@@ -62,6 +62,8 @@ func (sc *SyncController) OnEvent(event ControllerEvent) {
 	switch event.Type {
 	case EVENT_REFRESH:
 		sc.ui.DrawGrs(event.Repos)
+	case EVENT_QUIT:
+		sc.ui.Close()
 	default:
 		base.Debug("unexpected event: %v", event.Type)
 	}
@@ -83,11 +85,10 @@ func (sc *SyncController) refresh() []script.GrsRepo {
 
 // loop starts the event dispatch loop.
 //
-// The event dispatch loop will handle events from the UI, for
-// example, an explict 'refresh' event.  It also handles the 'Done'
-// event and stops the dispatch loop.
+// The event dispatch loop will handle events from the UI, such as
+// "refresh" and "quit".
 //
-// The SyncController will also start a ticker that emits a "refresh"
+// The SyncController will also start a ticker that emits"refresh"
 // on a regular interval. This interval is configured by the
 // controller's 'duration' property.
 func (sc *SyncController) loop() {
@@ -96,15 +97,7 @@ func (sc *SyncController) loop() {
 
 	// run at least once
 	sc.OnEvent(ControllerEvent{Type: EVENT_REFRESH, Repos: sc.refresh()})
-SYNC_LOOP:
 	for {
-		// tie breaker in case ticker has an event and the goroutine is notified to stop q
-		select {
-		case <-sc.ui.DoneSender():
-			break SYNC_LOOP
-		default:
-		}
-
 		select {
 		case <-ticker.C:
 			sc.OnEvent(ControllerEvent{Type: EVENT_REFRESH, Repos: sc.refresh()})
@@ -112,8 +105,9 @@ SYNC_LOOP:
 			if event == EVENT_REFRESH {
 				sc.OnEvent(ControllerEvent{Type: EVENT_REFRESH, Repos: sc.refresh()})
 			}
-		case <-sc.ui.DoneSender():
-			break SYNC_LOOP
+			if event == EVENT_QUIT {
+				sc.OnEvent(ControllerEvent{Type: EVENT_QUIT, Repos: nil})
+			}
 		}
 	}
 }

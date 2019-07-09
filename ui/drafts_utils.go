@@ -1,10 +1,9 @@
 package ui
 
 import (
-	"jcheng/grs/script"	
+	"jcheng/grs/script"
 	"time"
 )
-
 
 func UpdateUI(cliUI CliUI, delay time.Duration) {
 	time.Sleep(delay)
@@ -13,8 +12,8 @@ func UpdateUI(cliUI CliUI, delay time.Duration) {
 		script.WithIndexstat(script.INDEX_MODIFIED),
 	)
 	stats.CommitTime = "X seconds ago"
-	
-	cliUI.DrawGrs([]script.GrsRepo {
+
+	cliUI.DrawGrs([]script.GrsRepo{
 		script.NewGrsRepo(
 			script.WithStats(stats),
 			script.WithLocalGrsRepo("/foo/bar"),

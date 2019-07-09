@@ -39,6 +39,7 @@ run:
 .PHONY: fmt
 fmt:
 	gofmt -s -w ./
+	golangci-lint run
 
 out/grs: $(GENERATED)
 	$(GOBUILD) -ldflags "-X main.Version=$(VERSION)" -o $(OUT_PRIME) $(MAIN_PRIME)

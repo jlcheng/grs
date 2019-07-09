@@ -1,39 +1,29 @@
 package ui
 
 import (
-        "github.com/rivo/tview"
 	"github.com/gdamore/tcell"
+	"github.com/rivo/tview"
+	"jcheng/grs/script"
 )
 
-// TviewUI renders the UI using the tview framework. The CliUI interface requires
-// 	DoneSender() <-chan struct{}
-//	EventSender() <-chan UiEvent
-//	MainLoop() error
-//	DrawGrs(repo []script.GrsRepo)
-//	Close()
+// TviewUI renders the UI using the tview framework.
 //
-//  Obvious candidates are:
-//      MainLoop() -> Application.Run()
-//      Stop() -> Application.Stop()
-//
-//  The DrawGrs function should clear the Application object and reconfiguire it from scratch.
-//  This is a little inefficient, as we get rid of reusable objects like the Flex and Table
-//  object. However, since we only refresh once every few minutes, it is not worth trading
-//  off simplicity for efficiency.
-//  
+// The DrawGrs clears the Application object and reconfiguire it from
+// scratch.  This is inefficient, as we get rid of reusable objects
+// such as Flex and Table. However, since we only refresh once every
+// few minutes, it is a worthwhile trade-off of efficiency for
+// readbility.
 type TviewUI struct {
-	app *tview.Application
-	flex *tview.Flex
-	bottomPane tview.Primitive
+	app     *tview.Application
+	eventCh chan UiEvent
 }
 
 func NewTviewUI() *TviewUI {
 	app := tview.NewApplication()
-	flex, bottomPane := Configure(app)
+
 	return &TviewUI{
-		app: app,
-		flex: flex,
-		bottomPane: bottomPane,
+		app:     app,
+		eventCh: make(chan UiEvent),
 	}
 }
 
@@ -41,13 +31,21 @@ func (ui *TviewUI) MainLoop() error {
 	return ui.app.Run()
 }
 
-func Configure(app *tview.Application) (*tview.Flex, tview.Primitive) {
+func (ui *TviewUI) Close() {
+	ui.app.Stop()
+}
+
+func (ui *TviewUI) DrawGrs(repo []script.GrsRepo) {
 	bottomPane := NewTviewExample()
-        flex := tview.NewFlex().SetDirection(tview.FlexRow).
-                AddItem(tview.NewBox().SetBorder(true).SetTitle("A"), 0, 1, false).
+	flex := tview.NewFlex().SetDirection(tview.FlexRow).
+		AddItem(tview.NewBox().SetBorder(true).SetTitle("Grs"), 0, 1, false).
 		AddItem(bottomPane, 5, 1, false)
-	app.SetRoot(flex, true)
-	return flex, bottomPane
+	ui.app.SetRoot(flex, true)
+	ui.app.Draw()
+}
+
+func (ui *TviewUI) EventSender() <-chan UiEvent {
+	return ui.eventCh
 }
 
 type TviewExample struct {

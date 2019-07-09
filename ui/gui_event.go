@@ -7,4 +7,5 @@ type UiEvent int
 
 const (
 	EVENT_REFRESH UiEvent = iota
+	EVENT_QUIT
 )
