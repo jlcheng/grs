@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	"jcheng/grs/base"
 	"jcheng/grs/ui"
 	"os"
 )
@@ -13,6 +14,8 @@ var Version string = "PLACE_HOLDER_VERSION"
 var configFile = ""
 
 func main() {
+	base.SetVersion(Version)
+	
 	var rootCmd = &cobra.Command{
 		Use:   "grs [-t 60] [--use-tui]",
 		Short: "grs performs two-way sync of Git repos",

@@ -86,7 +86,8 @@ func InitCliUI(simpleUI bool) CliUI {
 	if simpleUI {
 		cliUI, err = NewPrintUI()
 	} else {
-		cliUI, err = NewConsoleUI()
+		//cliUI, err = NewConsoleUI()
+		cliUI = NewTviewUI()
 	}
 	if err != nil {
 		log.Fatal("cannot initialize the terminal", err)

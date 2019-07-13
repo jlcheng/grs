@@ -49,6 +49,13 @@ func WithStats(stats GrsStats) GrsRepoOpt {
 	}
 }
 
+// WithError is an option to initiailize a repo's error
+func WithError(error error) GrsRepoOpt {
+	return func(gr *GrsRepo) {
+		gr.err = error
+	}
+}
+
 // NewGrsRepo returns an instance of GresRepo
 func NewGrsRepo(options ...GrsRepoOpt) GrsRepo {
 	retval := GrsRepo{
