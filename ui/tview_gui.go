@@ -5,7 +5,7 @@ import (
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
 	"jcheng/grs/base"
-	"jcheng/grs/script"
+	"jcheng/grs"
 	"strings"
 	"time"
 )
@@ -48,7 +48,7 @@ func NewTviewUI() *TviewUI {
 		return event
 	})
 
-	ui.DrawGrs(make([]script.GrsRepo,0))
+	ui.DrawGrs(make([]grs.GrsRepo,0))
 	ui.box.SetTitle("Starting Grs...")
 	
 	return ui
@@ -62,7 +62,7 @@ func (ui *TviewUI) Close() {
 	ui.app.Stop()
 }
 
-func (ui *TviewUI) DrawGrs(repos []script.GrsRepo) {
+func (ui *TviewUI) DrawGrs(repos []grs.GrsRepo) {
 	errorCount, textView := errorView(repos)
 	reposPane := repositoryTable(repos)
 	ui.box = reposPane.Box
@@ -81,7 +81,7 @@ func (ui *TviewUI) EventSender() <-chan UiEvent {
 	return ui.eventCh
 }
 
-func repositoryTable(repos []script.GrsRepo) *tview.Table {
+func repositoryTable(repos []grs.GrsRepo) *tview.Table {
 	timeStr := time.Now().Format("Jan _2 3:04:05PM PST")
 	title := fmt.Sprintf("Grs (%v) [%v]", base.Version(), timeStr)
 	
@@ -106,21 +106,21 @@ func repositoryTable(repos []script.GrsRepo) *tview.Table {
 
 		color := tcell.ColorWhite
 		text := repos[i].GetStats().Dir.String()
-		if repos[i].GetStats().Dir != script.GRSDIR_VALID {
+		if repos[i].GetStats().Dir != grs.GRSDIR_VALID {
 			color = tcell.ColorRed
 		}
 		table.SetCell(i+1, 2, tview.NewTableCell(text).SetTextColor(color))
 
 		color = tcell.ColorWhite
 		text = repos[i].GetStats().Branch.String()
-		if repos[i].GetStats().Branch != script.BRANCH_UPTODATE {
+		if repos[i].GetStats().Branch != grs.BRANCH_UPTODATE {
 			color = tcell.ColorRed
 		}
 		table.SetCell(i+1, 3, tview.NewTableCell(text).SetTextColor(color))
 
 		color = tcell.ColorWhite
 		text = repos[i].GetStats().Index.String()
-		if repos[i].GetStats().Index != script.INDEX_UNMODIFIED {
+		if repos[i].GetStats().Index != grs.INDEX_UNMODIFIED {
 			color = tcell.ColorRed
 		}
 		table.SetCell(i+1, 4, tview.NewTableCell(text).SetTextColor(color))
@@ -131,7 +131,7 @@ func repositoryTable(repos []script.GrsRepo) *tview.Table {
 	return table
 }
 
-func errorView(repos []script.GrsRepo) (int, *tview.TextView) {
+func errorView(repos []grs.GrsRepo) (int, *tview.TextView) {
 	errorCount := 0
 	errorMsg := ""
 	for _, repo := range repos {

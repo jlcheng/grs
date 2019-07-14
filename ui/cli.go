@@ -3,7 +3,7 @@ package ui
 import (
 	"github.com/spf13/viper"
 	"jcheng/grs/base"
-	"jcheng/grs/script"
+	"jcheng/grs"
 	"jcheng/grs/shexec"
 	"log"
 	"time"
@@ -71,7 +71,7 @@ func RunCli(args Args) {
 	syncController.Run()
 }
 
-func InitGrsRepos(repos []string, repoCfgMap map[string]RepoConfig) []script.GrsRepo {
+func InitGrsRepos(repos []string, repoCfgMap map[string]RepoConfig) []grs.GrsRepo {
 	grsRepos := GrsRepos(repos, repoCfgMap)
 
 	if len(grsRepos) == 0 {
@@ -96,16 +96,16 @@ func InitCliUI(simpleUI bool) CliUI {
 }
 
 // GrsRepos parses a list of paths and a map of path configurations to derive a list of GrsRepo objects
-func GrsRepos(paths []string, repoCfg map[string]RepoConfig) []script.GrsRepo {
+func GrsRepos(paths []string, repoCfg map[string]RepoConfig) []grs.GrsRepo {
 	commandRunner := &shexec.ExecRunner{}
-	repos := make([]script.GrsRepo, len(paths))
+	repos := make([]grs.GrsRepo, len(paths))
 	for idx, path := range paths {
 		config := repoCfg[path]
 		pushAllowed := config.pushAllowed
-		repos[idx] = script.NewGrsRepo(
-			script.WithLocalGrsRepo(path),
-			script.WithPushAllowed(pushAllowed),
-			script.WithCommandRunnerGrsRepo(commandRunner),
+		repos[idx] = grs.NewGrsRepo(
+			grs.WithLocalGrsRepo(path),
+			grs.WithPushAllowed(pushAllowed),
+			grs.WithCommandRunnerGrsRepo(commandRunner),
 		)
 	}
 	return repos

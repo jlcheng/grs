@@ -3,7 +3,7 @@ package ui
 import (
 	"fmt"
 	"github.com/jroimartin/gocui"
-	"jcheng/grs/script"
+	"jcheng/grs"
 	"strings"
 	"time"
 )
@@ -109,7 +109,7 @@ func (consoleUI *ConsoleUI) MainLoop() error {
 }
 
 // DrawGrs enqueues a draw operation in the UI's rendering pipeline
-func (consoleUI *ConsoleUI) DrawGrs(repos []script.GrsRepo) {
+func (consoleUI *ConsoleUI) DrawGrs(repos []grs.GrsRepo) {
 	consoleUI.gui.Update(func(g *gocui.Gui) error {
 		v, err := g.View("main")
 		if err != nil {
@@ -160,15 +160,15 @@ func (consoleUI *ConsoleUI) EventSender() <-chan UiEvent {
 	return consoleUI.eventCh
 }
 
-func colorIGrs(s script.Indexstat) string {
-	if s == script.INDEX_UNMODIFIED {
+func colorIGrs(s grs.Indexstat) string {
+	if s == grs.INDEX_UNMODIFIED {
 		return fmt.Sprintf("%v", s)
 	}
 	return fmt.Sprintf("\033[31m%v\033[0m", s)
 }
 
-func colorBGrs(s script.Branchstat) string {
-	if s == script.BRANCH_UPTODATE {
+func colorBGrs(s grs.Branchstat) string {
+	if s == grs.BRANCH_UPTODATE {
 		return fmt.Sprintf("%v", s)
 	}
 	return fmt.Sprintf("\033[31m%v\033[0m", s)

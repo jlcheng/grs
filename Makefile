@@ -9,7 +9,7 @@ OUTDIR=out
 MAIN_PRIME=cmd/grs/main.go
 OUT_PRIME=out/grs
 
-GENERATED=script/grs_stat_strings.go ui/gui_event_strings.go
+GENERATED=grs_stat_strings.go ui/gui_event_strings.go
 
 VERSION=`head -n 1 VERSION.txt`
 
@@ -21,14 +21,14 @@ build: $(OUT_PRIME)
 
 .PHONY: test
 test: $(GENERATED)
-	$(GOTEST) -v jcheng/grs/script jcheng/grs/shexec
+	$(GOTEST) -v jcheng/grs jcheng/grs/shexec
 
 .PHONY: clean
 clean: 
 	rm -rf $(OUTDIR)
 
-$(GENERATED): script/grs_stat.go
-	$(GOGEN) .../script .../ui
+$(GENERATED): grs_stat.go
+	$(GOGEN) .../ .../ui
 
 install: all
 	mv $(OUT_PRIME) $(HOME)/bin

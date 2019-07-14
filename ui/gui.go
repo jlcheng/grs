@@ -1,7 +1,7 @@
 package ui
 
 import (
-	"jcheng/grs/script"
+	"jcheng/grs"
 )
 
 type CliUI interface {
@@ -12,7 +12,7 @@ type CliUI interface {
 	MainLoop() error
 
 	// DrawGrs accepts a list of repositories and renders them to screen
-	DrawGrs(repo []script.GrsRepo)
+	DrawGrs(repo []grs.GrsRepo)
 
 	// Close will stop the UI
 	Close()

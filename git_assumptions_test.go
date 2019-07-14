@@ -1,6 +1,6 @@
 // git_assumptions_test.go contains a set of 'tests' used to explore the behavior of Git commands. For GRS to work, these tests
 // likely must 'pass'. This is a collection of assumptions I make about Git's behaviors.0
-package script
+package grs
 
 import (
 	"strings"

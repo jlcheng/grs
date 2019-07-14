@@ -1,4 +1,4 @@
-package script
+package grs
 
 import (
 	"reflect"

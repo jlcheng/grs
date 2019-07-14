@@ -1,4 +1,4 @@
-package script
+package grs
 
 //go:generate stringer -type Dirstat,Branchstat,Indexstat -output grs_stat_strings.go
 

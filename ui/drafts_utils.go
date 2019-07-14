@@ -1,49 +1,49 @@
 package ui
 
 import (
-	"jcheng/grs/script"
+	"jcheng/grs"
 	"time"
 	"fmt"
 )
 
 func UpdateUI(cliUI CliUI, delay time.Duration) {
 	time.Sleep(delay)
-	repos := make([]script.GrsRepo, 0)
-	stats := script.NewGrsStats(
-		script.WithBranchstat(script.BRANCH_UPTODATE),
-		script.WithIndexstat(script.INDEX_MODIFIED),
+	repos := make([]grs.GrsRepo, 0)
+	stats := grs.NewGrsStats(
+		grs.WithBranchstat(grs.BRANCH_UPTODATE),
+		grs.WithIndexstat(grs.INDEX_MODIFIED),
 	)
 	stats.CommitTime = "X seconds ago"
 	repos = append(repos, 
-		script.NewGrsRepo(
-			script.WithStats(stats),
-			script.WithLocalGrsRepo("/foo/bar"),
-			script.WithPushAllowed(true),
+		grs.NewGrsRepo(
+			grs.WithStats(stats),
+			grs.WithLocalGrsRepo("/foo/bar"),
+			grs.WithPushAllowed(true),
 		))
 	
-	stats = script.NewGrsStats(
-		script.WithBranchstat(script.BRANCH_UPTODATE),
-		script.WithIndexstat(script.INDEX_UNMODIFIED),
+	stats = grs.NewGrsStats(
+		grs.WithBranchstat(grs.BRANCH_UPTODATE),
+		grs.WithIndexstat(grs.INDEX_UNMODIFIED),
 	)
 	stats.CommitTime = "X seconds ago"	
 	repos = append(repos,
-		script.NewGrsRepo(
-			script.WithStats(stats),
-			script.WithLocalGrsRepo("/foo/repo2"),
-			script.WithPushAllowed(false),
+		grs.NewGrsRepo(
+			grs.WithStats(stats),
+			grs.WithLocalGrsRepo("/foo/repo2"),
+			grs.WithPushAllowed(false),
 		))
 
-	stats = script.NewGrsStats(
-		script.WithBranchstat(script.BRANCH_UPTODATE),
-		script.WithIndexstat(script.INDEX_UNMODIFIED),
+	stats = grs.NewGrsStats(
+		grs.WithBranchstat(grs.BRANCH_UPTODATE),
+		grs.WithIndexstat(grs.INDEX_UNMODIFIED),
 	)
 	stats.CommitTime = "Z minutes ago"
 	repos = append(repos,
-		script.NewGrsRepo(
-			script.WithStats(stats),
-			script.WithLocalGrsRepo("/foo/repo3"),
-			script.WithPushAllowed(false),
-			script.WithError(fmt.Errorf("foo")),
+		grs.NewGrsRepo(
+			grs.WithStats(stats),
+			grs.WithLocalGrsRepo("/foo/repo3"),
+			grs.WithPushAllowed(false),
+			grs.WithError(fmt.Errorf("foo")),
 		))
 	cliUI.DrawGrs(repos)
 	

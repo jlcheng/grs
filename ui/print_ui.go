@@ -2,7 +2,7 @@ package ui
 
 import (
 	"fmt"
-	"jcheng/grs/script"
+	"jcheng/grs"
 	"time"
 )
 
@@ -25,7 +25,7 @@ func (printUI *PrintUI) MainLoop() error {
 	return nil
 }
 
-func (printUI *PrintUI) DrawGrs(repos []script.GrsRepo) {
+func (printUI *PrintUI) DrawGrs(repos []grs.GrsRepo) {
 	fmt.Print("\033[2J\033[H")
 	fmt.Println(time.Now().Format("=== Jan _2 3:04PM MST ==="))
 

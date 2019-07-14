@@ -4,9 +4,17 @@ package ui
 
 import "strconv"
 
-const _UiEvent_name = "EVENT_REFRESH"
+func _() {
+	// An "invalid array index" compiler error signifies that the constant values have changed.
+	// Re-run the stringer command to generate them again.
+	var x [1]struct{}
+	_ = x[EVENT_REFRESH-0]
+	_ = x[EVENT_QUIT-1]
+}
 
-var _UiEvent_index = [...]uint8{0, 13}
+const _UiEvent_name = "EVENT_REFRESHEVENT_QUIT"
+
+var _UiEvent_index = [...]uint8{0, 13, 23}
 
 func (i UiEvent) String() string {
 	if i < 0 || i >= UiEvent(len(_UiEvent_index)-1) {
