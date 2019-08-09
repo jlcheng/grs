@@ -1,9 +1,9 @@
 package ui
 
 import (
+	"fmt"
 	"jcheng/grs"
 	"time"
-	"fmt"
 )
 
 func UpdateUI(cliUI CliUI, delay time.Duration) {
@@ -14,18 +14,18 @@ func UpdateUI(cliUI CliUI, delay time.Duration) {
 		grs.WithIndexstat(grs.INDEX_MODIFIED),
 	)
 	stats.CommitTime = "X seconds ago"
-	repos = append(repos, 
+	repos = append(repos,
 		grs.NewGrsRepo(
 			grs.WithStats(stats),
 			grs.WithLocalGrsRepo("/foo/bar"),
 			grs.WithPushAllowed(true),
 		))
-	
+
 	stats = grs.NewGrsStats(
 		grs.WithBranchstat(grs.BRANCH_UPTODATE),
 		grs.WithIndexstat(grs.INDEX_UNMODIFIED),
 	)
-	stats.CommitTime = "X seconds ago"	
+	stats.CommitTime = "X seconds ago"
 	repos = append(repos,
 		grs.NewGrsRepo(
 			grs.WithStats(stats),
@@ -46,5 +46,5 @@ func UpdateUI(cliUI CliUI, delay time.Duration) {
 			grs.WithError(fmt.Errorf("foo")),
 		))
 	cliUI.DrawGrs(repos)
-	
+
 }

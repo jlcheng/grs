@@ -1,6 +1,5 @@
 package base
 
-
 import (
 	"github.com/spf13/viper"
 )

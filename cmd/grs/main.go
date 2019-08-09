@@ -15,7 +15,7 @@ var configFile = ""
 
 func main() {
 	base.SetVersion(Version)
-	
+
 	var rootCmd = &cobra.Command{
 		Use:   "grs [-t 60] [--use-tui]",
 		Short: "grs performs two-way sync of Git repos",

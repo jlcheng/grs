@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
-	"jcheng/grs/base"
 	"jcheng/grs"
+	"jcheng/grs/base"
 	"strings"
 	"time"
 )
@@ -30,7 +30,7 @@ func NewTviewUI() *TviewUI {
 		box:     nil,
 		eventCh: make(chan UiEvent),
 	}
-	
+
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyCtrlC {
 			app.Stop()
@@ -48,9 +48,9 @@ func NewTviewUI() *TviewUI {
 		return event
 	})
 
-	ui.DrawGrs(make([]grs.GrsRepo,0))
+	ui.DrawGrs(make([]grs.GrsRepo, 0))
 	ui.box.SetTitle("Starting Grs...")
-	
+
 	return ui
 }
 
@@ -84,14 +84,14 @@ func (ui *TviewUI) EventSender() <-chan UiEvent {
 func repositoryTable(repos []grs.GrsRepo) *tview.Table {
 	timeStr := time.Now().Format("Jan _2 3:04:05PM PST")
 	title := fmt.Sprintf("Grs (%v) [%v]", base.Version(), timeStr)
-	
+
 	table := tview.NewTable()
 	table.SetCell(0, 0, tview.NewTableCell("Push").SetTextColor(tcell.ColorGreen))
 	table.SetCell(0, 1, tview.NewTableCell("Path").SetTextColor(tcell.ColorGreen))
-	table.SetCell(0, 2, tview.NewTableCell("Local").SetTextColor(tcell.ColorGreen))
-	table.SetCell(0, 3, tview.NewTableCell("Branch").SetTextColor(tcell.ColorGreen))
-	table.SetCell(0, 4, tview.NewTableCell("Index").SetTextColor(tcell.ColorGreen))
-	
+	table.SetCell(0, 2, tview.NewTableCell("Branch").SetTextColor(tcell.ColorGreen))
+	table.SetCell(0, 3, tview.NewTableCell("Index").SetTextColor(tcell.ColorGreen))
+	table.SetCell(0, 4, tview.NewTableCell("Commit Time").SetTextColor(tcell.ColorGreen))
+
 	for i := 0; i < len(repos); i++ {
 		repo := repos[i]
 		pushIndicator := ""
@@ -100,29 +100,26 @@ func repositoryTable(repos []grs.GrsRepo) *tview.Table {
 		}
 		table.SetCell(i+1, 0,
 			tview.NewTableCell(pushIndicator).SetTextColor(tcell.ColorGreen))
-		
+
 		table.SetCell(i+1, 1,
 			tview.NewTableCell(repos[i].GetLocal()))
 
 		color := tcell.ColorWhite
-		text := repos[i].GetStats().Dir.String()
-		if repos[i].GetStats().Dir != grs.GRSDIR_VALID {
-			color = tcell.ColorRed
-		}
-		table.SetCell(i+1, 2, tview.NewTableCell(text).SetTextColor(color))
-
-		color = tcell.ColorWhite
-		text = repos[i].GetStats().Branch.String()
+		text := repos[i].GetStats().Branch.String()
 		if repos[i].GetStats().Branch != grs.BRANCH_UPTODATE {
 			color = tcell.ColorRed
 		}
-		table.SetCell(i+1, 3, tview.NewTableCell(text).SetTextColor(color))
+		table.SetCell(i+1, 2, tview.NewTableCell(text).SetTextColor(color))
 
 		color = tcell.ColorWhite
 		text = repos[i].GetStats().Index.String()
 		if repos[i].GetStats().Index != grs.INDEX_UNMODIFIED {
 			color = tcell.ColorRed
 		}
+		table.SetCell(i+1, 3, tview.NewTableCell(text).SetTextColor(color))
+
+		color = tcell.ColorWhite
+		text = repos[i].GetStats().CommitTime
 		table.SetCell(i+1, 4, tview.NewTableCell(text).SetTextColor(color))
 	}
 
@@ -140,7 +137,7 @@ func errorView(repos []grs.GrsRepo) (int, *tview.TextView) {
 			errorMsg = errorMsg + repo.GetError().Error()
 		}
 	}
-	
+
 	textView := tview.NewTextView()
 	textView.SetBorder(true).SetTitle("errors")
 	textView.ScrollToEnd()
