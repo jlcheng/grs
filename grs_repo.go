@@ -274,11 +274,13 @@ func (gr *GrsRepo) AutoPush() {
 
 // AutoRebase runs a smarter version of 'git --rebase'
 func (gr *GrsRepo) AutoRebase() {
+	base.Debug("%s:AutoRebase start", gr.local)
 	if gr.err != nil ||
 		gr.stats.Dir != GRSDIR_VALID ||
 		gr.stats.Index == INDEX_UNKNOWN ||
 		gr.stats.Branch == BRANCH_UNKNOWN ||
 		gr.stats.Branch == BRANCH_UNTRACKED {
+		base.Debug("%s:AutoRebase aborted", gr.local)
 		return
 	}
 
@@ -308,6 +310,7 @@ func (gr *GrsRepo) AutoRebase() {
 		_, err1 := cmd.CombinedOutput()
 		if err1 != nil {
 			//  4. Stop when conflict is detected
+			base.Debug("%s:AutoRebase conflict at %s", gr.local, commit)
 			rebaseErr = err1
 			cmd = gr.commandRunner.Command(gr.git, "rebase", "--abort").WithDir(gr.local)
 			bytes2, err2 := cmd.CombinedOutput()
