@@ -65,7 +65,7 @@ func (sc *SyncController) OnEvent(event ControllerEvent) {
 	case EVENT_QUIT:
 		sc.ui.Close()
 	default:
-		base.Debug("unexpected event: %v", event.Type)
+		base.DebugFull("", "SyncCtrl", "unexpected event: %v", event.Type)
 	}
 }
 

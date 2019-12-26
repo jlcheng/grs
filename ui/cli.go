@@ -54,6 +54,7 @@ type RepoConfig struct {
 func RunCli(args Args) {
 	if args.verbose {
 		base.SetLogLevel(base.DEBUG)
+		base.SetLogFlags(0)
 	}
 	if args.logFile != "" {
 		if err := base.SetLogFile(args.logFile); err != nil {

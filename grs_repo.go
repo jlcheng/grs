@@ -83,13 +83,14 @@ func (gr *GrsRepo) UpdateCommitTime() {
 	var statsPtr = &gr.stats
 
 	command = gr.commandRunner.Command(gr.git, "log", "-1", "--format=%cr").WithDir(gr.local)
-	base.Debug("CMD: git log -1 --format=%%cr")
+
 	if out, err = command.CombinedOutput(); err != nil {
-		base.Debug("failed: %v\n%v\n", err, string(out))
+		base.DebugFull("", gr.local, " failed: %v\n%v\n", err, string(out))
 		gr.err = err
 		statsPtr.CommitTime = "Unknown"
 	}
-	base.Debug(strings.TrimSpace(string(out)))
+	cmdStr := "+ git log -1 --format=%%cr"
+	base.DebugFull("", gr.local, fmt.Sprintf("%s... %s", cmdStr, strings.TrimSpace(string(out))))
 	statsPtr.CommitTime = strings.Trim(string(out), "\n")
 }
 
@@ -136,25 +137,28 @@ func (gr *GrsRepo) UpdateRepoStatus() {
 
 	command = gr.commandRunner.Command(git, "rev-parse", "@{upstream}").WithDir(gr.local)
 	if out, err = command.CombinedOutput(); err != nil {
-		base.Debug("UpdateRepoStatus: no upstream detected. %s, %s", err, strings.TrimSpace(string(out)))
+		base.DebugFull("", gr.local, "UpdateRepoStatus: no upstream detected. %s, %s", err, strings.TrimSpace(string(out)))
 		gr.err = err
 		statsPtr.Branch = BRANCH_UNTRACKED
 		return
 	}
 
-	base.Debug("CMD: git rev-list --left-right --count @{upstream}...HEAD")
+	cmdLine := "+ git rev-list --left-right --count @{upstream}...HEAD"
 	command = gr.commandRunner.Command(git, "rev-list", "--left-right", "--count", "@{upstream}...HEAD").WithDir(gr.local)
 	if out, err = command.CombinedOutput(); err != nil {
-		base.Debug("git rev-list failed: %v\n%v", err, string(out))
+		base.DebugFull("", gr.local, "git rev-list failed: %s %v\n%s", cmdLine, err, string(out))
 		gr.err = err
 		statsPtr.Dir = GRSDIR_INVALID
 		statsPtr.Branch = BRANCH_UNKNOWN
 		return
 	}
-	base.Debug(strings.TrimSpace(string(out)))
+	cmpOut := strings.TrimSpace(string(out))
+	if cmpOut != "0\t0" {
+		base.DebugFull("", gr.local, "%s... %s", cmdLine, cmpOut)
+	}
 	diff, err := parseRevList(out)
 	if err != nil {
-		base.Debug("cannot parse `git rev-list...` output: %q", string(out))
+		base.DebugFull("", gr.local, "cannot parse `git rev-list...` output: %q", string(out))
 		gr.err = err
 		statsPtr.Dir = GRSDIR_INVALID
 		statsPtr.Branch = BRANCH_UNKNOWN
@@ -189,7 +193,7 @@ func (gr *GrsRepo) UpdateIndexStatus() {
 	var out []byte
 	var err error
 	if out, err = command.CombinedOutput(); err != nil {
-		base.Debug("ls-files failed: %v\n%v\n", err, string(out))
+		base.DebugFull("", gr.local, "ls-files failed: %v\n%v\n", err, string(out))
 		return
 	}
 	if len(out) != 0 {
@@ -199,7 +203,7 @@ func (gr *GrsRepo) UpdateIndexStatus() {
 
 	command = gr.commandRunner.Command(gr.git, "diff-index", "HEAD").WithDir(gr.local)
 	if out, err = command.CombinedOutput(); err != nil {
-		base.Debug("diff-index failed: %v\n%v\n", err, string(out))
+		base.DebugFull("", gr.local, "diff-index failed: %v\n%v\n", err, string(out))
 		gr.err = err
 		return
 	}
@@ -220,11 +224,11 @@ func (gr *GrsRepo) Fetch() {
 	command := gr.commandRunner.Command(gr.git, "fetch").WithDir(gr.local)
 	if out, err := command.CombinedOutput(); err != nil {
 		// fetch may have failed for common reasons, such as not adding your ssh key to the agent
-		base.Debug("git fetch failed: %v\n%v", err, string(out))
+		base.DebugFull("", gr.local, "git fetch failed: %v\n%v", err, string(out))
 		gr.err = err
 		return
 	}
-	base.Debug("git fetch ok: %v", gr.local)
+	base.DebugFull("", gr.local, "git fetch ok: %v", gr.local)
 }
 
 // AutoPush attempts to commit any changes and push them to the remote repo
@@ -238,7 +242,7 @@ func (gr *GrsRepo) AutoPush() {
 		return
 	}
 
-	base.Debug("git auto-push eligible: %v", gr.local)
+	base.DebugFull("", gr.local, "AutoPush eligible")
 	commitMsg := AutoPushGenCommitMsg(NewStdClock())
 	var out []byte
 	var err error
@@ -246,14 +250,14 @@ func (gr *GrsRepo) AutoPush() {
 	if gr.stats.Index == INDEX_MODIFIED {
 		command := gr.commandRunner.Command(gr.git, "add", "-A").WithDir(gr.local)
 		if out, err = command.CombinedOutput(); err != nil {
-			base.Debug("git add failed. %v, %v", err, string(out))
+			base.DebugFull("", gr.local, "git add failed. %v, %v", err, string(out))
 			gr.err = err
 			return
 		}
 
 		command = gr.commandRunner.Command(gr.git, "commit", "-m", commitMsg).WithDir(gr.local)
 		if out, err = command.CombinedOutput(); err != nil {
-			base.Debug("git commit failed. commit-msg=%v\nerr-msg:%v\nout:%v", commitMsg, err, string(out))
+			base.DebugFull("", gr.local, "git commit failed. commit-msg=%v\nerr-msg:%v\nout:%v", commitMsg, err, string(out))
 			gr.err = err
 			return
 		}
@@ -262,7 +266,7 @@ func (gr *GrsRepo) AutoPush() {
 	if gr.stats.Branch == BRANCH_UPTODATE || gr.stats.Branch == BRANCH_AHEAD {
 		command = gr.commandRunner.Command(gr.git, "push").WithDir(gr.local)
 		if out, err = command.CombinedOutput(); err != nil {
-			base.Debug("git push failed. %v, %v", err, string(out))
+			base.DebugFull("", gr.local, "git push failed. %v, %v", err, string(out))
 			gr.err = err
 			return
 		}
@@ -274,13 +278,13 @@ func (gr *GrsRepo) AutoPush() {
 
 // AutoRebase runs a smarter version of 'git --rebase'
 func (gr *GrsRepo) AutoRebase() {
-	base.Debug("%s:AutoRebase start", gr.local)
+	base.DebugFull("", gr.local, "AutoRebase start")
 	if gr.err != nil ||
 		gr.stats.Dir != GRSDIR_VALID ||
 		gr.stats.Index == INDEX_UNKNOWN ||
 		gr.stats.Branch == BRANCH_UNKNOWN ||
 		gr.stats.Branch == BRANCH_UNTRACKED {
-		base.Debug("%s:AutoRebase aborted", gr.local)
+		base.DebugFull("", gr.local, "AutoRebase aborted")
 		return
 	}
 
@@ -310,7 +314,7 @@ func (gr *GrsRepo) AutoRebase() {
 		_, err1 := cmd.CombinedOutput()
 		if err1 != nil {
 			//  4. Stop when conflict is detected
-			base.Debug("%s:AutoRebase conflict at %s", gr.local, commit)
+			base.DebugFull("", gr.local, "%s:AutoRebase conflict at %s", gr.local, commit)
 			rebaseErr = err1
 			cmd = gr.commandRunner.Command(gr.git, "rebase", "--abort").WithDir(gr.local)
 			bytes2, err2 := cmd.CombinedOutput()
@@ -335,7 +339,7 @@ func (gr *GrsRepo) AutoFFMerge() {
 	var out []byte
 	var err error
 	if out, err = command.CombinedOutput(); err != nil {
-		base.Debug("git merge failed: %v\n%v\n", err, string(out))
+		base.DebugFull("", gr.local, "git merge failed: %v\n%v\n", err, string(out))
 		gr.err = err
 	}
 }
