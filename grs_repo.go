@@ -270,6 +270,7 @@ func (gr *GrsRepo) AutoPush() {
 			gr.err = err
 			return
 		}
+		base.DebugFull("", gr.local, "AutoPush complete")
 	}
 
 	gr.UpdateIndexStatus()
