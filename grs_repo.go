@@ -330,8 +330,11 @@ func (gr *GrsRepo) AutoRebase() {
 // AutoFFMerge runs git merge --ff-only
 func (gr *GrsRepo) AutoFFMerge() {
 	if gr.err != nil ||
-		gr.stats.Dir != GRSDIR_VALID ||
-		gr.stats.Branch != BRANCH_BEHIND ||
+		gr.stats.Dir == GRSDIR_INVALID ||
+		gr.stats.Branch == BRANCH_AHEAD ||
+		gr.stats.Branch == BRANCH_DIVERGED ||
+		gr.stats.Branch == BRANCH_UNKNOWN ||
+		gr.stats.Branch == BRANCH_UNTRACKED ||
 		gr.stats.Index != INDEX_UNMODIFIED {
 		return
 	}
