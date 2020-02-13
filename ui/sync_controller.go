@@ -41,6 +41,7 @@ func processGrsRepo(gr *grs.GrsRepo) {
 	gr.Fetch()
 	gr.UpdateRepoStatus()
 	gr.UpdateIndexStatus()
+	gr.AutoCommit()
 	switch gr.GetStats().Branch {
 	case grs.BRANCH_BEHIND:
 		gr.AutoFFMerge()

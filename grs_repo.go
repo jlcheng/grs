@@ -231,6 +231,42 @@ func (gr *GrsRepo) Fetch() {
 	base.DebugFull("", gr.local, "git fetch ok: %v", gr.local)
 }
 
+// AutoCommit attempt to commit changes without push changes to remote
+func (gr *GrsRepo) AutoCommit() {
+	if gr.err != nil ||
+		!gr.pushAllowed ||
+		gr.stats.Dir != GRSDIR_VALID ||
+		gr.stats.Index == INDEX_UNKNOWN ||
+		gr.stats.Branch == BRANCH_UNKNOWN ||
+		gr.stats.Branch == BRANCH_UNTRACKED {
+		return
+	}
+
+	base.DebugFull("", gr.local, "AutoPush eligible")
+	commitMsg := AutoPushGenCommitMsg(NewStdClock())
+	var out []byte
+	var err error
+	var command shexec.Command
+	if gr.stats.Index == INDEX_MODIFIED {
+		command = gr.commandRunner.Command(gr.git, "add", "-A").WithDir(gr.local)
+		if out, err = command.CombinedOutput(); err != nil {
+			base.DebugFull("", gr.local, "git add failed. %v, %v", err, string(out))
+			gr.err = err
+			return
+		}
+
+		command = gr.commandRunner.Command(gr.git, "commit", "-m", commitMsg).WithDir(gr.local)
+		if out, err = command.CombinedOutput(); err != nil {
+			base.DebugFull("", gr.local, "git commit failed. commit-msg=%v\nerr-msg:%v\nout:%v", commitMsg, err, string(out))
+			gr.err = err
+			return
+		}
+	}
+
+	gr.UpdateIndexStatus()
+	gr.UpdateRepoStatus()
+}
+
 // AutoPush attempts to commit any changes and push them to the remote repo
 func (gr *GrsRepo) AutoPush() {
 	if gr.err != nil ||
